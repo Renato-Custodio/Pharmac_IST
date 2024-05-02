@@ -9,4 +9,16 @@ export class AccountService {
   async getUsers(): Promise<Account[]> {
     return await this.prismaService.account.findMany();
   }
+
+  async getUser(username: string): Promise<Account | null> {
+    const account = await this.prismaService.account.findFirst({
+      where: {
+        username: {
+          equals: username,
+        },
+      },
+    });
+
+    return account ?? null;
+  }
 }

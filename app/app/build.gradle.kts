@@ -1,13 +1,28 @@
 plugins {
     alias(libs.plugins.androidApplication)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+}
+
+secrets {
+    propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "local.defaults.properties"
+
+    // Configure which keys should be ignored by the plugin by providing regular expressions.
+    // "sdk.dir" is ignored by default
+    ignoreList.add("sdk.*")       // Ignore all keys matching the regexp "sdk.*"
 }
 
 android {
-    namespace = "com.tecnico.pharmacist"
+    namespace = "pt.ulisboa.tecnico.cmov.pharmacist"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
+    }
+
     defaultConfig {
-        applicationId = "com.tecnico.pharmacist"
+        applicationId = "pt.ulisboa.tecnico.cmov.pharmacist"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -19,27 +34,26 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    buildFeatures {
-        viewBinding = true
-    }
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
+    implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.lifecycle.livedata.ktx)
-    implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.navigation.fragment)
-    implementation(libs.navigation.ui)
+    implementation(libs.material)
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

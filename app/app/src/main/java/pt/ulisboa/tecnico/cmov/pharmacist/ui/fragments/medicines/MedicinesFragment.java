@@ -14,14 +14,13 @@ import android.view.ViewGroup;
 
 import com.google.android.material.transition.MaterialFadeThrough;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 
 
-public class MedicinesFragment extends Fragment implements OnItemC {
+public class MedicinesFragment extends Fragment {
 
     RecyclerView recommendedMedicines;
     RecyclerView resultsMedicines;
@@ -56,7 +55,7 @@ public class MedicinesFragment extends Fragment implements OnItemC {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mLayoutManager2 = new LinearLayoutManager(getActivity());
 
-        recommendedMedicines = view.findViewById(R.id.recommended_medicines);
+        recommendedMedicines = view.findViewById(R.id.nearest_pharmacies);
         resultsMedicines = view.findViewById(R.id.medicine_search_results);
 
         medicinesRecyclerAdapter = new MedicinesRecyclerAdapter(test);

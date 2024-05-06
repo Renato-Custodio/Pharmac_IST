@@ -66,12 +66,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="28dp"
             android:text="Sample medicine description and possible side effects and all of that"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/medicineImage"
-            app:layout_constraintTop_toTopOf="@+id/medicineTitle" />
+            app:layout_constraintTop_toBottomOf="@+id/medicineTitle" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

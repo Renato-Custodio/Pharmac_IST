@@ -3,5 +3,5 @@
     <string name="menu_pharmacies">Pharmacies near me</string>
     <string name="menu_medicines">Medicines</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Medicine">Medicine</string>
 </resources>

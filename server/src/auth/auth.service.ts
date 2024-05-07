@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { compare } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { PrismaService } from 'src/core/prisma.service';
 import { LoginDto, TokenRefreshDto, TokensResponse } from './auth.dto';
@@ -111,6 +111,31 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  }
+
+  async createAccount(loginDto: LoginDto): Promise<TokensResponse> {
+    try {
+      // Create the account with the provided username and password
+      const newUser = await this.prismaService.account.create({
+        data: {
+          username: loginDto.username,
+          password: (await hash(loginDto.password, 10)).toString(),
+        },
+      });
+
+      // After successfully creating the account, generate tokens for the newly created account
+      const userId = newUser.id;
+      const accessToken = await this.createAccessToken(userId);
+      const refreshToken = await this.createRefreshToken(userId);
+
+      return {
+        accessToken,
+        refreshToken,
+      };
+    } catch (error) {
+      console.error('Error creating account:', error);
+      throw error;
+    }
   }
 
   async refresh(refreshDto: TokenRefreshDto): Promise<TokensResponse> {

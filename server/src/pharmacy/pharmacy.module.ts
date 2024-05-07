@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { MedicineService } from './medicine.service';
+import { PharmacyService } from './pharmacy.service';
 import { CoreModule } from 'src/core/core.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { AccountService } from 'src/account/account.service';
-import { MedicineController } from './medicine.controller';
+import { PharmacyController } from './pharmacy.controller';
 
 @Module({
   imports: [CoreModule, AuthModule],
-  providers: [MedicineService, AccountService],
-  controllers: [MedicineController],
+  providers: [PharmacyService, AccountService],
+  controllers: [PharmacyController],
 })
-export class MedicineModule {}
+export class PharmacyModule {}

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { Account } from '@prisma/client';
 import { LoginDto, TokenRefreshDto } from 'src/auth/auth.dto';
@@ -24,5 +24,16 @@ export class AccountController {
   @Get()
   async findAll(): Promise<Account[]> {
     return await this.accountService.getUsers();
+  }
+
+  @Put(':accountId/addFavorite/:pharmacyId')
+  async addFavorite(
+    @Param('accountId') accountId: string,
+    @Param('pharmacyId') pharmacyId: string,
+  ): Promise<Account> {
+    return await this.accountService.addFavoritePharmacie(
+      accountId,
+      pharmacyId,
+    );
   }
 }

@@ -1,7 +1,15 @@
 version: '3'
 
 services:
-  cmu-mongo:
-    image: mongo
+  pharmacist-db:
+    build:
+      context: ./database/mongodb_replica
+      args:
+        MONGO_VERSION: 4
+    environment:
+      MONGO_REPLICA_HOST: 127.0.0.1
+      MONGO_REPLICA_PORT: 27017
+      # Use "mongo" instead of "mongosh" before v5.0
+      MONGO_COMMAND: 'mongo'
     ports:
       - "27017:27017"

@@ -1,28 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Medicine } from '@prisma/client';
 import { PrismaService } from 'src/core/prisma.service';
+import { CreateMedicineDto } from './dtos/create-Medicine.dto';
 
 @Injectable()
-export class MedicineService {
+export class MedicineService implements OnModuleInit {
   constructor(private prismaService: PrismaService) {}
-
-  async getMedicines(pageNumber: number): Promise<Medicine[]> {
-    const skip = (pageNumber - 1) * 10;
-    const medicines = await this.prismaService.medicine.findMany({
-      skip: skip,
-      take: 10,
+  async onModuleInit() {
+    const medicineData = [];
+    for (let i = 1; i <= 50; i++) {
+      const medicine = {
+        name: `Medicine ${i}`,
+        purpose: `Purpose ${i}`,
+        picture: '',
+      };
+      medicineData.push(medicine);
+    }
+    await this.prismaService.medicine.createMany({
+      data: medicineData,
     });
-    return medicines;
   }
 
-  async getQuery(
+  async getMedicines(
     query: string,
-    pageNumber: number,
+    pageNumber: number = 1,
   ): Promise<Medicine[] | null> {
     const skip = (pageNumber - 1) * 10;
     const medicine = await this.prismaService.medicine.findMany({
       where: {
-        AND: [{ name: { contains: query } }, { purpose: { contains: query } }],
+        OR: [{ name: { contains: query } }, { purpose: { contains: query } }],
       },
       skip: skip,
       take: 10,
@@ -31,18 +37,12 @@ export class MedicineService {
     return medicine ?? null;
   }
 
-  async createMedicine(data: {
-    name: string;
-    purpose: string;
-    picture: string;
-    quantity: number;
-  }): Promise<Medicine> {
+  async createMedicine(dto: CreateMedicineDto): Promise<Medicine> {
     return await this.prismaService.medicine.create({
       data: {
-        name: data.name,
-        purpose: data.purpose,
-        picture: data.picture,
-        quantity: data.quantity,
+        name: dto.name,
+        purpose: dto.purpose,
+        picture: '',
       },
     });
   }

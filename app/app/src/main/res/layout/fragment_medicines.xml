@@ -20,7 +20,7 @@
             android:layout_height="match_parent">
 
             <com.google.android.material.search.SearchBar
-                android:id="@+id/search_medicine"
+                android:id="@+id/medicine_search_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Search medicine"
@@ -37,7 +37,7 @@
                 android:text="Recommended"
                 android:textSize="24sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/search_medicine" />
+                app:layout_constraintTop_toBottomOf="@+id/medicine_search_bar" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/nearest_pharmacies"
@@ -54,19 +54,20 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.search.SearchView
+            android:id="@+id/medicine_search_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="Search medicine"
             app:backgroundTint="#FBF8FB"
-            app:layout_anchor="@id/search_medicine" >
+            app:layout_anchor="@id/medicine_search_bar">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/medicine_search_results"
-                android:layout_marginTop="24dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="16dp" />
         </com.google.android.material.search.SearchView>
 
 

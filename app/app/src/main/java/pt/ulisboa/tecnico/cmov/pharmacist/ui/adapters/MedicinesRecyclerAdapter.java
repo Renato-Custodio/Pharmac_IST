@@ -7,30 +7,41 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.chip.Chip;
+
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
+import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
 
 public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecyclerAdapter.ViewHolder> {
-    private final List<String> localDataSet;
+    private final List<Medicine> localDataSet;
 
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder)
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textView;
+        private final TextView titleView;
+        private final TextView descriptionView;
 
         public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
 
-            textView = (TextView) view.findViewById(R.id.medicineTitle);
+            titleView = (TextView) view.findViewById(R.id.medicine_title);
+            descriptionView = (TextView) view.findViewById(R.id.medicine_description);
+
         }
 
-        public TextView getTextView() {
-            return textView;
+        public TextView getTitleView() {
+            return titleView;
         }
+
+        public TextView getDescriptionView() {
+            return descriptionView;
+        }
+
     }
 
     /**
@@ -39,7 +50,7 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
      * @param dataSet String[] containing the data to populate views to be used
      * by RecyclerView
      */
-    public MedicinesRecyclerAdapter(List<String> dataSet) {
+    public MedicinesRecyclerAdapter(List<Medicine> dataSet) {
         localDataSet = dataSet;
     }
 
@@ -59,7 +70,8 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
 
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
-        viewHolder.getTextView().setText(localDataSet.get(position));
+        viewHolder.getTitleView().setText(localDataSet.get(position).name);
+        viewHolder.getDescriptionView().setText(localDataSet.get(position).purpose);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

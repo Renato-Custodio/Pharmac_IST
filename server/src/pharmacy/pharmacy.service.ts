@@ -11,7 +11,7 @@ export class PharmacyService implements OnModuleInit {
     const pharmacyData = [];
     for (let i = 1; i <= 50; i++) {
       const pharmacy = {
-        name: `Pharmacy ${i}`,
+        name: `Pharmacy${i}`,
         location: {
           lat: parseFloat((Math.random() * (100 - -200) + -200).toFixed(6)), // Random latitude between 100 and -200
           lng: parseFloat((Math.random() * (100 - -200) + -200).toFixed(6)), // Random longitude between 100 and -200

@@ -10,8 +10,8 @@ export class MedicineService implements OnModuleInit {
     const medicineData = [];
     for (let i = 1; i <= 50; i++) {
       const medicine = {
-        name: `Medicine ${i}`,
-        purpose: `Purpose ${i}`,
+        name: `Medicine${i}`,
+        purpose: `Purpose${i}`,
         picture: '',
       };
       medicineData.push(medicine);

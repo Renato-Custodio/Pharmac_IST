@@ -36,4 +36,15 @@ export class AccountController {
       pharmacyId,
     );
   }
+
+  @Put(':accountId/removeFavorite/:pharmacyId')
+  async removeFavorite(
+    @Param('accountId') accountId: string,
+    @Param('pharmacyId') pharmacyId: string,
+  ): Promise<Account> {
+    return await this.accountService.removeFavoritePharmacy(
+      accountId,
+      pharmacyId,
+    );
+  }
 }

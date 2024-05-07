@@ -4,7 +4,7 @@ import { Medicine, Pharmacy, Stock } from '@prisma/client';
 import { CreatePharmacyDto } from './dtos/create-pharmacy.dto';
 import { CreateStockDto } from './dtos/create-stock.dto';
 
-@Controller('pharmacy')
+@Controller('api/pharmacy')
 export class PharmacyController {
   constructor(private readonly pharmacyService: PharmacyService) {}
 

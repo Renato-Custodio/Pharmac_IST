@@ -7,6 +7,7 @@ import { CreateMedicineDto } from './dtos/create-Medicine.dto';
 export class MedicineService implements OnModuleInit {
   constructor(private prismaService: PrismaService) {}
   async onModuleInit() {
+    await this.prismaService.medicine.deleteMany();
     const medicineData = [];
     for (let i = 1; i <= 50; i++) {
       const medicine = {
@@ -22,18 +23,23 @@ export class MedicineService implements OnModuleInit {
   }
 
   async getMedicines(
-    query: string,
+    query: string = '',
     pageNumber: number = 1,
-  ): Promise<Medicine[] | null> {
+  ): Promise<Partial<Medicine>[] | null> {
     const skip = (pageNumber - 1) * 10;
     const medicine = await this.prismaService.medicine.findMany({
       where: {
         OR: [{ name: { contains: query } }, { purpose: { contains: query } }],
       },
+      select: {
+        id: true,
+        name: true,
+        purpose: true,
+        picture: true,
+      },
       skip: skip,
       take: 10,
     });
-
     return medicine ?? null;
   }
 

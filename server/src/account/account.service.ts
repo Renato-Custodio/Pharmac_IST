@@ -1,16 +1,18 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Account } from '@prisma/client';
+import { hash } from 'bcrypt';
 import { PrismaService } from 'src/core/prisma.service';
 
 @Injectable()
 export class AccountService implements OnModuleInit {
   constructor(private prismaService: PrismaService) {}
   async onModuleInit() {
+    await this.prismaService.account.deleteMany();
     const AccountData = [];
     for (let i = 1; i <= 10; i++) {
       const account = {
         username: `account${i}`,
-        password: `account${i}`,
+        password: (await hash(`account${i}`, 10)).toString(),
       };
       AccountData.push(account);
     }
@@ -86,7 +88,7 @@ export class AccountService implements OnModuleInit {
     }
   }
 
-  async removeFavoritePharmacy(accountId, pharmacyId) {
+  async removeFavoritePharmacy(accountId, pharmacyId): Promise<Account> {
     try {
       // Fetch the account to get its current favorite pharmacies
       const account = await this.prismaService.account.findUnique({
@@ -132,6 +134,53 @@ export class AccountService implements OnModuleInit {
       return updatedAccount;
     } catch (error) {
       console.error('Error removing favorite pharmacy:', error);
+      throw error;
+    }
+  }
+
+  async addFlaggedPharmacy(
+    accountId: string,
+    pharmacyId: string,
+  ): Promise<Account> {
+    try {
+      // Fetch the account to ensure it exists
+      const account = await this.prismaService.account.findUnique({
+        where: {
+          id: accountId,
+        },
+      });
+
+      if (!account) {
+        throw new Error(`Account with ID ${accountId} not found.`);
+      }
+
+      // Check if the pharmacy is already flagged by the account
+      const isAlreadyFlagged =
+        account.flaggedPharmaciesIds.includes(pharmacyId);
+      if (isAlreadyFlagged) {
+        throw new Error(
+          `Pharmacy with ID ${pharmacyId} is already flagged by this account.`,
+        );
+      }
+
+      // Update the account by adding the pharmacy ID to flaggedPharmaciesIds array
+      const updatedAccount = await this.prismaService.account.update({
+        where: {
+          id: accountId,
+        },
+        data: {
+          flaggedPharmaciesIds: {
+            push: pharmacyId,
+          },
+        },
+      });
+
+      console.log(
+        `Pharmacy with ID ${pharmacyId} flagged by account ${accountId}.`,
+      );
+      return updatedAccount;
+    } catch (error) {
+      console.error('Error adding flagged pharmacy:', error);
       throw error;
     }
   }

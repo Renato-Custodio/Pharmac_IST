@@ -3,7 +3,7 @@ import { MedicineService } from './medicine.service';
 import { Medicine } from '@prisma/client';
 import { CreateMedicineDto } from './dtos/create-Medicine.dto';
 
-@Controller('medicine')
+@Controller('api/medicine')
 export class MedicineController {
   constructor(private readonly medicineService: MedicineService) {}
 
@@ -11,7 +11,7 @@ export class MedicineController {
   async findQuery(
     @Query('query') query: string,
     @Query('pageNumber') pageNumber?: number,
-  ): Promise<Medicine[]> {
+  ) {
     return await this.medicineService.getMedicines(query, pageNumber);
   }
 

@@ -8,6 +8,7 @@ import { CreateStockDto } from './dtos/create-stock.dto';
 export class PharmacyService implements OnModuleInit {
   constructor(private prismaService: PrismaService) {}
   async onModuleInit() {
+    await this.prismaService.pharmacy.deleteMany();
     const pharmacyData = [];
     for (let i = 1; i <= 50; i++) {
       const pharmacy = {
@@ -93,7 +94,7 @@ export class PharmacyService implements OnModuleInit {
     });
   }
 
-  async buyMedicine(pharmacyId, medicineId): Promise<Stock> {
+  async buyMedicine(pharmacyId: string, medicineId: string): Promise<Stock> {
     try {
       // Find the stock item based on pharmacyId and medicineId
       const existingStockItem = await this.prismaService.stock.findFirst({

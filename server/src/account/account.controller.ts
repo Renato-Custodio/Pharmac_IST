@@ -4,12 +4,17 @@ import { Account } from '@prisma/client';
 import { LoginDto, TokenRefreshDto } from 'src/auth/auth.dto';
 import { AuthService } from 'src/auth/auth.service';
 
-@Controller('account')
+@Controller('api/account')
 export class AccountController {
   constructor(
     private readonly accountService: AccountService,
     private readonly authService: AuthService,
   ) {}
+
+  @Post('auth/createAccount')
+  async createAccount(@Body() loginDto: LoginDto) {
+    return await this.authService.createAccount(loginDto);
+  }
 
   @Post('auth/login')
   async login(@Body() loginDto: LoginDto) {

@@ -22,7 +22,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
+            app:layout_constraintTop_toBottomOf="@+id/medicine_purpose" />
 
         <TextView
             android:id="@+id/medicine_name"
@@ -89,13 +89,13 @@
             app:chipStartPadding="6dp"
             app:chipStrokeColor="#E8DEF8"
             app:chipSurfaceColor="#6750A4"
-            app:layout_constraintBottom_toTopOf="@+id/textView"
+            app:layout_constraintBottom_toTopOf="@+id/medicine_purpose"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView"
             app:textStartPadding="6dp" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/medicine_purpose"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -108,7 +108,7 @@
             app:layout_constraintTop_toBottomOf="@+id/medicine_name" />
 
         <Button
-            android:id="@+id/iconButton"
+            android:id="@+id/backButton"
             style="?attr/materialIconButtonFilledStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

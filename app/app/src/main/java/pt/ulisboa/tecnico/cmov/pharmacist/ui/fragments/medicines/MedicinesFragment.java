@@ -128,7 +128,7 @@ public class MedicinesFragment extends Fragment {
         recommendedMedicines = view.findViewById(R.id.nearest_pharmacies);
         resultsMedicines = view.findViewById(R.id.medicine_search_results);
 
-        medicinesRecyclerAdapter = new MedicinesRecyclerAdapter(searchResults);
+        medicinesRecyclerAdapter = new MedicinesRecyclerAdapter(searchResults, this);
 
         recommendedMedicines.setLayoutManager(mLayoutManager);
         resultsMedicines.setLayoutManager(mLayoutManager2);

@@ -1,31 +1,101 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { GPSLocation, Medicine, Pharmacy, Stock } from '@prisma/client';
+import {
+  GPSLocation,
+  MapChunk,
+  Medicine,
+  Pharmacy,
+  Stock,
+} from '@prisma/client';
 import { PrismaService } from 'src/core/prisma.service';
 import { CreatePharmacyDto } from './dtos/create-pharmacy.dto';
 import { CreateStockDto } from './dtos/create-stock.dto';
 
+const LAT_MAX = 38.81;
+const LAT_MIN = 38.69;
+const LNG_MAX = -9.05;
+const LNG_MIN = -9.3;
+
+const RANGE = 0.01;
+
 @Injectable()
 export class PharmacyService implements OnModuleInit {
   constructor(private prismaService: PrismaService) {}
+
   async onModuleInit() {
     await this.prismaService.pharmacy.deleteMany();
-    const pharmacyData = [];
-    for (let i = 1; i <= 50; i++) {
+    await this.prismaService.mapChunk.deleteMany();
+
+    for (let i = 1; i <= 261; i++) {
       const pharmacy = {
         name: `Pharmacy${i}`,
         location: {
-          lat: parseFloat((Math.random() * (100 - -200) + -200).toFixed(6)), // Random latitude between 100 and -200
-          lng: parseFloat((Math.random() * (100 - -200) + -200).toFixed(6)), // Random longitude between 100 and -200
+          lat: parseFloat(
+            (Math.random() * (LAT_MAX - LAT_MIN) + LAT_MIN).toFixed(6),
+          ), // Random latitude between 100 and -200
+          lng: parseFloat(
+            (Math.random() * (LNG_MAX - LNG_MIN) + LNG_MIN).toFixed(6),
+          ), // Random longitude between 100 and -200
         },
-        picture: '',
-        rating: '',
-        flagCount: Math.floor(Math.random() * 100) + 1, // Random quantity between 1 and 100
       };
-      pharmacyData.push(pharmacy);
+
+      await this.createPharmacy(pharmacy);
     }
-    await this.prismaService.pharmacy.createMany({
-      data: pharmacyData,
-    });
+
+    this.getMapChunks(38.72, -9.1);
+  }
+
+  private precisionRound(n: number, step: number) {
+    return Math.round((n + Number.EPSILON) * step) / step;
+  }
+
+  async getMapChunks(lat: number, lng: number) {
+    // Find chunks
+
+    const possibleChunks: GPSLocation[] = [
+      {
+        lat,
+        lng,
+      },
+      {
+        lat: lat - RANGE,
+        lng: lng,
+      },
+      {
+        lat: lat + RANGE,
+        lng: lng,
+      },
+      {
+        lat: lat,
+        lng: lng - RANGE,
+      },
+      {
+        lat: lat,
+        lng: lng + RANGE,
+      },
+    ];
+
+    const chunks = possibleChunks.map(({ lat, lng }) =>
+      Buffer.from(`${lat}${lng}`).toString('base64'),
+    );
+
+    return (
+      await this.prismaService.mapChunk.findMany({
+        where: {
+          chunkId: {
+            in: chunks,
+          },
+        },
+        include: {
+          pharmacies: {
+            select: {
+              id: true,
+              name: true,
+              location: true,
+            },
+          },
+        },
+      })
+    ).filter((chunk) => chunk.pharmacies.length > 0);
   }
 
   async getpharmacies(pageNumber: number = 1): Promise<Pharmacy[]> {
@@ -73,6 +143,13 @@ export class PharmacyService implements OnModuleInit {
   }
 
   async createPharmacy(dto: CreatePharmacyDto): Promise<Pharmacy> {
+    const roundedLat = this.precisionRound(dto.location.lat, 50);
+    const roundedLng = this.precisionRound(dto.location.lng, 50);
+    const chunkLocation = `${roundedLat}${roundedLng}`;
+    const chunkId = Buffer.from(chunkLocation).toString('base64');
+
+    console.log(`Pharmacy chunk: ${chunkId} / Coords: ${chunkLocation}`);
+
     return await this.prismaService.pharmacy.create({
       data: {
         name: dto.name,
@@ -80,6 +157,20 @@ export class PharmacyService implements OnModuleInit {
         picture: '',
         rating: '',
         flagCount: 0,
+        mapChunk: {
+          connectOrCreate: {
+            where: {
+              chunkId: chunkId,
+            },
+            create: {
+              chunkId: chunkId,
+              location: {
+                lat: roundedLat,
+                lng: roundedLng,
+              },
+            },
+          },
+        },
       },
     });
   }

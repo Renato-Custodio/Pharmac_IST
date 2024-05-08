@@ -39,6 +39,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.transition.MaterialFadeThrough;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 
@@ -49,7 +51,7 @@ enum MapFocus {
     MARKER
 }
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnMarkerClickListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnCameraIdleListener {
 
     private static final Float DEFAULT_ZOOM = 18f;
     private GoogleMap mapInstance;
@@ -70,6 +72,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private Marker currentSelectedMarker;
     private Location lastKnownLocation;
+
+    private MarkersSystem markersSystem;
 
     // Fragment Lifecycle functions
 
@@ -182,6 +186,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mapInstance = googleMap;
         mapInstance.setMapStyle(MapStyleOptions.loadRawResourceStyle(getActivity().getApplicationContext(), R.raw.map_style));
 
+        markersSystem = new MarkersSystem(mapInstance, getContext());
+
         if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.w("MapFragment", "Location is not enabled, requesting permissions...");
             mapInstance.setMyLocationEnabled(false);
@@ -194,6 +200,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mapInstance.setMyLocationEnabled(true);
         mapInstance.setOnMapLoadedCallback(this);
         mapInstance.setOnCameraMoveStartedListener(this);
+        mapInstance.setOnCameraIdleListener(this);
         mapInstance.setOnMarkerClickListener(this);
     }
 
@@ -213,8 +220,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         }, null);
 
-        mapInstance.addMarker(PharmacyMarker.createNew(getContext(), new LatLng(38.7611, -9.1647)));
-        mapInstance.addMarker(PharmacyMarker.createNew(getContext(), new LatLng(38.7608, -9.1647)));
+        // mapInstance.addMarker(PharmacyMarker.createNew(getContext(), new LatLng(38.7611, -9.1647)));
+        // mapInstance.addMarker(PharmacyMarker.createNew(getContext(), new LatLng(38.7608, -9.1647)));
     }
 
     private void onLocationChanged(@NonNull Location location) {
@@ -242,8 +249,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
     }
 
-    // Point system
-
+    // Markers system
+    @Override
+    public void onCameraIdle() {
+        LatLng coordinates = mapInstance.getCameraPosition().target;
+        markersSystem.update(coordinates, currentSelectedMarker, (marker) -> {
+            Log.d("MapFragment", "Replaced current marker");
+            currentSelectedMarker = marker;
+            PharmacyMarker.setActive(marker, true);
+        });
+    }
 
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {

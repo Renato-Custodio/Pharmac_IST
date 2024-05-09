@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
@@ -14,8 +15,11 @@ import com.google.android.gms.maps.model.Marker;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.client.APIFactory;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.MapChunk;
@@ -33,7 +37,7 @@ public class MarkersSystem {
     private final Context context;
 
     public MarkersSystem(GoogleMap mapInstance, Context context) {
-        this.mapCache = new LruCache<>(10);
+        this.mapCache = new LruCache<>(50);
         this.markers = new ArrayList<>();
         this.mapInstance = mapInstance;
         this.context = context;
@@ -48,7 +52,7 @@ public class MarkersSystem {
         return Base64.getEncoder().encodeToString(MessageFormat.format("{0}{1}", coord.latitude, coord.longitude).getBytes());
     }
 
-    public void refreshPoints(Pharmacy selectedPharmacy, Consumer<Marker> callback) {
+    public void refreshPoints(Set<String> newChunksIds, Pharmacy selectedPharmacy, Consumer<Marker> selectedMarkerCallback) {
         if (!this.markers.isEmpty()) {
             this.markers.forEach(Marker::remove);
             this.markers.clear();
@@ -62,9 +66,14 @@ public class MarkersSystem {
                     this.markers.add(marker);
                     marker.setTag(pharmacy);
 
+                    if (newChunksIds.contains(chunk.chunkId)) {
+                        ObjectAnimator.ofFloat(marker, "alpha", 0f, 1f).setDuration(500).start();
+                    }
+
                     if (selectedPharmacy != null) {
                         if (selectedPharmacy.id.equals(pharmacy.id)) {
-                            callback.accept(marker);
+                            // Persist selected marker after points refresh
+                            selectedMarkerCallback.accept(marker);
                         }
                     }
                 }
@@ -72,6 +81,7 @@ public class MarkersSystem {
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void update(LatLng coord, Marker selectedMarker, Consumer<Marker> callback) {
         // Do we have this marker in the cache?
         LatLng roundedCoord = new LatLng(roundDecimal(coord.latitude, 100), roundDecimal(coord.longitude, 100));
@@ -88,15 +98,21 @@ public class MarkersSystem {
             chunks.enqueue(new Callback<List<MapChunk>>() {
                 @Override
                 public void onResponse(Call<List<MapChunk>> call, Response<List<MapChunk>> response) {
+                    Set<String> loadedChunkIds = new HashSet<>();
+
                     response.body().forEach((chunk) -> {
                         mapCache.put(chunk.chunkId, chunk);
+                        loadedChunkIds.add(chunk.chunkId);
                     });
-                    refreshPoints(selectedPharmacy, callback);
+
+                    Log.d("MarkersSystem", MessageFormat.format("Loaded chunks: {0}", loadedChunkIds));
+
+                    refreshPoints(loadedChunkIds, selectedPharmacy, callback);
                 }
 
                 @Override
                 public void onFailure(Call<List<MapChunk>> call, Throwable t) {
-                    Log.e("MarkersSystem", t.getMessage());
+                    Log.e("MarkersSystem", MessageFormat.format("doGetMapFragment: {0}", t.getMessage()));
                     call.cancel();
                 }
             });

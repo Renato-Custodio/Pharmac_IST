@@ -78,7 +78,7 @@ export class PharmacyService implements OnModuleInit {
       Buffer.from(`${lat}${lng}`).toString('base64'),
     );
 
-    return (
+    const retrievedChunks = (
       await this.prismaService.mapChunk.findMany({
         where: {
           chunkId: {
@@ -96,6 +96,25 @@ export class PharmacyService implements OnModuleInit {
         },
       })
     ).filter((chunk) => chunk.pharmacies.length > 0);
+
+    const retrievedChunksIds = retrievedChunks.map((chunk) => chunk.chunkId);
+
+    // Fill non existent chunks for cache
+    chunks.forEach((chunk) => {
+      if (!retrievedChunksIds.includes(chunk)) {
+        retrievedChunks.push({
+          id: 'mock_chunk',
+          chunkId: chunk,
+          pharmacies: [],
+          location: {
+            lat: 0,
+            lng: 0,
+          },
+        });
+      }
+    });
+
+    return retrievedChunks;
   }
 
   async getpharmacies(pageNumber: number = 1): Promise<Pharmacy[]> {

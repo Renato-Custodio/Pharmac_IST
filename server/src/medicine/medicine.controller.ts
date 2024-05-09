@@ -2,7 +2,6 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { MedicineService } from './medicine.service';
 import { Medicine } from '@prisma/client';
 import { CreateMedicineDto } from './dtos/create-Medicine.dto';
-import { LocationDto } from './dtos/location.dto';
 
 @Controller('api/medicine')
 export class MedicineController {
@@ -18,12 +17,14 @@ export class MedicineController {
 
   @Get(':medicineId/closestPharmacies')
   async getClosestPharmacies(
-    @Body() location: LocationDto,
+    @Query('latitude') latitude,
+    @Query('longitude') longitude,
     @Param('medicineId') medicineId,
   ) {
     return await this.medicineService.getClosestPharmacies(
       medicineId,
-      location,
+      parseInt(latitude),
+      parseInt(longitude),
     );
   }
 

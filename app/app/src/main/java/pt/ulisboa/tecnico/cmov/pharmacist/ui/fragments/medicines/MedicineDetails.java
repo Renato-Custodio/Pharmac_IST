@@ -56,6 +56,7 @@ public class MedicineDetails extends Fragment {
         TextView nameTextView = rootView.findViewById(R.id.medicine_name);
         TextView purposeTextView = rootView.findViewById(R.id.medicine_purpose);
         //TextView imageTextView = rootView.findViewById(R.id.imageView);
+        TextView nearestPharmaciesTextView = rootView.findViewById(R.id.nearest_pharmacies);
 
         Button backButton = rootView.findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {

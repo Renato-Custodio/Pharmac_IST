@@ -3,7 +3,6 @@ import { GPSLocation, Medicine, Pharmacy } from '@prisma/client';
 import { PrismaService } from 'src/core/prisma.service';
 import { CreateMedicineDto } from './dtos/create-Medicine.dto';
 import { getDistance } from 'geolib';
-import { LocationDto } from './dtos/location.dto';
 
 @Injectable()
 export class MedicineService implements OnModuleInit {
@@ -57,7 +56,8 @@ export class MedicineService implements OnModuleInit {
 
   async getClosestPharmacies(
     medicineId: string,
-    currentLocation: LocationDto,
+    latitude: number,
+    longitude: number,
   ): Promise<Pharmacy[]> {
     //closest pharmacies
     const avaliablePharmacies = await this.prismaService.stock.findMany({
@@ -73,7 +73,7 @@ export class MedicineService implements OnModuleInit {
     const pharmaciesWithDistances = avaliablePharmacies.map((stock) => {
       const pharmacy = stock.pharmacy;
       const distance = this.calculateDistance(
-        { lat: currentLocation.latitude, lng: currentLocation.longitude },
+        { lat: latitude, lng: longitude },
         {
           lat: pharmacy.location.lat,
           lng: pharmacy.location.lng,

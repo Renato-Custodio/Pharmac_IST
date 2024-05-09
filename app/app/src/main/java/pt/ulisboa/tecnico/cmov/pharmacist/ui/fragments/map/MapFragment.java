@@ -2,6 +2,8 @@ package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -19,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -35,9 +38,14 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.List;
+import java.util.Locale;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
+import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Pharmacy;
 
 
 enum MapFocus {
@@ -265,7 +273,40 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         if (currentSelectedMarker != null) {
             PharmacyMarker.setActive(currentSelectedMarker, false);
         }
+        Pharmacy pharmacy = (Pharmacy) marker.getTag();
+        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());;
 
+
+        View bottomSheetView = getView().findViewById(R.id.pharmacy_details);
+        TextView textViewTitle = bottomSheetView.findViewById(R.id.textView5);
+        TextView textViewLocation = bottomSheetView.findViewById(R.id.textView6);
+        if (textViewTitle != null && pharmacy != null) {
+            textViewTitle.setText(pharmacy.name);
+            // Get address from coordinates using Geocoder
+            try {
+                List<Address> addresses = geocoder.getFromLocation(
+                        marker.getPosition().latitude,
+                        marker.getPosition().longitude,
+                        1
+                );
+                if (addresses != null && addresses.size() > 0) {
+                    Address address = addresses.get(0);
+                    StringBuilder addressBuilder = new StringBuilder();
+                    for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
+                        addressBuilder.append(address.getAddressLine(i));
+                        if (i < address.getMaxAddressLineIndex()) {
+                            addressBuilder.append(", ");
+                        }
+                    }
+                    textViewLocation.setText(addressBuilder.toString());
+                } else {
+                    textViewLocation.setText("Address not found");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                textViewLocation.setText("Address not available");
+            }
+        }
         currentSelectedMarker = marker;
 
         PharmacyMarker.setActive(marker, true);

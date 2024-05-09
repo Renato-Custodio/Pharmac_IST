@@ -38,6 +38,13 @@ type GPSLocation {
   lng Float
 }
 
+model MapChunk {
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  chunkId    String      @unique
+  location   GPSLocation
+  pharmacies Pharmacy[]
+}
+
 model Pharmacy {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
   name         String
@@ -57,6 +64,9 @@ model Pharmacy {
 
   flaggedByIds String[]  @db.ObjectId
   flaggedBy    Account[] @relation(name: "FlaggedPharmacies", fields: [flaggedByIds], references: [id])
+
+  mapChunk   MapChunk? @relation(fields: [mapChunkId], references: [id])
+  mapChunkId String?   @db.ObjectId
 }
 
 model Stock {

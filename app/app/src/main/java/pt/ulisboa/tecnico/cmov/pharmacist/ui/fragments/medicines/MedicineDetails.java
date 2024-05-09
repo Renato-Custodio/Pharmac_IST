@@ -13,6 +13,7 @@ import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
 
 import com.google.android.material.transition.MaterialFadeThrough;
+import com.google.android.material.transition.MaterialSharedAxis;
 
 public class MedicineDetails extends Fragment {
 
@@ -37,7 +38,8 @@ public class MedicineDetails extends Fragment {
         if (getArguments() != null) {
             mMedicine = getArguments().getParcelable(ARG_MEDICINE);
         }
-        setEnterTransition(new MaterialFadeThrough());
+        setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+        setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
     }
 
     @Override

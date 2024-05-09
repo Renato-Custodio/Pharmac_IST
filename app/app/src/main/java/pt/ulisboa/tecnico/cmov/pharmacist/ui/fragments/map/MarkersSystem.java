@@ -1,10 +1,11 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
-import static java.security.AccessController.getContext;
-
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import android.util.LruCache;
+
+import androidx.annotation.RequiresApi;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -13,10 +14,7 @@ import com.google.android.gms.maps.model.Marker;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.client.APIFactory;
@@ -27,9 +25,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MarkersSystem {
-
-    private static final double RANGE = 0.01;
-    private LruCache<String, MapChunk> mapCache;
+    private final LruCache<String, MapChunk> mapCache;
     private final List<Marker> markers;
 
     private final GoogleMap mapInstance;
@@ -47,6 +43,7 @@ public class MarkersSystem {
         return (double) Math.round(a * dec) / dec;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public String getChunkId(LatLng coord) {
         return Base64.getEncoder().encodeToString(MessageFormat.format("{0}{1}", coord.latitude, coord.longitude).getBytes());
     }

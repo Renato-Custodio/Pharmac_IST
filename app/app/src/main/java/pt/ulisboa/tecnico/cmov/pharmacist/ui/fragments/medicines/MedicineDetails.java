@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
 
-import com.google.android.material.transition.MaterialFadeThrough;
 import com.google.android.material.transition.MaterialSharedAxis;
 
 public class MedicineDetails extends Fragment {
@@ -20,12 +19,18 @@ public class MedicineDetails extends Fragment {
     private static final String ARG_MEDICINE = "arg_medicine";
     private Medicine mMedicine;
 
-    public MedicineDetails() {
+
+    public interface back {
+        void back();
+    }
+    private final back back;
+    public MedicineDetails(MedicineDetails.back back) {
         // Required empty public constructor
+        this.back = back;
     }
 
-    public static MedicineDetails newInstance(Medicine medicine) {
-        MedicineDetails fragment = new MedicineDetails();
+    public static MedicineDetails newInstance(Medicine medicine, back back) {
+        MedicineDetails fragment = new MedicineDetails(back);
         Bundle args = new Bundle();
         args.putParcelable(ARG_MEDICINE, medicine);
         fragment.setArguments(args);
@@ -57,7 +62,7 @@ public class MedicineDetails extends Fragment {
             @Override
             public void onClick(View v) {
                 // Navigate back to the previous fragment
-                getParentFragmentManager().popBackStack();
+                back.back();
             }
         });
 

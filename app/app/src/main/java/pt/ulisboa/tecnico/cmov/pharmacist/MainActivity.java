@@ -15,17 +15,24 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.navigation.NavigationBarView;
 
+import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.databinding.ActivityMainBinding;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.MapFragment;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicineDetails;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicinesFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MedicinesRecyclerAdapter.OnItemClickListener, MedicineDetails.back{
 
     ActivityMainBinding binding;
     MapFragment mapFragment;
     MedicinesFragment medicinesFragment;
 
     Fragment current;
+
+    Fragment details = new Fragment();
+
+    int medicinesOrDetails = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         mapFragment = new MapFragment();
-        medicinesFragment = new MedicinesFragment();
+        medicinesFragment = MedicinesFragment.newInstance(this);
 
         addFragment(mapFragment);
         addFragment(medicinesFragment);
@@ -51,7 +58,13 @@ public class MainActivity extends AppCompatActivity {
                 if (menuItemId == R.id.pharmacies_map) {
                     replaceFragment(mapFragment);
                 } else if (menuItemId == R.id.medicines) {
-                    replaceFragment(medicinesFragment);
+                    if(medicinesOrDetails == 0){
+                        replaceFragment(medicinesFragment);
+                    }else{
+                        addFragment(details);
+                        replaceFragment(details);
+                    }
+
                 }
 
                 return true;
@@ -71,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
 
         transaction.add(R.id.fragmentContainerView, fragment);
         transaction.hide(fragment);
-
         transaction.commit();
     }
 
@@ -81,7 +93,28 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         if (current != null) transaction.hide(current);
         transaction.show(fragment);
+        if(fragment == details){
+            this.medicinesOrDetails = 1;
+        } else if (fragment == medicinesFragment) {
+            this.medicinesOrDetails = 0;
+        }
+        if(current == details && details != fragment) {
+            transaction.remove(details);
+        }
         current = fragment;
         transaction.commit();
+    }
+
+    @Override
+    public void onItemClicked(Medicine medicine) {
+        MedicineDetails newFragment = MedicineDetails.newInstance(medicine, this);
+        details = newFragment;
+        addFragment(newFragment);
+        replaceFragment(newFragment);
+    }
+
+    @Override
+    public void back() {
+        replaceFragment(medicinesFragment);
     }
 }

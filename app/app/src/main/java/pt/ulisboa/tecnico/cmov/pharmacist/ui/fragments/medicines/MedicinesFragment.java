@@ -50,7 +50,13 @@ public class MedicinesFragment extends Fragment {
 
     // Search results
     private List<Medicine> searchResults = new ArrayList<>();
+    private MedicinesRecyclerAdapter.OnItemClickListener listener;
 
+    public static MedicinesFragment newInstance(MedicinesRecyclerAdapter.OnItemClickListener listener) {
+        MedicinesFragment fragment = new MedicinesFragment();
+        fragment.listener = listener;
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -131,7 +137,7 @@ public class MedicinesFragment extends Fragment {
         recommendedMedicines = view.findViewById(R.id.nearest_pharmacies);
         resultsMedicines = view.findViewById(R.id.medicine_search_results);
 
-        medicinesRecyclerAdapter = new MedicinesRecyclerAdapter(searchResults, this);
+        medicinesRecyclerAdapter = new MedicinesRecyclerAdapter(searchResults, this, listener);
         recommendedMedicines.setLayoutManager(mLayoutManager);
         recommendedMedicines.setAdapter(medicinesRecyclerAdapter);
 

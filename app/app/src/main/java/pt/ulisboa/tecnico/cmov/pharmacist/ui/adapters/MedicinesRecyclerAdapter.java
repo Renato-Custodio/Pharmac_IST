@@ -1,28 +1,26 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters;
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicineDetails;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicinesFragment;
 
 public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecyclerAdapter.ViewHolder> {
     private static List<Medicine> localDataSet = null;
     private static Fragment fragment = null;
+
+    public interface OnItemClickListener {
+        void onItemClicked(Medicine medicine);
+    }
+    private final OnItemClickListener itemClickListener;
 
     /**
      * Initialize the dataset of the Adapter
@@ -30,10 +28,13 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
      * @param dataSet String[] containing the data to populate views to be used
      * by RecyclerView
      */
-    public MedicinesRecyclerAdapter(List<Medicine> dataSet, Fragment incomingFragment) {
+    public MedicinesRecyclerAdapter(List<Medicine> dataSet, Fragment incomingFragment, OnItemClickListener listener) {
         localDataSet = dataSet;
         fragment = incomingFragment;
+        itemClickListener = listener;
     }
+
+
 
     /**
      * Provide a reference to the type of views that you are using
@@ -44,10 +45,13 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
         private final TextView descriptionView;
         private final View rootView;
 
-        public ViewHolder(View view) {
+        private final OnItemClickListener itemClickListener;
+
+        public ViewHolder(View view, OnItemClickListener itemClickListener) {
             super(view);
             // Define click listener for the ViewHolder's View
             rootView = view;
+            this.itemClickListener = itemClickListener;
             rootView.setOnClickListener(this);
             titleView = (TextView) view.findViewById(R.id.medicine_title);
             descriptionView = (TextView) view.findViewById(R.id.medicine_description);
@@ -67,24 +71,8 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
             // For example, you can get the clicked item position using getAdapterPosition()
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-
                 Medicine clickedMedicine = localDataSet.get(position);
-                // Get reference to the FragmentManager
-                FragmentManager fragmentManager = fragment.requireActivity().getSupportFragmentManager();
-
-                // Start a fragment transaction
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-                // Replace the current fragment with your new fragment
-                MedicineDetails newFragment = MedicineDetails.newInstance(clickedMedicine);
-
-                transaction.replace(R.id.fragmentContainerView, newFragment); // R.id.fragment_container is the id of the container where you want to replace the fragments
-
-                // You can also add the transaction to the back stack, so the user can navigate back
-                transaction.addToBackStack(null);
-
-                // Commit the transaction
-                transaction.commit();
+                itemClickListener.onItemClicked(clickedMedicine);
             }
         }
     }
@@ -96,7 +84,7 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.medicine_card_item, viewGroup, false);
 
-        return new ViewHolder(view);
+        return new ViewHolder(view, itemClickListener);
     }
 
     // Replace the contents of a view (invoked by the layout manager)

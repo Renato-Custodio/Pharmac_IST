@@ -1,11 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import {
-  GPSLocation,
-  MapChunk,
-  Medicine,
-  Pharmacy,
-  Stock,
-} from '@prisma/client';
+import { GPSLocation, Medicine, Pharmacy, Stock } from '@prisma/client';
 import { PrismaService } from 'src/core/prisma.service';
 import { CreatePharmacyDto } from './dtos/create-pharmacy.dto';
 import { CreateStockDto } from './dtos/create-stock.dto';
@@ -42,6 +36,24 @@ export class PharmacyService implements OnModuleInit {
     }
 
     this.getMapChunks(38.72, -9.1);
+
+    this.randomlyAssignMedicinesToPharmacies();
+  }
+
+  async randomlyAssignMedicinesToPharmacies(): Promise<void> {
+    const pharmacies = await this.getPharmacies();
+    const medicines = await this.prismaService.medicine.findMany();
+
+    for (const medicine of medicines) {
+      const randomPharmacy =
+        pharmacies[Math.floor(Math.random() * pharmacies.length)];
+      const quantity = Math.floor(Math.random() * 100); // You can adjust the quantity as needed
+      await this.addMedicine({
+        medicineID: medicine.id,
+        quantity: quantity,
+        pharmacyId: randomPharmacy.id,
+      });
+    }
   }
 
   private precisionRound(n: number, step: number) {
@@ -117,7 +129,7 @@ export class PharmacyService implements OnModuleInit {
     return retrievedChunks;
   }
 
-  async getpharmacies(pageNumber: number = 1): Promise<Pharmacy[]> {
+  async getPharmacies(pageNumber: number = 1): Promise<Pharmacy[]> {
     const skip = (pageNumber - 1) * 10;
     const pharmacies = await this.prismaService.pharmacy.findMany({
       skip: skip,

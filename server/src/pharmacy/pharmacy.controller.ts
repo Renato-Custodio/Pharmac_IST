@@ -12,7 +12,7 @@ import { PharmacyService } from './pharmacy.service';
 import { Medicine, Pharmacy, Stock } from '@prisma/client';
 import { CreatePharmacyDto } from './dtos/create-pharmacy.dto';
 import { CreateStockDto } from './dtos/create-stock.dto';
-import { isNumber, isNumberString } from 'class-validator';
+import { isNumberString } from 'class-validator';
 
 @Controller('api/pharmacy')
 export class PharmacyController {
@@ -20,7 +20,7 @@ export class PharmacyController {
 
   @Get('getAll')
   async findAll(@Query('pageNumber') pageNumber?: number): Promise<Pharmacy[]> {
-    return await this.pharmacyService.getpharmacies(pageNumber);
+    return await this.pharmacyService.getPharmacies(pageNumber);
   }
 
   @Get(':pharmacyId/medicines')

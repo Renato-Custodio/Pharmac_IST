@@ -146,6 +146,7 @@ public class MedicinesFragment extends Fragment {
             searchBar.setText(searchView.getText());
             searchView.hide();
         });
+
         resultsMedicines.setLayoutManager(mLayoutManager2);
         resultsMedicines.setAdapter(searchRecyclerAdapter);
 

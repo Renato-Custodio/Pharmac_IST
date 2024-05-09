@@ -30,10 +30,10 @@
             android:layout_height="match_parent">
 
             <com.google.android.material.search.SearchBar
-                android:id="@+id/search_bar"
+                android:id="@+id/address_search_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Search pharmacy by name or location"
+                android:hint="Search location"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -44,7 +44,7 @@
                 android:layout_gravity="end"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/search_bar">
+                app:layout_constraintTop_toBottomOf="@+id/address_search_bar">
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/focus_action_button"
@@ -79,10 +79,21 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.search.SearchView
+            android:id="@+id/address_search_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="Search by name or location"
-            app:layout_anchor="@id/search_bar"/>
+            app:layout_anchor="@id/address_search_bar">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/address_search_results"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="16dp" />
+
+        </com.google.android.material.search.SearchView>
 
         <FrameLayout
             android:id="@+id/pharmacy_details"

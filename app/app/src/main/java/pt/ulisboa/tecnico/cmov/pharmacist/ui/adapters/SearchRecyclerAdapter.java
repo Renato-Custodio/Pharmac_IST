@@ -45,7 +45,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchRecyclerAd
             rootView = view;
             this.searchCallback = searchCallback;
             rootView.setOnClickListener(this);
-            titleView = (TextView) view.findViewById(R.id.medicine_search_title);
+            titleView = (TextView) view.findViewById(R.id.simple_list_item_title);
         }
 
         public TextView getTitleView() {
@@ -69,7 +69,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchRecyclerAd
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the list item
         View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.medicine_card_item_search, viewGroup, false);
+                .inflate(R.layout.simple_list_item, viewGroup, false);
 
         return new ViewHolder(view, searchCallback);
     }

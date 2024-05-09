@@ -82,7 +82,7 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the list item
         View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.medicine_card_item, viewGroup, false);
+                .inflate(R.layout.medicine_list_item, viewGroup, false);
 
         return new ViewHolder(view, itemClickListener);
     }

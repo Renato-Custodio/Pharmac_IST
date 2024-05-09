@@ -16,7 +16,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,16 +40,22 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.search.SearchBar;
+import com.google.android.material.search.SearchView;
 
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
 
+import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Pharmacy;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.PlacesAutoCompleteAdapter;
 
 
 enum MapFocus {
@@ -78,6 +88,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private MarkersSystem markersSystem;
 
+    private RecyclerView addressResultsView;
+    private SearchView searchView;
+    private PlacesAutoCompleteAdapter mAutoCompleteAdapter;
+    private SearchBar searchBar;
+
     // Fragment Lifecycle functions
 
     @Override
@@ -86,6 +101,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         if (savedInstanceState != null) {
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
         }
+
+        Places.initialize(getActivity().getApplicationContext(), BuildConfig.MAPS_API_KEY);
 
     }
 
@@ -102,6 +119,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -154,6 +172,50 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
             @Override
             public void onSlide(@NonNull View view, float v) {}
+        });
+
+        // Initialize places search
+        addressResultsView = view.findViewById(R.id.address_search_results);
+        searchView = view.findViewById(R.id.address_search_view);
+        searchBar = view.findViewById(R.id.address_search_bar);
+
+        mAutoCompleteAdapter = new PlacesAutoCompleteAdapter(getContext());
+        addressResultsView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mAutoCompleteAdapter.setClickListener(new PlacesAutoCompleteAdapter.ClickListener() {
+            @Override
+            public void click(Place place) {
+                searchView.setText(place.getAddress());
+                searchBar.setText(searchView.getText());
+                searchView.hide();
+
+                LatLng position = place.getLatLng();
+
+                if (position != null) {
+                    unfocused();
+                    mapInstance.animateCamera(CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM));
+                }
+            }
+        });
+
+        addressResultsView.setAdapter(mAutoCompleteAdapter);
+        mAutoCompleteAdapter.notifyDataSetChanged();
+
+        searchView.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().isEmpty()) {
+                    mAutoCompleteAdapter.getFilter().filter(s.toString());
+                    if (addressResultsView.getVisibility() == View.GONE) {addressResultsView.setVisibility(View.VISIBLE);}
+                } else {
+                    if (addressResultsView.getVisibility() == View.VISIBLE) {addressResultsView.setVisibility(View.GONE);}
+                }
+            }
         });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()

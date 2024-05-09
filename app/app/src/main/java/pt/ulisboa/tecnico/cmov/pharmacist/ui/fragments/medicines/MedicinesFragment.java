@@ -27,6 +27,7 @@ import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.APIFactory;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.SearchRecyclerAdapter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -36,6 +37,7 @@ public class MedicinesFragment extends Fragment {
 
     RecyclerView recommendedMedicines;
     MedicinesRecyclerAdapter medicinesRecyclerAdapter;
+    SearchRecyclerAdapter searchRecyclerAdapter;
 
     RecyclerView.LayoutManager mLayoutManager;
 
@@ -74,6 +76,7 @@ public class MedicinesFragment extends Fragment {
                 searchResults.clear();
                 searchResults.addAll(response.body());
                 medicinesRecyclerAdapter.notifyDataSetChanged();
+                searchRecyclerAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -129,12 +132,16 @@ public class MedicinesFragment extends Fragment {
         resultsMedicines = view.findViewById(R.id.medicine_search_results);
 
         medicinesRecyclerAdapter = new MedicinesRecyclerAdapter(searchResults, this);
-
         recommendedMedicines.setLayoutManager(mLayoutManager);
-        resultsMedicines.setLayoutManager(mLayoutManager2);
-
         recommendedMedicines.setAdapter(medicinesRecyclerAdapter);
-        resultsMedicines.setAdapter(medicinesRecyclerAdapter);
+
+        searchRecyclerAdapter = new SearchRecyclerAdapter(searchResults, (query) -> {
+            searchView.setText(query);
+            searchBar.setText(searchView.getText());
+            searchView.hide();
+        });
+        resultsMedicines.setLayoutManager(mLayoutManager2);
+        resultsMedicines.setAdapter(searchRecyclerAdapter);
 
         registerSearchEvents();
 

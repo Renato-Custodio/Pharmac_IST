@@ -1,3 +1,4 @@
+import { Pharmacy } from '@prisma/client';
 import { IsNotEmpty, IsPositive, IsString } from 'class-validator';
 
 export class CreateMedicineDto {
@@ -12,4 +13,9 @@ export class CreateMedicineDto {
   @IsPositive()
   @IsNotEmpty()
   quantity: number;
+}
+
+export class ReturnPharmaciesDto {
+  pharmacy: Partial<Pharmacy>;
+  distance: number;
 }

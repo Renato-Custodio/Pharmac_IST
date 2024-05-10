@@ -1,6 +1,9 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines;
 
+import android.annotation.SuppressLint;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,17 +11,38 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
+import pt.ulisboa.tecnico.cmov.pharmacist.client.APIFactory;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
+import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.PharmacyDistance;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.ClosestPharmaciesRecyclerAdapter;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import com.google.android.material.transition.MaterialSharedAxis;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MedicineDetails extends Fragment {
 
     private static final String ARG_MEDICINE = "arg_medicine";
     private Medicine mMedicine;
 
+    private RecyclerView nearestPharmacies;
+    private SharedLocationViewModel sharedLocationViewModel;
+
+    private RecyclerView.LayoutManager mLayoutManager;
+
+    private ClosestPharmaciesRecyclerAdapter nearestPharmaciesAdapter;
+
+    private List<PharmacyDistance> recivedPharmacies = new ArrayList<PharmacyDistance>();
 
     public interface back {
         void back();
@@ -43,8 +67,29 @@ public class MedicineDetails extends Fragment {
         if (getArguments() != null) {
             mMedicine = getArguments().getParcelable(ARG_MEDICINE);
         }
+        sharedLocationViewModel = new ViewModelProvider(requireActivity()).get(SharedLocationViewModel.class);
         setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
         setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+    }
+
+    private void closestPharmacies(String medicineId, String lat, String lng) {
+        Call<List<PharmacyDistance>> closestPharmacies = APIFactory.getInterface().doGetClosestPharmacies(medicineId, lat, lng);
+        closestPharmacies.enqueue(new Callback<List<PharmacyDistance>>() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onResponse(Call<List<PharmacyDistance>> call, Response<List<PharmacyDistance>> response) {
+                recivedPharmacies.clear();
+                recivedPharmacies.addAll(response.body());
+                System.out.println(recivedPharmacies);
+                nearestPharmaciesAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Call<List<PharmacyDistance>> call, Throwable t) {
+                Log.e("closestPharmacies", t.getMessage());
+                call.cancel();
+            }
+        });
     }
 
     @Override
@@ -56,7 +101,7 @@ public class MedicineDetails extends Fragment {
         TextView nameTextView = rootView.findViewById(R.id.medicine_name);
         TextView purposeTextView = rootView.findViewById(R.id.medicine_purpose);
         //TextView imageTextView = rootView.findViewById(R.id.imageView);
-        TextView nearestPharmaciesTextView = rootView.findViewById(R.id.nearest_pharmacies);
+        nearestPharmacies = rootView.findViewById(R.id.nearest_pharmacies);
 
         Button backButton = rootView.findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -69,10 +114,17 @@ public class MedicineDetails extends Fragment {
 
         // Set text based on the Medicine object
         if (mMedicine != null) {
+            Location currentLocation = sharedLocationViewModel.getLocation();
+            nearestPharmaciesAdapter = new ClosestPharmaciesRecyclerAdapter(recivedPharmacies);
             nameTextView.setText(mMedicine.name);
             purposeTextView.setText(mMedicine.purpose);
             //falta a imagem
-            //logica das farmacias mais proximas
+            mLayoutManager = new LinearLayoutManager(getActivity());
+            nearestPharmacies.setLayoutManager(mLayoutManager);
+            nearestPharmacies.setAdapter(nearestPharmaciesAdapter);
+
+            closestPharmacies(mMedicine.id,String.valueOf((int) Math.round(currentLocation.getLatitude())),
+                    String.valueOf((int) Math.round(currentLocation.getLongitude())));
         }
 
         return rootView;

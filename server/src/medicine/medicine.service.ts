@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { GPSLocation, Medicine, Pharmacy } from '@prisma/client';
+import { GPSLocation, Medicine } from '@prisma/client';
 import { PrismaService } from 'src/core/prisma.service';
-import { CreateMedicineDto } from './dtos/create-Medicine.dto';
+import {
+  CreateMedicineDto,
+  ReturnPharmaciesDto,
+} from './dtos/create-Medicine.dto';
 import { getDistance } from 'geolib';
 
 @Injectable()
@@ -43,7 +46,7 @@ export class MedicineService {
     medicineId: string,
     latitude: number,
     longitude: number,
-  ): Promise<Pharmacy[]> {
+  ): Promise<ReturnPharmaciesDto[]> {
     //closest pharmacies
     const avaliablePharmacies = await this.prismaService.stock.findMany({
       where: {
@@ -70,7 +73,7 @@ export class MedicineService {
     pharmaciesWithDistances.sort((a, b) => a.distance - b.distance);
 
     // Return the 10 closest pharmacies
-    return pharmaciesWithDistances.slice(0, 10).map((entry) => entry.pharmacy);
+    return pharmaciesWithDistances.slice(0, 10);
   }
 
   async createMedicine(dto: CreateMedicineDto): Promise<Medicine> {

@@ -113,7 +113,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(KEY_LOCATION, sharedLocationViewModel.getLocation());
+        outState.putParcelable(KEY_LOCATION, sharedLocationViewModel.getLocation().getValue());
     }
 
     @Override
@@ -156,7 +156,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             @Override
             public void onClick(View v) {
                 focus = MapFocus.CURRENT_POSITION;
-                onLocationChanged(sharedLocationViewModel.getLocation());
+                onLocationChanged(sharedLocationViewModel.getLocation().getValue());
                 focusButton.setVisibility(View.INVISIBLE);
             }
         });
@@ -291,7 +291,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void onLocationChanged(@NonNull Location location) {
-        Location lastKnownLocation = sharedLocationViewModel.getLocation();
+        Location lastKnownLocation = sharedLocationViewModel.getLocation().getValue();
         lastKnownLocation = focus != MapFocus.CURRENT_POSITION ? lastKnownLocation : location;
         if (focus != MapFocus.DISABLED) mapInstance.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
         sharedLocationViewModel.setLocation(lastKnownLocation);
@@ -346,8 +346,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             return false;
         }
 
-        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
-
         View bottomSheetView = getView().findViewById(R.id.pharmacy_details);
         TextView textViewTitle = bottomSheetView.findViewById(R.id.textView5);
         TextView textViewLocation = bottomSheetView.findViewById(R.id.textView6);
@@ -356,30 +354,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         if (textViewTitle != null && pharmacy != null) {
             textViewTitle.setText(pharmacy.name);
-            // Get address from coordinates using Geocoder
-            try {
-                List<Address> addresses = geocoder.getFromLocation(
-                        marker.getPosition().latitude,
-                        marker.getPosition().longitude,
-                        1
-                );
-                if (addresses != null && addresses.size() > 0) {
-                    Address address = addresses.get(0);
-                    StringBuilder addressBuilder = new StringBuilder();
-                    for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
-                        addressBuilder.append(address.getAddressLine(i));
-                        if (i < address.getMaxAddressLineIndex()) {
-                            addressBuilder.append(", ");
-                        }
-                    }
-                    textViewLocation.setText(addressBuilder.toString());
-                } else {
-                    textViewLocation.setText("Address not found");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                textViewLocation.setText("Address not available");
-            }
+            pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Location location =
+                    new pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Location();
+            location.lat = marker.getPosition().latitude;
+            location.lng = marker.getPosition().longitude;
+            textViewLocation.setText(
+                    pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getAddress(location, getContext()));
         }
         currentSelectedMarker = marker;
 

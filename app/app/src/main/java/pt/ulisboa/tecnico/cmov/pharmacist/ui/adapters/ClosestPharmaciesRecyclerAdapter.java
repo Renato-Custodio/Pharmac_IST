@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
@@ -18,10 +19,10 @@ import java.util.Locale;
 import java.util.function.Consumer;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
-import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Location;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.PharmacyDistance;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.Location;
 
 public class ClosestPharmaciesRecyclerAdapter extends RecyclerView.Adapter<ClosestPharmaciesRecyclerAdapter.ViewHolder> {
     private static List<PharmacyDistance> localDataSet = null;
@@ -84,43 +85,27 @@ public class ClosestPharmaciesRecyclerAdapter extends RecyclerView.Adapter<Close
     }
 
     // Replace the contents of a view (invoked by the layout manager)
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         Log.d("ClosestPharmaciesRecyclerAdapter", MessageFormat.format("{0}",localDataSet));
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         viewHolder.getTitleView().setText(localDataSet.get(position).pharmacy.name);
-        viewHolder.getDistanceView().setText(String.valueOf(Math.round(localDataSet.get(position).distance)));
-        viewHolder.getAddressView().setText(getAddressFromLocation(localDataSet.get(position).pharmacy.location));
 
-    }
-
-    private String getAddressFromLocation(Location location){
-        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-
-        try {
-            List<Address> addresses = geocoder.getFromLocation(
-                    location.lat,
-                    location.lng,
-                    1
-            );
-            if (addresses != null && addresses.size() > 0) {
-                Address address = addresses.get(0);
-                StringBuilder addressBuilder = new StringBuilder();
-                for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
-                    addressBuilder.append(address.getAddressLine(i));
-                    if (i < address.getMaxAddressLineIndex()) {
-                        addressBuilder.append(", ");
-                    }
-                }
-                return addressBuilder.toString();
-            } else {
-                return null;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        double distanceInMeters = localDataSet.get(position).distance;
+        double distanceInKilometers = distanceInMeters / 1000;
+        String distanceText;
+        if (distanceInKilometers < 1) {
+            // If distance is less than 1 km, display in meters
+            distanceText = Math.round(distanceInMeters) + "m";
+        } else {
+            // If distance is 1 km or more, display in kilometers
+            distanceText = String.format("%.1fkm", distanceInKilometers);
         }
+        viewHolder.getDistanceView().setText(distanceText);
+        viewHolder.getAddressView().setText(Location.getAddress(localDataSet.get(position).pharmacy.location, context));
+
     }
 
     // Return the size of your dataset (invoked by the layout manager)

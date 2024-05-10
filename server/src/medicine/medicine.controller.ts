@@ -17,9 +17,9 @@ export class MedicineController {
 
   @Get(':medicineId/closestPharmacies')
   async getClosestPharmacies(
-    @Query('latitude') latitude,
-    @Query('longitude') longitude,
-    @Param('medicineId') medicineId,
+    @Param('medicineId') medicineId: string,
+    @Query('lat') latitude: string,
+    @Query('lng') longitude: string,
   ) {
     return await this.medicineService.getClosestPharmacies(
       medicineId,

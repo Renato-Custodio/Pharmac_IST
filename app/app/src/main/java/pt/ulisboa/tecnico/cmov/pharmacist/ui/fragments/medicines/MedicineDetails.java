@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines;
 
 import android.annotation.SuppressLint;
+import android.content.SyncAdapterType;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -96,6 +98,16 @@ public class MedicineDetails extends Fragment {
         });
     }
 
+    private Float calculateDistance(Location curruntLocation,
+                                      pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Location pharmacyLocation){
+
+            Location location2 = new Location("");
+            location2.setLatitude(pharmacyLocation.lat);
+            location2.setLongitude(pharmacyLocation.lng);
+
+            return curruntLocation.distanceTo(location2);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -118,7 +130,20 @@ public class MedicineDetails extends Fragment {
 
         // Set text based on the Medicine object
         if (mMedicine != null) {
-            Location currentLocation = sharedLocationViewModel.getLocation();
+            //mudar
+            sharedLocationViewModel.getLocation().observe(getViewLifecycleOwner(), new Observer<Location>() {
+                @Override
+                public void onChanged(Location location) {
+                    for (PharmacyDistance pharmacyDistance: recivedPharmacies) {
+                        pharmacyDistance.distance = calculateDistance(location, pharmacyDistance.pharmacy.location);
+                    }
+                    nearestPharmaciesAdapter = new ClosestPharmaciesRecyclerAdapter(recivedPharmacies, getContext());
+                    mLayoutManager = new LinearLayoutManager(getActivity());
+                    nearestPharmacies.setLayoutManager(mLayoutManager);
+                    nearestPharmacies.setAdapter(nearestPharmaciesAdapter);
+                }
+            });
+            Location currentLocation = sharedLocationViewModel.getLocation().getValue();
             nearestPharmaciesAdapter = new ClosestPharmaciesRecyclerAdapter(recivedPharmacies, getContext());
             nameTextView.setText(mMedicine.name);
             purposeTextView.setText(mMedicine.purpose);

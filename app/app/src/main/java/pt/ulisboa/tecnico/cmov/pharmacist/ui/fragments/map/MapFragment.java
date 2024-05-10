@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -60,6 +61,8 @@ import java.util.Locale;
 import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Pharmacy;
+import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.PharmacyDistance;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.ClosestPharmaciesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.PlacesAutoCompleteAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 
@@ -78,6 +81,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private FusedLocationProviderClient fusedLocationClient;
     private LocationRequest locationRequest;
+
+    private Location lastKnownLocation;
 
     // UI
     private MapFocus focus = MapFocus.CURRENT_POSITION;
@@ -105,6 +110,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         super.onCreate(savedInstanceState);
         sharedLocationViewModel = new ViewModelProvider(requireActivity()).get(SharedLocationViewModel.class);
         if (savedInstanceState != null) {
+            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             sharedLocationViewModel.setLocation(savedInstanceState.getParcelable(KEY_LOCATION));
         }
         Places.initialize(getActivity().getApplicationContext(), BuildConfig.MAPS_API_KEY);
@@ -113,7 +119,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(KEY_LOCATION, sharedLocationViewModel.getLocation().getValue());
+        outState.putParcelable(KEY_LOCATION, lastKnownLocation);
     }
 
     @Override
@@ -156,7 +162,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             @Override
             public void onClick(View v) {
                 focus = MapFocus.CURRENT_POSITION;
-                onLocationChanged(sharedLocationViewModel.getLocation().getValue());
+                onLocationChanged(lastKnownLocation);
                 focusButton.setVisibility(View.INVISIBLE);
             }
         });
@@ -260,7 +266,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.w("MapFragment", "Location is not enabled, requesting permissions...");
             mapInstance.setMyLocationEnabled(false);
-            sharedLocationViewModel.setLocation(null);
+            lastKnownLocation = null;
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
             return;
         }
@@ -291,10 +297,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void onLocationChanged(@NonNull Location location) {
-        Location lastKnownLocation = sharedLocationViewModel.getLocation().getValue();
         lastKnownLocation = focus != MapFocus.CURRENT_POSITION ? lastKnownLocation : location;
         if (focus != MapFocus.DISABLED) mapInstance.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
-        sharedLocationViewModel.setLocation(lastKnownLocation);
+        sharedLocationViewModel.setLocation(location);
     }
 
     private void onLocationChanged(@NonNull LatLng coordinates) {
@@ -329,6 +334,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         });
     }
 
+    private String getDistance(Location location, Pharmacy pharmacy){
+        Float distance = pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(
+                location ,pharmacy.location);
+        return pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistanceString(
+                Double.valueOf(distance));
+    }
+
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
         Log.d("MapFragment:onMarkerClick", MessageFormat.format("Selected: {0}", marker.getPosition()));
@@ -349,8 +361,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         View bottomSheetView = getView().findViewById(R.id.pharmacy_details);
         TextView textViewTitle = bottomSheetView.findViewById(R.id.textView5);
         TextView textViewLocation = bottomSheetView.findViewById(R.id.textView6);
-
+        TextView textViewDistance = bottomSheetView.findViewById(R.id.pharmacy_distance);
         Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, pharmacy.picture)).into((ImageView) bottomSheetView.findViewById(R.id.pharmacy_image));
+        sharedLocationViewModel.getLocation().observe(getViewLifecycleOwner(), new Observer<Location>() {
+            @Override
+            public void onChanged(Location location) {
+                textViewDistance.setText(getDistance(location, pharmacy));
+            }
+        });
 
         if (textViewTitle != null && pharmacy != null) {
             textViewTitle.setText(pharmacy.name);
@@ -360,6 +378,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             location.lng = marker.getPosition().longitude;
             textViewLocation.setText(
                     pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getAddress(location, getContext()));
+
+            textViewDistance.setText(getDistance(sharedLocationViewModel.getLocation().getValue() , pharmacy));
         }
         currentSelectedMarker = marker;
 

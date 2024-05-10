@@ -98,16 +98,6 @@ public class MedicineDetails extends Fragment {
         });
     }
 
-    private Float calculateDistance(Location curruntLocation,
-                                      pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Location pharmacyLocation){
-
-            Location location2 = new Location("");
-            location2.setLatitude(pharmacyLocation.lat);
-            location2.setLongitude(pharmacyLocation.lng);
-
-            return curruntLocation.distanceTo(location2);
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -130,12 +120,13 @@ public class MedicineDetails extends Fragment {
 
         // Set text based on the Medicine object
         if (mMedicine != null) {
-            //mudar
             sharedLocationViewModel.getLocation().observe(getViewLifecycleOwner(), new Observer<Location>() {
                 @Override
                 public void onChanged(Location location) {
                     for (PharmacyDistance pharmacyDistance: recivedPharmacies) {
-                        pharmacyDistance.distance = calculateDistance(location, pharmacyDistance.pharmacy.location);
+                        pharmacyDistance.distance =
+                                pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(
+                                        location, pharmacyDistance.pharmacy.location);
                     }
                     nearestPharmaciesAdapter = new ClosestPharmaciesRecyclerAdapter(recivedPharmacies, getContext());
                     mLayoutManager = new LinearLayoutManager(getActivity());

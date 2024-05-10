@@ -61,8 +61,10 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
                     if(medicinesOrDetails == 0){
                         replaceFragment(medicinesFragment);
                     }else{
-                        addFragment(details);
-                        replaceFragment(details);
+                        if(!(current == details)) {
+                            addFragment(details);
+                            replaceFragment(details);
+                        }
                     }
 
                 }

@@ -93,17 +93,8 @@ public class ClosestPharmaciesRecyclerAdapter extends RecyclerView.Adapter<Close
         // contents of the view with that element
         viewHolder.getTitleView().setText(localDataSet.get(position).pharmacy.name);
 
-        double distanceInMeters = localDataSet.get(position).distance;
-        double distanceInKilometers = distanceInMeters / 1000;
-        String distanceText;
-        if (distanceInKilometers < 1) {
-            // If distance is less than 1 km, display in meters
-            distanceText = Math.round(distanceInMeters) + "m";
-        } else {
-            // If distance is 1 km or more, display in kilometers
-            distanceText = String.format("%.1fkm", distanceInKilometers);
-        }
-        viewHolder.getDistanceView().setText(distanceText);
+
+        viewHolder.getDistanceView().setText(Location.getDistanceString(localDataSet.get(position).distance));
         viewHolder.getAddressView().setText(Location.getAddress(localDataSet.get(position).pharmacy.location, context));
 
     }

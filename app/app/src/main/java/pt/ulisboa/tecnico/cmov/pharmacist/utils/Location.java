@@ -36,4 +36,26 @@ public class Location {
             return null;
         }
     }
+
+    public static Float getDistance(android.location.Location curruntLocation,
+                                     pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Location pharmacyLocation){
+        android.location.Location location2 = new android.location.Location("");
+        location2.setLatitude(pharmacyLocation.lat);
+        location2.setLongitude(pharmacyLocation.lng);
+
+        return curruntLocation.distanceTo(location2);
+    }
+
+    public static String getDistanceString(Double distance){
+        double distanceInMeters = distance;
+        double distanceInKilometers = distanceInMeters / 1000;
+        String distanceText;
+        if (distanceInKilometers < 1) {
+            // If distance is less than 1 km, display in meters
+            return Math.round(distanceInMeters) + "m";
+        } else {
+            // If distance is 1 km or more, display in kilometers
+            return String.format("%.1fkm", distanceInKilometers);
+        }
+    }
 }

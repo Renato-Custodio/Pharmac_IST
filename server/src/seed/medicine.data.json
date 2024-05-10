@@ -1,0 +1,606 @@
+[
+  {
+    "name": "Aspirin",
+    "purpose": "Pain relief, fever reduction, anti-inflammatory"
+  },
+  {
+    "name": "Amoxicillin",
+    "purpose": "Antibiotic used to treat bacterial infections"
+  },
+  {
+    "name": "Lisinopril",
+    "purpose": "Blood pressure medication"
+  },
+  {
+    "name": "Atorvastatin",
+    "purpose": "Cholesterol-lowering medication"
+  },
+  {
+    "name": "Ibuprofen",
+    "purpose": "Pain relief, fever reduction, anti-inflammatory"
+  },
+  {
+    "name": "Metformin",
+    "purpose": "Antidiabetic medication for type 2 diabetes"
+  },
+  {
+    "name": "Cetirizine",
+    "purpose": "Antihistamine used to relieve allergy symptoms"
+  },
+  {
+    "name": "Omeprazole",
+    "purpose": "Proton pump inhibitor for treating acid reflux and stomach ulcers"
+  },
+  {
+    "name": "Acetaminophen",
+    "purpose": "Pain relief, fever reduction"
+  },
+  {
+    "name": "Simvastatin",
+    "purpose": "Cholesterol-lowering medication"
+  },
+  {
+    "name": "Albuterol",
+    "purpose": "Bronchodilator used to treat asthma and COPD"
+  },
+  {
+    "name": "Warfarin",
+    "purpose": "Anticoagulant (blood thinner) to prevent blood clots"
+  },
+  {
+    "name": "Levothyroxine",
+    "purpose": "Thyroid hormone replacement for hypothyroidism"
+  },
+  {
+    "name": "Diazepam",
+    "purpose": "Benzodiazepine used to treat anxiety, muscle spasms, and seizures"
+  },
+  {
+    "name": "Metoprolol",
+    "purpose": "Beta blocker for treating high blood pressure and heart problems"
+  },
+  {
+    "name": "Fluoxetine",
+    "purpose": "Selective serotonin reuptake inhibitor (SSRI) antidepressant"
+  },
+  {
+    "name": "Ciprofloxacin",
+    "purpose": "Antibiotic used to treat bacterial infections"
+  },
+  {
+    "name": "Prednisone",
+    "purpose": "Corticosteroid used to treat inflammation and immune system disorders"
+  },
+  {
+    "name": "Gabapentin",
+    "purpose": "Anticonvulsant used to treat seizures and nerve pain"
+  },
+  {
+    "name": "Hydrochlorothiazide",
+    "purpose": "Diuretic used to treat high blood pressure and fluid retention"
+  },
+  {
+    "name": "Amlodipine",
+    "purpose": "Calcium channel blocker for treating high blood pressure and angina"
+  },
+  {
+    "name": "Ranitidine",
+    "purpose": "H2 blocker for treating acid reflux and stomach ulcers"
+  },
+  {
+    "name": "Cephalexin",
+    "purpose": "Antibiotic used to treat bacterial infections"
+  },
+  {
+    "name": "Sertraline",
+    "purpose": "Selective serotonin reuptake inhibitor (SSRI) antidepressant"
+  },
+  {
+    "name": "Furosemide",
+    "purpose": "Loop diuretic used to treat high blood pressure and fluid buildup"
+  },
+  {
+    "name": "Clonazepam",
+    "purpose": "Benzodiazepine used to treat panic disorder and seizures"
+  },
+  {
+    "name": "Losartan",
+    "purpose": "Angiotensin II receptor blocker for treating high blood pressure and heart failure"
+  },
+  {
+    "name": "Levofloxacin",
+    "purpose": "Antibiotic used to treat bacterial infections"
+  },
+  {
+    "name": "Tramadol",
+    "purpose": "Opioid analgesic used to treat moderate to severe pain"
+  },
+  {
+    "name": "Metronidazole",
+    "purpose": "Antibiotic and antiprotozoal medication used to treat infections"
+  },
+  {
+    "name": "Trazodone",
+    "purpose": "Antidepressant used to treat depression and insomnia"
+  },
+  {
+    "name": "Doxycycline",
+    "purpose": "Antibiotic used to treat bacterial infections"
+  },
+  {
+    "name": "Carvedilol",
+    "purpose": "Beta blocker for treating high blood pressure and heart failure"
+  },
+  {
+    "name": "Pantoprazole",
+    "purpose": "Proton pump inhibitor for treating acid reflux and stomach ulcers"
+  },
+  {
+    "name": "Fluticasone",
+    "purpose": "Corticosteroid used to treat asthma and allergic rhinitis"
+  },
+  {
+    "name": "Bupropion",
+    "purpose": "Atypical antidepressant used to treat depression and smoking cessation"
+  },
+  {
+    "name": "Venlafaxine",
+    "purpose": "Serotonin-norepinephrine reuptake inhibitor (SNRI) antidepressant"
+  },
+  {
+    "name": "Hydrocodone",
+    "purpose": "Opioid analgesic used to treat moderate to severe pain"
+  },
+  {
+    "name": "Montelukast",
+    "purpose": "Leukotriene receptor antagonist used to treat asthma and allergic rhinitis"
+  },
+  {
+    "name": "Esomeprazole",
+    "purpose": "Proton pump inhibitor for treating acid reflux and stomach ulcers"
+  },
+  {
+    "name": "Metoprolol Succinate",
+    "purpose": "Beta blocker for treating high blood pressure and heart failure"
+  },
+  {
+    "name": "Hydroxyzine",
+    "purpose": "Antihistamine used to treat anxiety, itching, and allergies"
+  },
+  {
+    "name": "Fluconazole",
+    "purpose": "Antifungal medication used to treat fungal infections"
+  },
+  {
+    "name": "Propranolol",
+    "purpose": "Beta blocker for treating high blood pressure, angina, and migraines"
+  },
+  {
+    "name": "Amitriptyline",
+    "purpose": "Tricyclic antidepressant used to treat depression, neuropathic pain, and migraines"
+  },
+  {
+    "name": "Loratadine",
+    "purpose": "Antihistamine used to relieve allergy symptoms"
+  },
+  {
+    "name": "Azithromycin",
+    "purpose": "Antibiotic used to treat bacterial infections"
+  },
+  {
+    "name": "Duloxetine",
+    "purpose": "Serotonin-norepinephrine reuptake inhibitor (SNRI) antidepressant"
+  },
+  {
+    "name": "Quetiapine",
+    "purpose": "Atypical antipsychotic used to treat schizophrenia, bipolar disorder, and depression"
+  },
+  {
+    "name": "Vitamin D",
+    "purpose": "Vitamin supplement for bone health and immune system support"
+  },
+  {
+    "name": "Mirtazapine",
+    "purpose": "Atypical antidepressant used to treat depression and insomnia"
+  },
+  {
+    "name": "Aripiprazole",
+    "purpose": "Atypical antipsychotic used to treat schizophrenia, bipolar disorder, and depression"
+  },
+  {
+    "name": "Alprazolam",
+    "purpose": "Benzodiazepine used to treat anxiety and panic disorder"
+  },
+  {
+    "name": "Naproxen",
+    "purpose": "Nonsteroidal anti-inflammatory drug (NSAID) used for pain relief and inflammation reduction"
+  },
+  {
+    "name": "Citalopram",
+    "purpose": "Selective serotonin reuptake inhibitor (SSRI) antidepressant"
+  },
+  {
+    "name": "Folic Acid",
+    "purpose": "Vitamin supplement for red blood cell production and neural tube development"
+  },
+  {
+    "name": "Cyclobenzaprine",
+    "purpose": "Muscle relaxant used to treat muscle spasms and pain"
+  },
+  {
+    "name": "Budesonide",
+    "purpose": "Corticosteroid used to treat asthma, inflammatory bowel disease, and allergic rhinitis"
+  },
+  {
+    "name": "Benzonatate",
+    "purpose": "Antitussive medication used to relieve cough"
+  },
+  {
+    "name": "Methotrexate",
+    "purpose": "Disease-modifying antirheumatic drug (DMARD) used to treat rheumatoid arthritis and certain cancers"
+  },
+  {
+    "name": "Nortriptyline",
+    "purpose": "Tricyclic antidepressant used to treat depression and neuropathic pain"
+  },
+  {
+    "name": "Clindamycin",
+    "purpose": "Antibiotic used to treat bacterial infections"
+  },
+  {
+    "name": "Rosuvastatin",
+    "purpose": "Cholesterol-lowering medication"
+  },
+  {
+    "name": "Diphenhydramine",
+    "purpose": "Antihistamine used to relieve allergy symptoms, insomnia, and motion sickness"
+  },
+  {
+    "name": "Lansoprazole",
+    "purpose": "Proton pump inhibitor for treating acid reflux and stomach ulcers"
+  },
+  {
+    "name": "Meloxicam",
+    "purpose": "Nonsteroidal anti-inflammatory drug (NSAID) used for pain relief and inflammation reduction"
+  },
+  {
+    "name": "Clobazam",
+    "purpose": "Benzodiazepine used to treat seizures associated with epilepsy"
+  },
+  {
+    "name": "Cyclosporine",
+    "purpose": "Immunosuppressant used to prevent organ rejection after transplant and treat autoimmune conditions"
+  },
+  {
+    "name": "Venlafaxine XR",
+    "purpose": "Serotonin-norepinephrine reuptake inhibitor (SNRI) antidepressant"
+  },
+  {
+    "name": "Lamotrigine",
+    "purpose": "Anticonvulsant used to treat seizures and bipolar disorder"
+  },
+  {
+    "name": "Desvenlafaxine",
+    "purpose": "Serotonin-norepinephrine reuptake inhibitor (SNRI) antidepressant"
+  },
+  {
+    "name": "Methylprednisolone",
+    "purpose": "Corticosteroid used to treat inflammation, allergic reactions, and autoimmune conditions"
+  },
+  {
+    "name": "Guaifenesin",
+    "purpose": "Expectorant used to relieve chest congestion and cough"
+  },
+  {
+    "name": "Ondansetron",
+    "purpose": "Anti-nausea medication used to prevent vomiting caused by chemotherapy, radiation therapy, and surgery"
+  },
+  {
+    "name": "Metoclopramide",
+    "purpose": "Prokinetic agent used to treat gastrointestinal disorders and prevent nausea and vomiting"
+  },
+  {
+    "name": "Memantine",
+    "purpose": "NMDA receptor antagonist used to treat Alzheimer's disease and dementia"
+  },
+  {
+    "name": "Benazepril",
+    "purpose": "Angiotensin-converting enzyme (ACE) inhibitor for treating high blood pressure and heart failure"
+  },
+  {
+    "name": "Mupirocin",
+    "purpose": "Topical antibiotic used to treat bacterial skin infections"
+  },
+  {
+    "name": "Nystatin",
+    "purpose": "Antifungal medication used to treat fungal skin infections and oral thrush"
+  },
+  {
+    "name": "Telmisartan",
+    "purpose": "Angiotensin II receptor blocker for treating high blood pressure and reducing risk of stroke"
+  },
+  {
+    "name": "Promethazine",
+    "purpose": "Antihistamine and antiemetic medication used to treat allergy symptoms and prevent motion sickness"
+  },
+  {
+    "name": "Nitrofurantoin",
+    "purpose": "Antibiotic used to treat urinary tract infections"
+  },
+  {
+    "name": "Buprenorphine",
+    "purpose": "Partial opioid agonist used to treat opioid addiction and moderate to severe pain"
+  },
+  {
+    "name": "Raloxifene",
+    "purpose": "Selective estrogen receptor modulator (SERM) used to treat and prevent osteoporosis and breast cancer"
+  },
+  {
+    "name": "Fluvoxamine",
+    "purpose": "Selective serotonin reuptake inhibitor (SSRI) antidepressant"
+  },
+  {
+    "name": "Nifedipine",
+    "purpose": "Calcium channel blocker for treating high blood pressure and angina"
+  },
+  {
+    "name": "Methocarbamol",
+    "purpose": "Muscle relaxant used to treat muscle spasms and pain"
+  },
+  {
+    "name": "Ezetimibe",
+    "purpose": "Cholesterol absorption inhibitor used to lower cholesterol levels"
+  },
+  {
+    "name": "Isosorbide Mononitrate",
+    "purpose": "Nitrate medication for treating angina and heart failure"
+  },
+  {
+    "name": "Sildenafil",
+    "purpose": "Phosphodiesterase type 5 inhibitor (PDE5 inhibitor) used to treat erectile dysfunction and pulmonary arterial hypertension"
+  },
+  {
+    "name": "Terbinafine",
+    "purpose": "Antifungal medication used to treat fungal infections of the skin and nails"
+  },
+  {
+    "name": "Lisinopril-Hydrochlorothiazide",
+    "purpose": "Combination medication for treating high blood pressure"
+  },
+  {
+    "name": "Diltiazem",
+    "purpose": "Calcium channel blocker for treating high blood pressure and angina"
+  },
+  {
+    "name": "Lamivudine",
+    "purpose": "Antiretroviral medication used to treat HIV/AIDS and hepatitis B"
+  },
+  {
+    "name": "Sitagliptin",
+    "purpose": "Antidiabetic medication for type 2 diabetes"
+  },
+  {
+    "name": "Rosiglitazone",
+    "purpose": "Antidiabetic medication for type 2 diabetes"
+  },
+  {
+    "name": "Sulfamethoxazole-Trimethoprim",
+    "purpose": "Antibiotic combination used to treat bacterial infections"
+  },
+  {
+    "name": "Dicyclomine",
+    "purpose": "Antispasmodic medication used to treat irritable bowel syndrome and gastrointestinal cramps"
+  },
+  {
+    "name": "Olmesartan",
+    "purpose": "Angiotensin II receptor blocker for treating high blood pressure"
+  },
+  {
+    "name": "Candesartan",
+    "purpose": "Angiotensin II receptor blocker for treating high blood pressure"
+  },
+  {
+    "name": "Olanzapine",
+    "purpose": "Atypical antipsychotic used to treat schizophrenia and bipolar disorder"
+  },
+  {
+    "name": "Carbamazepine",
+    "purpose": "Anticonvulsant and mood stabilizer used to treat seizures, bipolar disorder, and nerve pain"
+  },
+  {
+    "name": "Fluocinonide",
+    "purpose": "Topical corticosteroid used to treat skin inflammation and itching"
+  },
+  {
+    "name": "Melatonin",
+    "purpose": "Hormone supplement used to regulate sleep-wake cycles and treat sleep disorders"
+  },
+  {
+    "name": "Erythromycin",
+    "purpose": "Antibiotic used to treat bacterial infections"
+  },
+  {
+    "name": "Enalapril",
+    "purpose": "Angiotensin-converting enzyme (ACE) inhibitor for treating high blood pressure and heart failure"
+  },
+  {
+    "name": "Triamcinolone",
+    "purpose": "Topical corticosteroid used to treat skin conditions such as eczema and psoriasis"
+  },
+  {
+    "name": "Irbesartan",
+    "purpose": "Angiotensin II receptor blocker for treating high blood pressure and kidney problems caused by diabetes"
+  },
+  {
+    "name": "Baclofen",
+    "purpose": "Muscle relaxant and antispastic agent used to treat muscle spasticity"
+  },
+  {
+    "name": "Lovastatin",
+    "purpose": "Cholesterol-lowering medication"
+  },
+  {
+    "name": "Bicalutamide",
+    "purpose": "Antiandrogen medication used to treat prostate cancer"
+  },
+  {
+    "name": "Tamsulosin",
+    "purpose": "Alpha blocker used to treat symptoms of benign prostatic hyperplasia (BPH)"
+  },
+  {
+    "name": "Fenofibrate",
+    "purpose": "Fibrate medication used to lower cholesterol levels and reduce risk of heart disease"
+  },
+  {
+    "name": "Meclizine",
+    "purpose": "Antihistamine and anticholinergic medication used to treat motion sickness and vertigo"
+  },
+  {
+    "name": "Hydralazine",
+    "purpose": "Direct-acting vasodilator for treating high blood pressure and heart failure"
+  },
+  {
+    "name": "Doxazosin",
+    "purpose": "Alpha blocker for treating high blood pressure and symptoms of benign prostatic hyperplasia (BPH)"
+  },
+  {
+    "name": "Atomoxetine",
+    "purpose": "Selective norepinephrine reuptake inhibitor (SNRI) used to treat attention deficit hyperactivity disorder (ADHD)"
+  },
+  {
+    "name": "Escitalopram",
+    "purpose": "Selective serotonin reuptake inhibitor (SSRI) antidepressant"
+  },
+  {
+    "name": "Nebivolol",
+    "purpose": "Beta blocker for treating high blood pressure and heart failure"
+  },
+  {
+    "name": "Sodium Valproate",
+    "purpose": "Anticonvulsant and mood stabilizer used to treat epilepsy and bipolar disorder"
+  },
+  {
+    "name": "Sulfasalazine",
+    "purpose": "Disease-modifying antirheumatic drug (DMARD) used to treat inflammatory bowel disease and rheumatoid arthritis"
+  },
+  {
+    "name": "Fexofenadine",
+    "purpose": "Non-sedating antihistamine used to relieve allergy symptoms"
+  },
+  {
+    "name": "Hydroxyzine Pamoate",
+    "purpose": "Antihistamine used to treat anxiety and itching"
+  },
+  {
+    "name": "Risperidone",
+    "purpose": "Atypical antipsychotic used to treat schizophrenia and bipolar disorder"
+  },
+  {
+    "name": "Varenicline",
+    "purpose": "Smoking cessation aid that reduces nicotine cravings and withdrawal symptoms"
+  },
+  {
+    "name": "Memantine",
+    "purpose": "NMDA receptor antagonist used to treat Alzheimer's disease and dementia"
+  },
+  {
+    "name": "Bimatoprost",
+    "purpose": "Prostaglandin analog used to treat glaucoma and promote eyelash growth"
+  },
+  {
+    "name": "Nifedipine",
+    "purpose": "Calcium channel blocker for treating high blood pressure and angina"
+  },
+  {
+    "name": "Cefdinir",
+    "purpose": "Antibiotic used to treat bacterial infections"
+  },
+  {
+    "name": "Tiotropium",
+    "purpose": "Anticholinergic bronchodilator used to treat chronic obstructive pulmonary disease (COPD)"
+  },
+  {
+    "name": "Thyroxine",
+    "purpose": "Thyroid hormone replacement for hypothyroidism"
+  },
+  {
+    "name": "Epoetin Alfa",
+    "purpose": "Erythropoiesis-stimulating agent used to treat anemia"
+  },
+  {
+    "name": "Buprenorphine-Naloxone",
+    "purpose": "Medication-assisted treatment for opioid addiction"
+  },
+  {
+    "name": "Doxepin",
+    "purpose": "Tricyclic antidepressant used to treat depression and anxiety"
+  },
+  {
+    "name": "Naloxone",
+    "purpose": "Opioid antagonist used to reverse opioid overdose"
+  },
+  {
+    "name": "Indomethacin",
+    "purpose": "Nonsteroidal anti-inflammatory drug (NSAID) used for pain relief and inflammation reduction"
+  },
+  {
+    "name": "Docusate",
+    "purpose": "Stool softener used to treat constipation"
+  },
+  {
+    "name": "Methyldopa",
+    "purpose": "Centrally acting antihypertensive medication for treating high blood pressure"
+  },
+  {
+    "name": "Hydroxyzine Hydrochloride",
+    "purpose": "Antihistamine used to treat anxiety, itching, and allergies"
+  },
+  {
+    "name": "Carbamazepine",
+    "purpose": "Anticonvulsant and mood stabilizer used to treat seizures, bipolar disorder, and nerve pain"
+  },
+  {
+    "name": "Tolterodine",
+    "purpose": "Antimuscarinic medication used to treat overactive bladder"
+  },
+  {
+    "name": "Terazosin",
+    "purpose": "Alpha blocker for treating high blood pressure and symptoms of benign prostatic hyperplasia (BPH)"
+  },
+  {
+    "name": "Ethinyl Estradiol-Norethindrone",
+    "purpose": "Combination hormonal contraceptive (birth control pill)"
+  },
+  {
+    "name": "Spironolactone",
+    "purpose": "Potassium-sparing diuretic used to treat high blood pressure, heart failure, and edema"
+  },
+  {
+    "name": "Nalbuphine",
+    "purpose": "Opioid analgesic used to treat moderate to severe pain"
+  },
+  {
+    "name": "Sumatriptan",
+    "purpose": "Serotonin receptor agonist used to treat migraine headaches"
+  },
+  {
+    "name": "Azelastine",
+    "purpose": "Antihistamine and mast cell stabilizer used to treat allergic rhinitis"
+  },
+  {
+    "name": "Ethambutol",
+    "purpose": "Antibiotic used to treat tuberculosis (TB)"
+  },
+  {
+    "name": "Fludrocortisone",
+    "purpose": "Mineralocorticoid used to treat adrenal insufficiency and salt-losing adrenogenital syndrome"
+  },
+  {
+    "name": "Doxazosin",
+    "purpose": "Alpha blocker for treating high blood pressure and symptoms of benign prostatic hyperplasia (BPH)"
+  },
+  {
+    "name": "Dapagliflozin",
+    "purpose": "SGLT2 inhibitor used to treat type 2 diabetes by increasing glucose excretion in the urine"
+  }
+]

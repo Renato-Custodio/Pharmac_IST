@@ -2,8 +2,8 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../core/prisma.service';
 import { hash } from 'bcrypt';
 import { PharmacyService } from 'src/pharmacy/pharmacy.service';
-import { Pharmacy } from '@prisma/client';
 import { CreatePharmacyDto } from 'src/pharmacy/dtos/create-pharmacy.dto';
+import * as medicineData from './medicine.data.json';
 
 const LAT_MAX = 38.81;
 const LAT_MIN = 38.69;
@@ -42,17 +42,11 @@ export class SeedService implements OnModuleInit {
   }
 
   private async createMedicines() {
-    const medicineData = [];
-    for (let i = 1; i <= 50; i++) {
-      const medicine = {
-        name: `Medicine${i}`,
-        purpose: `Purpose${i}`,
-        picture: 'medicines/generic_medicine.jpg',
-      };
-      medicineData.push(medicine);
-    }
     await this.prismaService.medicine.createMany({
-      data: medicineData,
+      data: medicineData.map((medicine) => ({
+        ...medicine,
+        picture: 'medicines/sample_1.jpg',
+      })),
     });
   }
 

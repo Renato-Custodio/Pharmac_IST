@@ -44,4 +44,5 @@ Local deployment of the backend structure (mongodb + NestJS server) can be done 
 This project was made by:
 - (96925) Gonçalo Abreu Corrêa Brito da Silva
 - (110948) Renato Miguel Monteirinho Custódio
+- (93747) Pedro Xavier Diogo Gomes
 

@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +26,6 @@ import com.google.android.libraries.places.api.model.AutocompletePrediction;
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceTypes;
-import com.google.android.libraries.places.api.model.TypeFilter;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceResponse;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
@@ -148,7 +146,7 @@ public class PlacesAutoCompleteAdapter extends RecyclerView.Adapter<PlacesAutoCo
     @Override
     public PredictionHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View convertView = layoutInflater.inflate(R.layout.address_list_item, viewGroup, false);
+        View convertView = layoutInflater.inflate(R.layout.common_list_item, viewGroup, false);
         return new PredictionHolder(convertView);
     }
 
@@ -172,8 +170,8 @@ public class PlacesAutoCompleteAdapter extends RecyclerView.Adapter<PlacesAutoCo
 
         PredictionHolder(View itemView) {
             super(itemView);
-            area = itemView.findViewById(R.id.address_list_item_title);
-            address = itemView.findViewById(R.id.address_list_item_description);
+            area = itemView.findViewById(R.id.common_list_item_title);
+            address = itemView.findViewById(R.id.common_list_item_description);
             itemView.setOnClickListener(this);
         }
 

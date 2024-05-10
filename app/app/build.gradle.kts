@@ -38,8 +38,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-
-            buildConfigField("String", "API_BASE_URL", "http://localhost:3000")
         }
     }
     compileOptions {

@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
 
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.search.SearchView;
@@ -52,6 +54,9 @@ public class MedicinesFragment extends Fragment {
     private List<Medicine> searchResults = new ArrayList<>();
     private MedicinesRecyclerAdapter.OnItemClickListener listener;
 
+    // Search back button
+    private Button backButton;
+
     public static MedicinesFragment newInstance(MedicinesRecyclerAdapter.OnItemClickListener listener) {
         MedicinesFragment fragment = new MedicinesFragment();
         fragment.listener = listener;
@@ -73,12 +78,15 @@ public class MedicinesFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_medicines, container, false);
     }
 
-    private void medicineSearch(String query, Integer page) {
+    private void medicineSearch(String query, Integer page, boolean initialQuery) {
+        if (query.isEmpty() && !initialQuery) return;
+
         Call<List<Medicine>> search = APIFactory.getInterface().doGetMedicines(query, page);
         search.enqueue(new Callback<List<Medicine>>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onResponse(Call<List<Medicine>> call, Response<List<Medicine>> response) {
+                backButton.setVisibility(View.VISIBLE);
                 searchResults.clear();
                 searchResults.addAll(response.body());
                 medicinesRecyclerAdapter.notifyDataSetChanged();
@@ -97,7 +105,19 @@ public class MedicinesFragment extends Fragment {
         searchView.addTransitionListener((searchView, previousState, newState) -> {
             if (newState == SearchView.TransitionState.SHOWING) {
                 // Handle search view opened, load medicines
-                medicineSearch("", 1);
+                medicineSearch("", 1, true);
+            }
+        });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onClick(View v) {
+                searchView.setText("");
+                searchBar.setText("");
+                searchResults.clear();
+                searchRecyclerAdapter.notifyDataSetChanged();
+                backButton.setVisibility(View.GONE);
             }
         });
 
@@ -107,7 +127,7 @@ public class MedicinesFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                medicineSearch(s.toString(), 1);
+                medicineSearch(s.toString(), 1, false);
             }
 
             @Override
@@ -130,6 +150,7 @@ public class MedicinesFragment extends Fragment {
 
         searchView = view.findViewById(R.id.medicine_search_view);
         searchBar = view.findViewById(R.id.medicine_search_bar);
+        backButton = view.findViewById(R.id.back_search_button);
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mLayoutManager2 = new LinearLayoutManager(getActivity());

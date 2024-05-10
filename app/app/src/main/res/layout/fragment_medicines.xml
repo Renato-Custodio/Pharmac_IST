@@ -15,41 +15,64 @@
         android:layout_height="match_parent"
         android:background="#FEF7FF">
 
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <Button
+                android:id="@+id/back_search_button"
+                style="?attr/materialIconButtonFilledStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="back button"
+                android:scaleX="1.1"
+                android:scaleY="1.1"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                map:icon="@drawable/back_btn" />
+
             <com.google.android.material.search.SearchBar
                 android:id="@+id/medicine_search_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
                 android:hint="Search medicine"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toEndOf="@+id/back_search_button"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_goneMarginLeft="16dp" />
 
             <TextView
                 android:id="@+id/recommendedTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="32dp"
                 android:text="Search Results"
                 android:textSize="24sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/medicine_search_bar" />
+                app:layout_constraintTop_toBottomOf="@+id/back_search_button" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/nearest_pharmacies"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recommendedTitle" />
+                app:layout_constraintTop_toBottomOf="@+id/recommendedTitle">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -58,7 +81,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="Search medicine"
-            app:backgroundTint="#FBF8FB"
             app:layout_anchor="@id/medicine_search_bar">
 
             <androidx.recyclerview.widget.RecyclerView

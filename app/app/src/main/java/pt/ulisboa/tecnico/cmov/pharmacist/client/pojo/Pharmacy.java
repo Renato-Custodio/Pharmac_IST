@@ -9,6 +9,9 @@ public class Pharmacy {
     @SerializedName("name")
     public String name;
 
+    @SerializedName("picture")
+    public String picture;
+
     @SerializedName("location")
     public Location location;
 }

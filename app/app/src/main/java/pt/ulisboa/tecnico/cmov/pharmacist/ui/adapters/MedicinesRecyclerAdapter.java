@@ -3,13 +3,18 @@ package pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
+
+import java.text.MessageFormat;
 import java.util.List;
 
+import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
 
@@ -43,6 +48,8 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final TextView titleView;
         private final TextView descriptionView;
+
+        private final ImageView imageView;
         private final View rootView;
 
         private final OnItemClickListener itemClickListener;
@@ -53,8 +60,9 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
             rootView = view;
             this.itemClickListener = itemClickListener;
             rootView.setOnClickListener(this);
-            titleView = (TextView) view.findViewById(R.id.medicine_title);
-            descriptionView = (TextView) view.findViewById(R.id.medicine_description);
+            titleView = view.findViewById(R.id.medicine_title);
+            descriptionView = view.findViewById(R.id.medicine_description);
+            imageView = view.findViewById(R.id.medicine_image);
         }
 
         public TextView getTitleView() {
@@ -63,6 +71,10 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
 
         public TextView getDescriptionView() {
             return descriptionView;
+        }
+
+        public ImageView getImageView() {
+            return imageView;
         }
 
         @Override
@@ -95,6 +107,7 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
         // contents of the view with that element
         viewHolder.getTitleView().setText(localDataSet.get(position).name);
         viewHolder.getDescriptionView().setText(localDataSet.get(position).purpose);
+        Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, localDataSet.get(position).picture)).into(viewHolder.getImageView());
     }
 
     // Return the size of your dataset (invoked by the layout manager)

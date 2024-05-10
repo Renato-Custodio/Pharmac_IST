@@ -155,12 +155,12 @@
                             android:id="@+id/pharmacy_image"
                             android:layout_width="110dp"
                             android:layout_height="110dp"
-                            android:src="@drawable/__wa3uibb2uizmvpt6reyk8g"
+                            android:background="#ECE6F0"
                             android:scaleType="centerCrop"
                             app:shapeAppearanceOverlay="@style/RoundedSquare"
                             map:layout_constraintBottom_toBottomOf="parent"
                             map:layout_constraintStart_toStartOf="parent"
-                            map:layout_constraintTop_toTopOf="parent"/>
+                            map:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
                             android:id="@+id/textView5"

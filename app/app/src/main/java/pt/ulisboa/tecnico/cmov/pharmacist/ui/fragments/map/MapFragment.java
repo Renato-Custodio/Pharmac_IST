@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -46,6 +47,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.search.SearchView;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -103,7 +105,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         Places.initialize(getActivity().getApplicationContext(), BuildConfig.MAPS_API_KEY);
-
     }
 
     @Override
@@ -284,9 +285,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 }
             }
         }, null);
-
-        // mapInstance.addMarker(PharmacyMarker.createNew(getContext(), new LatLng(38.7611, -9.1647)));
-        // mapInstance.addMarker(PharmacyMarker.createNew(getContext(), new LatLng(38.7608, -9.1647)));
     }
 
     private void onLocationChanged(@NonNull Location location) {
@@ -327,7 +325,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
-        Log.d("MapFragment", MessageFormat.format("Selected: {0}", marker.getPosition()));
+        Log.d("MapFragment:onMarkerClick", MessageFormat.format("Selected: {0}", marker.getPosition()));
         focus = MapFocus.MARKER;
         onLocationChanged(marker.getPosition());
         unfocused();
@@ -336,12 +334,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             PharmacyMarker.setActive(currentSelectedMarker, false);
         }
         Pharmacy pharmacy = (Pharmacy) marker.getTag();
-        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());;
 
+        if (pharmacy == null) {
+            Log.e("MapFragment:onMarkerClick", "Pharmacy is null!");
+            return false;
+        }
+
+        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
 
         View bottomSheetView = getView().findViewById(R.id.pharmacy_details);
         TextView textViewTitle = bottomSheetView.findViewById(R.id.textView5);
         TextView textViewLocation = bottomSheetView.findViewById(R.id.textView6);
+
+        Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, pharmacy.picture)).into((ImageView) bottomSheetView.findViewById(R.id.pharmacy_image));
+
         if (textViewTitle != null && pharmacy != null) {
             textViewTitle.setText(pharmacy.name);
             // Get address from coordinates using Geocoder

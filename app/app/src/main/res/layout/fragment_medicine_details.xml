@@ -41,12 +41,12 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/medicine_details_image"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
+            android:background="#ECE6F0"
             android:scaleType="centerCrop"
-            android:src="@drawable/generic_medicine"
             app:layout_constraintBottom_toTopOf="@+id/medicine_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -92,7 +92,7 @@
             app:chipSurfaceColor="#6750A4"
             app:layout_constraintBottom_toTopOf="@+id/medicine_purpose"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView"
+            app:layout_constraintTop_toBottomOf="@+id/medicine_details_image"
             app:textStartPadding="6dp" />
 
         <TextView

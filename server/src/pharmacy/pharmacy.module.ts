@@ -8,5 +8,6 @@ import { PharmacyController } from './pharmacy.controller';
   imports: [CoreModule, AuthModule],
   providers: [PharmacyService],
   controllers: [PharmacyController],
+  exports: [PharmacyService],
 })
 export class PharmacyModule {}

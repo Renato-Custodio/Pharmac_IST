@@ -1,27 +1,12 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { GPSLocation, Medicine, Pharmacy } from '@prisma/client';
 import { PrismaService } from 'src/core/prisma.service';
 import { CreateMedicineDto } from './dtos/create-Medicine.dto';
 import { getDistance } from 'geolib';
 
 @Injectable()
-export class MedicineService implements OnModuleInit {
+export class MedicineService {
   constructor(private prismaService: PrismaService) {}
-  async onModuleInit() {
-    await this.prismaService.medicine.deleteMany();
-    const medicineData = [];
-    for (let i = 1; i <= 50; i++) {
-      const medicine = {
-        name: `Medicine${i}`,
-        purpose: `Purpose${i}`,
-        picture: '',
-      };
-      medicineData.push(medicine);
-    }
-    await this.prismaService.medicine.createMany({
-      data: medicineData,
-    });
-  }
 
   calculateDistance(location1: GPSLocation, location2: GPSLocation): number {
     const distance = getDistance(

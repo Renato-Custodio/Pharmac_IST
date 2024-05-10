@@ -1,60 +1,14 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { GPSLocation, Medicine, Pharmacy, Stock } from '@prisma/client';
 import { PrismaService } from 'src/core/prisma.service';
 import { CreatePharmacyDto } from './dtos/create-pharmacy.dto';
 import { CreateStockDto } from './dtos/create-stock.dto';
 
-const LAT_MAX = 38.81;
-const LAT_MIN = 38.69;
-const LNG_MAX = -9.05;
-const LNG_MIN = -9.3;
-
 const RANGE = 0.01;
 
 @Injectable()
-export class PharmacyService implements OnModuleInit {
+export class PharmacyService {
   constructor(private prismaService: PrismaService) {}
-
-  async onModuleInit() {
-    await this.prismaService.pharmacy.deleteMany();
-    await this.prismaService.mapChunk.deleteMany();
-
-    for (let i = 1; i <= 261; i++) {
-      const pharmacy = {
-        name: `Pharmacy${i}`,
-        location: {
-          lat: parseFloat(
-            (Math.random() * (LAT_MAX - LAT_MIN) + LAT_MIN).toFixed(6),
-          ), // Random latitude between 100 and -200
-          lng: parseFloat(
-            (Math.random() * (LNG_MAX - LNG_MIN) + LNG_MIN).toFixed(6),
-          ), // Random longitude between 100 and -200
-        },
-      };
-
-      await this.createPharmacy(pharmacy);
-    }
-
-    this.getMapChunks(38.72, -9.1);
-
-    this.randomlyAssignMedicinesToPharmacies();
-  }
-
-  async randomlyAssignMedicinesToPharmacies(): Promise<void> {
-    const pharmacies = await this.getPharmacies();
-    const medicines = await this.prismaService.medicine.findMany();
-
-    for (const medicine of medicines) {
-      const randomPharmacy =
-        pharmacies[Math.floor(Math.random() * pharmacies.length)];
-      const quantity = Math.floor(Math.random() * 100); // You can adjust the quantity as needed
-      await this.addMedicine({
-        medicineID: medicine.id,
-        quantity: quantity,
-        pharmacyId: randomPharmacy.id,
-      });
-    }
-  }
 
   private precisionRound(n: number, step: number) {
     return Math.round((n + Number.EPSILON) * step) / step;

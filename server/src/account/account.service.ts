@@ -1,25 +1,10 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Account } from '@prisma/client';
-import { hash } from 'bcrypt';
 import { PrismaService } from 'src/core/prisma.service';
 
 @Injectable()
-export class AccountService implements OnModuleInit {
+export class AccountService {
   constructor(private prismaService: PrismaService) {}
-  async onModuleInit() {
-    await this.prismaService.account.deleteMany();
-    const AccountData = [];
-    for (let i = 1; i <= 10; i++) {
-      const account = {
-        username: `account${i}`,
-        password: (await hash(`account${i}`, 10)).toString(),
-      };
-      AccountData.push(account);
-    }
-    await this.prismaService.account.createMany({
-      data: AccountData,
-    });
-  }
 
   async getUsers(): Promise<Account[]> {
     return await this.prismaService.account.findMany();

@@ -119,10 +119,9 @@ public class MedicineDetails extends Fragment {
         // Set text based on the Medicine object
         if (mMedicine != null) {
             Location currentLocation = sharedLocationViewModel.getLocation();
-            nearestPharmaciesAdapter = new ClosestPharmaciesRecyclerAdapter(recivedPharmacies);
+            nearestPharmaciesAdapter = new ClosestPharmaciesRecyclerAdapter(recivedPharmacies, getContext());
             nameTextView.setText(mMedicine.name);
             purposeTextView.setText(mMedicine.purpose);
-            //falta a imagem
             Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, mMedicine.picture)).into((ImageView) rootView.findViewById(R.id.medicine_details_image));
             mLayoutManager = new LinearLayoutManager(getActivity());
             nearestPharmacies.setLayoutManager(mLayoutManager);

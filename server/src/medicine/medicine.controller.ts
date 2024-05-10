@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { MedicineService } from './medicine.service';
 import { Medicine } from '@prisma/client';
-import { CreateMedicineDto } from './dtos/create-Medicine.dto';
+import { CreateMedicineDto } from './dtos/create-medicine.dto';
 
 @Controller('api/medicine')
 export class MedicineController {

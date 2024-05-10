@@ -4,7 +4,7 @@ import { PrismaService } from 'src/core/prisma.service';
 import {
   CreateMedicineDto,
   ReturnPharmaciesDto,
-} from './dtos/create-Medicine.dto';
+} from './dtos/create-medicine.dto';
 import { getDistance } from 'geolib';
 
 @Injectable()

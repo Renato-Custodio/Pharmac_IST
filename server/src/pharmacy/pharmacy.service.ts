@@ -57,6 +57,7 @@ export class PharmacyService {
               id: true,
               name: true,
               location: true,
+              picture: true,
             },
           },
         },
@@ -139,7 +140,7 @@ export class PharmacyService {
       data: {
         name: dto.name,
         location: dto.location,
-        picture: '',
+        picture: 'pharmacies/example.jpg',
         rating: '',
         flagCount: 0,
         mapChunk: {

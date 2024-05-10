@@ -78,7 +78,7 @@ export class MedicineService {
       data: {
         name: dto.name,
         purpose: dto.purpose,
-        picture: '',
+        picture: 'medicines/generic_medicine.jpg',
       },
     });
   }

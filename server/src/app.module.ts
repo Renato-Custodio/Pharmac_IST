@@ -11,7 +11,12 @@ import { SeedModule } from './seed/seed.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'images'),
+      rootPath: join(__dirname, '..', 'images', 'pharmacies'),
+      serveRoot: '/images/pharmacies',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'images', 'medicines'),
+      serveRoot: '/images/medicines',
     }),
     ConfigModule.forRoot(),
     AccountModule,

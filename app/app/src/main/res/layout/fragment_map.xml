@@ -124,7 +124,7 @@
 
                     <com.google.android.material.chip.Chip
 
-                        android:id="@+id/pharmacy_distance"
+                        android:id="@+id/fragment_map_pharmacy_distance"
                         style="@style/Widget.Material3.Chip.Suggestion"
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"
@@ -153,7 +153,7 @@
                         android:layout_height="match_parent">
 
                         <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/pharmacy_image"
+                            android:id="@+id/fragment_map_pharmacy_image"
                             android:layout_width="110dp"
                             android:layout_height="110dp"
                             android:background="#ECE6F0"
@@ -164,7 +164,7 @@
                             map:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
-                            android:id="@+id/textView5"
+                            android:id="@+id/fragment_map_pharmacy_title"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
@@ -172,11 +172,11 @@
                             android:textSize="24sp"
                             android:textStyle="bold"
                             app:layout_constraintEnd_toEndOf="parent"
-                            map:layout_constraintStart_toEndOf="@+id/pharmacy_image"
+                            map:layout_constraintStart_toEndOf="@+id/fragment_map_pharmacy_image"
                             map:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
-                            android:id="@+id/textView6"
+                            android:id="@+id/fragment_map_pharmacy_address"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
@@ -185,8 +185,8 @@
                             android:text="Rua Professor Eduardo Araújo Coelho Nº5"
                             android:textSize="16sp"
                             map:layout_constraintEnd_toEndOf="parent"
-                            map:layout_constraintStart_toEndOf="@+id/pharmacy_image"
-                            map:layout_constraintTop_toBottomOf="@+id/textView5" />
+                            map:layout_constraintStart_toEndOf="@+id/fragment_map_pharmacy_image"
+                            map:layout_constraintTop_toBottomOf="@+id/fragment_map_pharmacy_title" />
 
                         <Button
                             android:id="@+id/routeButton"
@@ -196,11 +196,11 @@
                             android:layout_marginTop="8dp"
                             android:text="Get route"
                             app:icon="@drawable/route"
-                            map:layout_constraintStart_toEndOf="@+id/pharmacy_image"
-                            map:layout_constraintTop_toBottomOf="@+id/textView6" />
+                            map:layout_constraintStart_toEndOf="@+id/fragment_map_pharmacy_image"
+                            map:layout_constraintTop_toBottomOf="@+id/fragment_map_pharmacy_address" />
 
                         <Button
-                            android:id="@+id/favouriteButton"
+                            android:id="@+id/fragment_map_pharmacy_favoriteButton"
                             style="?attr/materialIconButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -208,10 +208,10 @@
                             android:visibility="visible"
                             app:icon="@drawable/favorite_outline"
                             map:layout_constraintBottom_toBottomOf="parent"
-                            map:layout_constraintEnd_toStartOf="@+id/flagButton" />
+                            map:layout_constraintEnd_toStartOf="@+id/fragment_map_pharmacy_flagButton" />
 
                         <Button
-                            android:id="@+id/flagButton"
+                            android:id="@+id/fragment_map_pharmacy_flagButton"
                             style="?attr/materialIconButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -247,6 +247,17 @@
                         android:text="Slide up to see available medicines"
                         android:textColor="#8849454F"
                         app:drawableLeftCompat="@drawable/arrow_upward" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Avaliable medicines" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
 

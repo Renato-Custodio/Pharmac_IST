@@ -1,11 +1,15 @@
 package pt.ulisboa.tecnico.cmov.pharmacist;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -34,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
 
     int medicinesOrDetails = 0;
 
+    boolean isLoggedIn = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +55,30 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
         addFragment(medicinesFragment);
 
         replaceFragment(mapFragment);
+
+        binding.topAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+
+                if (id == R.id.account) {
+                    // Handle click on the "Account" menu item
+                    if (isLoggedIn) {
+                        // If the user is logged in, navigate to AccountInfo activity
+                        //Intent accIntent = new Intent(MainActivity.this, AccountInfo.class);
+                        //startActivity(accIntent);
+                        Log.d("MainActivity", "User is logged in");
+                    } else {
+                        // If the user is not logged in, navigate to AccountLogin activity
+                        Intent accIntent = new Intent(MainActivity.this, AccountLogin.class);
+                        startActivity(accIntent);
+                    }
+                }
+                return true;
+            }
+        });
+
+
 
         binding.bottomNavigation.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override

@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".AccountSignup">
 
     <!-- TODO: Update blank fragment layout -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -50,18 +51,19 @@
             app:layout_constraintTop_toBottomOf="@id/usernameEditText" />
 
         <Button
-            android:id="@+id/SignupButton"
-            android:layout_width="0dp"
+            android:id="@+id/signupButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="56dp"
             android:scaleX="1.5"
             android:scaleY="1.5"
             android:text="Sign up"
-            app:layout_constraintTop_toBottomOf="@id/passwordEditText"
-            tools:layout_editor_absoluteX="154dp" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/passwordEditText" />
 
         <Button
-            android:id="@+id/createAccountButton"
+            android:id="@+id/loginButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
@@ -69,8 +71,8 @@
             android:scaleY="1.5"
             android:text="Login"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/SignupButton"
-            app:layout_constraintStart_toStartOf="@+id/SignupButton" />
+            app:layout_constraintEnd_toEndOf="@+id/signupButton"
+            app:layout_constraintStart_toStartOf="@+id/signupButton" />
 
         <TextView
             android:id="@+id/create_acc"
@@ -78,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="Already have an account?"
-            app:layout_constraintBottom_toTopOf="@+id/createAccountButton"
+            app:layout_constraintBottom_toTopOf="@+id/loginButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

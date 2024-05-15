@@ -31,6 +31,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".AccountLogin"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".AccountSignup"
+            android:exported="true">
+        </activity>
     </application>
 
 </manifest>

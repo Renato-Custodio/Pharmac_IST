@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    alias(libs.plugins.googleGmsGoogleServices)
 }
 
 secrets {
@@ -61,6 +62,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.places)
     implementation("com.squareup.picasso:picasso:2.8")
+    implementation(libs.firebase.database)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

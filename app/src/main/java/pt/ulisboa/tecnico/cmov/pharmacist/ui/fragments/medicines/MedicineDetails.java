@@ -20,14 +20,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
-import pt.ulisboa.tecnico.cmov.pharmacist.client.APIFactory;
 import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
-import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.PharmacyDistance;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyDistance;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.ClosestPharmaciesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import com.google.android.material.transition.MaterialSharedAxis;
 import com.squareup.picasso.Picasso;
@@ -78,7 +74,7 @@ public class MedicineDetails extends Fragment {
         setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
     }
 
-    private void closestPharmacies(String medicineId, String lat, String lng) {
+    /*private void closestPharmacies(String medicineId, String lat, String lng) {
         Call<List<PharmacyDistance>> closestPharmacies = APIFactory.getInterface().doGetClosestPharmacies(medicineId, lat, lng);
         closestPharmacies.enqueue(new Callback<List<PharmacyDistance>>() {
             @SuppressLint("NotifyDataSetChanged")
@@ -86,6 +82,7 @@ public class MedicineDetails extends Fragment {
             public void onResponse(Call<List<PharmacyDistance>> call, Response<List<PharmacyDistance>> response) {
                 recivedPharmacies.clear();
                 recivedPharmacies.addAll(response.body());
+                System.out.println(recivedPharmacies);
                 nearestPharmaciesAdapter.notifyDataSetChanged();
             }
 
@@ -95,7 +92,7 @@ public class MedicineDetails extends Fragment {
                 call.cancel();
             }
         });
-    }
+    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -142,8 +139,8 @@ public class MedicineDetails extends Fragment {
             nearestPharmacies.setLayoutManager(mLayoutManager);
             nearestPharmacies.setAdapter(nearestPharmaciesAdapter);
 
-            closestPharmacies(mMedicine.id,String.valueOf((int) Math.round(currentLocation.getLatitude())),
-                    String.valueOf((int) Math.round(currentLocation.getLongitude())));
+            /*closestPharmacies(mMedicine.id,String.valueOf((int) Math.round(currentLocation.getLatitude())),
+                    String.valueOf((int) Math.round(currentLocation.getLongitude())));*/
         }
 
         return rootView;

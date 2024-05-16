@@ -3,7 +3,6 @@ package pt.ulisboa.tecnico.cmov.pharmacist;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
@@ -19,7 +18,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.navigation.NavigationBarView;
 
-import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.databinding.ActivityMainBinding;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.MapFragment;
@@ -31,9 +29,7 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
     ActivityMainBinding binding;
     MapFragment mapFragment;
     MedicinesFragment medicinesFragment;
-
     Fragment current;
-
     Fragment details = new Fragment();
 
     int medicinesOrDetails = 0;
@@ -77,8 +73,6 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
                 return true;
             }
         });
-
-
 
         binding.bottomNavigation.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -138,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
     }
 
     @Override
-    public void onItemClicked(Medicine medicine) {
+    public void onItemClicked(pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine medicine) {
         MedicineDetails newFragment = MedicineDetails.newInstance(medicine, this);
         details = newFragment;
         addFragment(newFragment);

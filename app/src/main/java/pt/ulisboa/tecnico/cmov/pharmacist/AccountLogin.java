@@ -34,7 +34,3 @@ public class AccountLogin extends AppCompatActivity {
         return true;
     }
 }
-
-
-
-

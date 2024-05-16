@@ -19,14 +19,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-import pt.ulisboa.tecnico.cmov.pharmacist.client.APIFactory;
-import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.MapChunk;
-import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Pharmacy;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MapChunk;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
+
 
 public class MarkersSystem {
     private final LruCache<String, MapChunk> mapCache;
@@ -91,7 +87,7 @@ public class MarkersSystem {
 
         Log.d("MarkersSystem", MessageFormat.format("Requested chunk: {0} / {1}", roundedCoord, chunkId));
 
-        if (this.mapCache.get(chunkId) == null) {
+        /*if (this.mapCache.get(chunkId) == null) {
             Log.d("MarkersSystem", MessageFormat.format("Fetching chunk: {0} / {1} (Cached chunks: {2} / {3})", roundedCoord, chunkId, mapCache.size(), mapCache.maxSize()));
 
             Call<List<MapChunk>> chunks = APIFactory.getInterface().doGetMapFragment(roundedCoord.latitude, roundedCoord.longitude);
@@ -116,7 +112,7 @@ public class MarkersSystem {
                     call.cancel();
                 }
             });
-        }
+        }*/
 
     }
 }

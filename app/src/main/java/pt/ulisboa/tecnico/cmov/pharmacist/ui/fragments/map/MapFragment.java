@@ -2,6 +2,8 @@ package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -51,11 +53,14 @@ import com.google.android.material.search.SearchBar;
 import com.google.android.material.search.SearchView;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.List;
+import java.util.Locale;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
-import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Pharmacy;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.PlacesAutoCompleteAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 
@@ -352,10 +357,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         View bottomSheetView = getView().findViewById(R.id.pharmacy_details);
-        TextView textViewTitle = bottomSheetView.findViewById(R.id.fragment_map_pharmacy_title);
-        TextView textViewLocation = bottomSheetView.findViewById(R.id.fragment_map_pharmacy_address);
-        TextView textViewDistance = bottomSheetView.findViewById(R.id.fragment_map_pharmacy_distance);
-        Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, pharmacy.picture)).into((ImageView) bottomSheetView.findViewById(R.id.fragment_map_pharmacy_image));
+        TextView textViewTitle = bottomSheetView.findViewById(R.id.textView5);
+        TextView textViewLocation = bottomSheetView.findViewById(R.id.textView6);
+        TextView textViewDistance = bottomSheetView.findViewById(R.id.pharmacy_distance);
+        Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, pharmacy.picture)).into((ImageView) bottomSheetView.findViewById(R.id.pharmacy_image));
         sharedLocationViewModel.getLocation().observe(getViewLifecycleOwner(), new Observer<Location>() {
             @Override
             public void onChanged(Location location) {
@@ -365,8 +370,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         if (textViewTitle != null && pharmacy != null) {
             textViewTitle.setText(pharmacy.name);
-            pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Location location =
-                    new pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Location();
+            pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location location =
+                    new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location();
             location.lat = marker.getPosition().latitude;
             location.lng = marker.getPosition().longitude;
             textViewLocation.setText(
@@ -379,7 +384,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         PharmacyMarker.setActive(marker, true);
 
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
-
         return true;
     }
 }

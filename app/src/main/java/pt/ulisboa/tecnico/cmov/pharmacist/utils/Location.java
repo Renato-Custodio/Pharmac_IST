@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class Location {
-    public static String getAddress(pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Location location, Context context){
+    public static String getAddress(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location location, Context context){
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
 
         try {
@@ -38,7 +38,7 @@ public class Location {
     }
 
     public static Float getDistance(android.location.Location curruntLocation,
-                                     pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Location pharmacyLocation){
+                                     pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location pharmacyLocation){
         android.location.Location location2 = new android.location.Location("");
         location2.setLatitude(pharmacyLocation.lat);
         location2.setLongitude(pharmacyLocation.lng);

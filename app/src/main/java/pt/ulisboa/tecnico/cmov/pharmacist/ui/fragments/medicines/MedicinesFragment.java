@@ -26,13 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
-import pt.ulisboa.tecnico.cmov.pharmacist.client.APIFactory;
-import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.SearchRecyclerAdapter;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
 public class MedicinesFragment extends Fragment {
@@ -51,7 +46,7 @@ public class MedicinesFragment extends Fragment {
     RecyclerView.LayoutManager mLayoutManager2;
 
     // Search results
-    private List<Medicine> searchResults = new ArrayList<>();
+    private List<pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine> searchResults = new ArrayList<>();
     private MedicinesRecyclerAdapter.OnItemClickListener listener;
 
     // Search back button
@@ -78,7 +73,7 @@ public class MedicinesFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_medicines, container, false);
     }
 
-    private void medicineSearch(String query, Integer page, boolean initialQuery) {
+    /*private void medicineSearch(String query, Integer page, boolean initialQuery) {
         if (query.isEmpty() && !initialQuery) return;
 
         Call<List<Medicine>> search = APIFactory.getInterface().doGetMedicines(query, page);
@@ -99,17 +94,17 @@ public class MedicinesFragment extends Fragment {
                 call.cancel();
             }
         });
-    }
+    }*/
 
     private void registerSearchEvents() {
         searchView.addTransitionListener((searchView, previousState, newState) -> {
             if (newState == SearchView.TransitionState.SHOWING) {
                 // Handle search view opened, load medicines
-                medicineSearch("", 1, true);
+                //medicineSearch("", 1, true);
             }
         });
 
-        backButton.setOnClickListener(new View.OnClickListener() {
+        /*backButton.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onClick(View v) {
@@ -119,7 +114,7 @@ public class MedicinesFragment extends Fragment {
                 searchRecyclerAdapter.notifyDataSetChanged();
                 backButton.setVisibility(View.GONE);
             }
-        });
+        });*/
 
         searchView.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
@@ -127,7 +122,7 @@ public class MedicinesFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                medicineSearch(s.toString(), 1, false);
+                //medicineSearch(s.toString(), 1, false);
             }
 
             @Override

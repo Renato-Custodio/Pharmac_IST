@@ -2,26 +2,17 @@ package pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.location.Address;
-import android.location.Geocoder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.Locale;
-import java.util.function.Consumer;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
-import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
-import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Pharmacy;
-import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.PharmacyDistance;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyDistance;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.Location;
 
 public class ClosestPharmaciesRecyclerAdapter extends RecyclerView.Adapter<ClosestPharmaciesRecyclerAdapter.ViewHolder> {

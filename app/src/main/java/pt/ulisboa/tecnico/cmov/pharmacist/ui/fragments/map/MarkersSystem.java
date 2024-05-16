@@ -1,16 +1,25 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 import android.util.LruCache;
+import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -87,11 +96,34 @@ public class MarkersSystem {
 
         Log.d("MarkersSystem", MessageFormat.format("Requested chunk: {0} / {1}", roundedCoord, chunkId));
 
-        /*if (this.mapCache.get(chunkId) == null) {
+        if (this.mapCache.get(chunkId) == null) {
             Log.d("MarkersSystem", MessageFormat.format("Fetching chunk: {0} / {1} (Cached chunks: {2} / {3})", roundedCoord, chunkId, mapCache.size(), mapCache.maxSize()));
 
-            Call<List<MapChunk>> chunks = APIFactory.getInterface().doGetMapFragment(roundedCoord.latitude, roundedCoord.longitude);
-            chunks.enqueue(new Callback<List<MapChunk>>() {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+            DatabaseReference pharmaciesRef = database.getReference("pharmacies");
+
+            Query query = pharmaciesRef.limitToFirst(4);
+
+            query.addValueEventListener(new ValueEventListener() {
+                @SuppressLint("NotifyDataSetChanged")
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    List<Pharmacy> pharmacies = new ArrayList<>();
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Pharmacy pharmacy = snapshot.getValue(Pharmacy.class);
+                        pharmacies.add(pharmacy);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.e("Medicine Fragment getting medicines", "Database error: " + databaseError.getMessage());
+                }
+            });
+
+            //Call<List<MapChunk>> chunks = APIFactory.getInterface().doGetMapFragment(roundedCoord.latitude, roundedCoord.longitude);
+            /*chunks.enqueue(new Callback<List<MapChunk>>() {
                 @Override
                 public void onResponse(Call<List<MapChunk>> call, Response<List<MapChunk>> response) {
                     Set<String> loadedChunkIds = new HashSet<>();
@@ -105,14 +137,8 @@ public class MarkersSystem {
 
                     refreshPoints(loadedChunkIds, selectedPharmacy, callback);
                 }
-
-                @Override
-                public void onFailure(Call<List<MapChunk>> call, Throwable t) {
-                    Log.e("MarkersSystem", MessageFormat.format("doGetMapFragment: {0}", t.getMessage()));
-                    call.cancel();
-                }
-            });
-        }*/
+            });*/
+        }
 
     }
 }

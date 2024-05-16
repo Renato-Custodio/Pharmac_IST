@@ -76,15 +76,6 @@ public class Medicine implements Parcelable {
     }
 
     @Override
-    public String toString() {
-        return "Medicine{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", purpose='" + purpose + '\'' +
-                '}';
-    }
-
-    @Override
     public int describeContents() {
         return 0;
     }

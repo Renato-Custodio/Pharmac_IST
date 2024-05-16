@@ -47,7 +47,7 @@ public class MedicinesFragment extends Fragment {
     RecyclerView.LayoutManager mLayoutManager;
 
     // Search view controllers
-    private String lastKey = null;
+
     SearchBar searchBar;
     SearchView searchView;
     RecyclerView resultsMedicines;
@@ -93,11 +93,8 @@ public class MedicinesFragment extends Fragment {
             query1 = medicinesRef.limitToFirst(4);
         }else{
             query = query.substring(0,1).toUpperCase() + query.substring(1);
-            System.out.println(query);
             query1 = medicinesRef.orderByChild("name").
                     startAt(query).endAt(query + "\uf8ff").limitToFirst(4);
-
-            System.out.println(query1.get());
         }
 
 
@@ -107,11 +104,10 @@ public class MedicinesFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine> medicines = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    System.out.println(snapshot.getValue());
+
                     pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine medicine =
                             snapshot.getValue(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine.class);
                     medicines.add(medicine);
-                    lastKey = snapshot.getKey();
                 }
 
                 backButton.setVisibility(View.VISIBLE);

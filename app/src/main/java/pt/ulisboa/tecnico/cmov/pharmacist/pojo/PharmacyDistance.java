@@ -2,8 +2,12 @@ package pt.ulisboa.tecnico.cmov.pharmacist.pojo;
 
 import com.google.gson.annotations.SerializedName;
 public class PharmacyDistance {
-    @SerializedName("pharmacy")
+
     public Pharmacy pharmacy;
-    @SerializedName("distance")
     public double distance;
+
+    public PharmacyDistance(Pharmacy pharmacy, double distance){
+        this.distance = distance;
+        this.pharmacy = pharmacy;
+    }
 }

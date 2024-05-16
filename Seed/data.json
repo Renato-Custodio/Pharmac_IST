@@ -250,5 +250,51 @@
       "name": "Paroxetine",
       "purpose": "Selective serotonin reuptake inhibitor (SSRI) antidepressant"
     }
+  },
+  "pharmacies": {
+    "pharmacy1": {
+      "id": "pharmacy1",
+      "name": "Lisbon Pharmacy",
+      "picture": "example_picture_url1",
+      "location": {
+        "lat": 38.7223,
+        "lng": -9.1393
+      }
+    },
+    "pharmacy2": {
+      "id": "pharmacy2",
+      "name": "São Jorge Pharmacy",
+      "picture": "example_picture_url2",
+      "location": {
+        "lat": 38.7369,
+        "lng": -9.1426
+      }
+    },
+    "pharmacy3": {
+      "id": "pharmacy3",
+      "name": "Santa Maria Pharmacy",
+      "picture": "example_picture_url3",
+      "location": {
+        "lat": 38.7223,
+        "lng": -9.1393
+      }
+    }
+  },
+  "stock": {
+    "1": {
+      "medicineId": "1",
+      "pharmacyId": "pharmacy1",
+      "stock": 30
+    },
+    "2": {
+      "medicineId": "1",
+      "pharmacyId": "pharmacy2",
+      "stock": 30
+    },
+    "3": {
+      "medicineId": "1",
+      "pharmacyId": "pharmacy3",
+      "stock": 30
+    }
   }
 }

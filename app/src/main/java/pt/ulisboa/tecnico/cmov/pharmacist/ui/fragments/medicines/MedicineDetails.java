@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -21,11 +22,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyDistance;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Stock;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.ClosestPharmaciesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 
 import com.google.android.material.transition.MaterialSharedAxis;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.MessageFormat;
@@ -74,25 +83,55 @@ public class MedicineDetails extends Fragment {
         setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
     }
 
-    /*private void closestPharmacies(String medicineId, String lat, String lng) {
-        Call<List<PharmacyDistance>> closestPharmacies = APIFactory.getInterface().doGetClosestPharmacies(medicineId, lat, lng);
-        closestPharmacies.enqueue(new Callback<List<PharmacyDistance>>() {
+    private void closestPharmacies(String medicineId, String lat, String lng) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+
+        //get all Pharmacies with the medicineId
+        DatabaseReference stockRef = database.getReference("stock");
+
+        Query query = stockRef.orderByChild("medicineId").equalTo(medicineId);
+
+        query.addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
-            public void onResponse(Call<List<PharmacyDistance>> call, Response<List<PharmacyDistance>> response) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 recivedPharmacies.clear();
-                recivedPharmacies.addAll(response.body());
-                System.out.println(recivedPharmacies);
-                nearestPharmaciesAdapter.notifyDataSetChanged();
+                List<Stock> stocks = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Stock stock = snapshot.getValue(Stock.class);
+                    stocks.add(stock);
+                }
+                // Now, for each stock, fetch its corresponding pharmacy
+                for (Stock stock : stocks) {
+                    DatabaseReference pharmacyRef = FirebaseDatabase.getInstance().getReference("pharmacies").child(stock.getPharmacyId());
+                    pharmacyRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Pharmacy pharmacy = dataSnapshot.getValue(Pharmacy.class);
+                            if (pharmacy != null) {
+                                recivedPharmacies.add(new PharmacyDistance(pharmacy, pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(sharedLocationViewModel.getLocation().getValue() ,pharmacy.location)) );
+                            }
+                            nearestPharmaciesAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Log.e("Medicine Fragment getting pharmacies", "Database error: " + databaseError.getMessage());
+                        }
+                    });
+                }
             }
 
             @Override
-            public void onFailure(Call<List<PharmacyDistance>> call, Throwable t) {
-                Log.e("closestPharmacies", t.getMessage());
-                call.cancel();
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Medicine Fragment getting medicines", "Database error: " + databaseError.getMessage());
             }
         });
-    }*/
+
+
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -139,8 +178,8 @@ public class MedicineDetails extends Fragment {
             nearestPharmacies.setLayoutManager(mLayoutManager);
             nearestPharmacies.setAdapter(nearestPharmaciesAdapter);
 
-            /*closestPharmacies(mMedicine.id,String.valueOf((int) Math.round(currentLocation.getLatitude())),
-                    String.valueOf((int) Math.round(currentLocation.getLongitude())));*/
+            closestPharmacies(mMedicine.id,String.valueOf((int) Math.round(currentLocation.getLatitude())),
+                    String.valueOf((int) Math.round(currentLocation.getLongitude())));
         }
 
         return rootView;

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
-import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 
 public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchRecyclerAdapter.ViewHolder> {
     private static List<Medicine> localDataSet = null;

@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines;
 
+import static com.android.volley.VolleyLog.TAG;
+
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 
@@ -21,6 +23,12 @@ import android.widget.Button;
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.search.SearchView;
 import com.google.android.material.transition.MaterialFadeThrough;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +47,14 @@ public class MedicinesFragment extends Fragment {
     RecyclerView.LayoutManager mLayoutManager;
 
     // Search view controllers
-
+    private String lastKey = null;
     SearchBar searchBar;
     SearchView searchView;
     RecyclerView resultsMedicines;
     RecyclerView.LayoutManager mLayoutManager2;
 
     // Search results
-    private List<pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine> searchResults = new ArrayList<>();
+    private List<pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine> searchResults = new ArrayList<>();
     private MedicinesRecyclerAdapter.OnItemClickListener listener;
 
     // Search back button
@@ -73,38 +81,63 @@ public class MedicinesFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_medicines, container, false);
     }
 
-    /*private void medicineSearch(String query, Integer page, boolean initialQuery) {
+    private void medicineSearch(String query, boolean initialQuery) {
         if (query.isEmpty() && !initialQuery) return;
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-        Call<List<Medicine>> search = APIFactory.getInterface().doGetMedicines(query, page);
-        search.enqueue(new Callback<List<Medicine>>() {
+        DatabaseReference medicinesRef = database.getReference("medicines");
+
+
+        Query query1;
+        if(query.equals("")){
+            query1 = medicinesRef.limitToFirst(4);
+        }else{
+            query = query.substring(0,1).toUpperCase() + query.substring(1);
+            System.out.println(query);
+            query1 = medicinesRef.orderByChild("name").
+                    startAt(query).endAt(query + "\uf8ff").limitToFirst(4);
+
+            System.out.println(query1.get());
+        }
+
+
+        query1.addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
-            public void onResponse(Call<List<Medicine>> call, Response<List<Medicine>> response) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine> medicines = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    System.out.println(snapshot.getValue());
+                    pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine medicine =
+                            snapshot.getValue(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine.class);
+                    medicines.add(medicine);
+                    lastKey = snapshot.getKey();
+                }
+
                 backButton.setVisibility(View.VISIBLE);
                 searchResults.clear();
-                searchResults.addAll(response.body());
+                searchResults.addAll(medicines);
                 medicinesRecyclerAdapter.notifyDataSetChanged();
                 searchRecyclerAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onFailure(Call<List<Medicine>> call, Throwable t) {
-                Log.e("medicineSearch", t.getMessage());
-                call.cancel();
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Medicine Fragment getting medicines", "Database error: " + databaseError.getMessage());
             }
         });
-    }*/
+
+    }
 
     private void registerSearchEvents() {
         searchView.addTransitionListener((searchView, previousState, newState) -> {
             if (newState == SearchView.TransitionState.SHOWING) {
                 // Handle search view opened, load medicines
-                //medicineSearch("", 1, true);
+                medicineSearch("", true);
             }
         });
 
-        /*backButton.setOnClickListener(new View.OnClickListener() {
+        backButton.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onClick(View v) {
@@ -114,7 +147,7 @@ public class MedicinesFragment extends Fragment {
                 searchRecyclerAdapter.notifyDataSetChanged();
                 backButton.setVisibility(View.GONE);
             }
-        });*/
+        });
 
         searchView.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
@@ -122,7 +155,7 @@ public class MedicinesFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //medicineSearch(s.toString(), 1, false);
+                medicineSearch(s.toString(), false);
             }
 
             @Override

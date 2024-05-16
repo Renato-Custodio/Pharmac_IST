@@ -16,7 +16,7 @@ import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
-import pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 
 public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecyclerAdapter.ViewHolder> {
     private static List<Medicine> localDataSet = null;

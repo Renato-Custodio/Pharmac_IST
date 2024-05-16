@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
     }
 
     @Override
-    public void onItemClicked(pt.ulisboa.tecnico.cmov.pharmacist.client.pojo.Medicine medicine) {
+    public void onItemClicked(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine medicine) {
         MedicineDetails newFragment = MedicineDetails.newInstance(medicine, this);
         details = newFragment;
         addFragment(newFragment);

@@ -21,6 +21,7 @@ import com.google.android.material.navigation.NavigationBarView;
 import pt.ulisboa.tecnico.cmov.pharmacist.databinding.ActivityMainBinding;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.MapFragment;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.SeedMapChunks;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicineDetails;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicinesFragment;
 

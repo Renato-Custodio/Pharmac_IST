@@ -104,7 +104,6 @@ public class MedicinesFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine> medicines = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-
                     pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine medicine =
                             snapshot.getValue(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine.class);
                     medicines.add(medicine);

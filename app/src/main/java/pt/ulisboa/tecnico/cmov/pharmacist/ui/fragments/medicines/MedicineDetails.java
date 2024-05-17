@@ -163,10 +163,7 @@ public class MedicineDetails extends Fragment {
                                 pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(
                                         location, pharmacyDistance.pharmacy.location);
                     }
-                    nearestPharmaciesAdapter = new ClosestPharmaciesRecyclerAdapter(recivedPharmacies, getContext());
-                    mLayoutManager = new LinearLayoutManager(getActivity());
-                    nearestPharmacies.setLayoutManager(mLayoutManager);
-                    nearestPharmacies.setAdapter(nearestPharmaciesAdapter);
+                    nearestPharmaciesAdapter.notifyDataSetChanged();
                 }
             });
             Location currentLocation = sharedLocationViewModel.getLocation().getValue();

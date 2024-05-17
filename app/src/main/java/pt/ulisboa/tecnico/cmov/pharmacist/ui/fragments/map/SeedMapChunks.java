@@ -32,7 +32,7 @@ public class SeedMapChunks {
 
         DatabaseReference chunksRef = database.getReference("chunks");
 
-        pharmacyRef.orderByChild("id").equalTo("pharmacy2").addValueEventListener(new ValueEventListener() {
+        pharmacyRef.addValueEventListener(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @SuppressLint("NotifyDataSetChanged")
             @Override

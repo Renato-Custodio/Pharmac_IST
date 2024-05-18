@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -268,6 +269,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
             return;
         }
+
+        mapInstance.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                // Add a marker at the long-pressed location
+                System.out.println("long press with lat: "+ latLng.latitude+" lng: "+latLng.longitude);
+                // Replace the fragment
+                CreatePharmacy newFragment = CreatePharmacy.newInstance(latLng);
+
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragmentContainerView, newFragment);
+                transaction.addToBackStack(null); // Add to back stack to allow back navigation
+                transaction.commit();
+            }
+        });
 
         mapInstance.getUiSettings().setMyLocationButtonEnabled(false);
         mapInstance.setMyLocationEnabled(true);

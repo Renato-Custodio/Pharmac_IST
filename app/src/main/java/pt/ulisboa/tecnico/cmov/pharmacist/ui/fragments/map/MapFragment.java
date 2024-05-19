@@ -102,6 +102,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private PlacesAutoCompleteAdapter mAutoCompleteAdapter;
     private SearchBar searchBar;
 
+
+    View bottomSheetView;
+    TextView textViewTitle;
+    TextView textViewLocation;
+    TextView textViewDistance;
+
+    Pharmacy pharmacy;
+
     // Fragment Lifecycle functions
 
     @Override
@@ -110,7 +118,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         sharedLocationViewModel = new ViewModelProvider(requireActivity()).get(SharedLocationViewModel.class);
         if (savedInstanceState != null) {
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            sharedLocationViewModel.setLocation(savedInstanceState.getParcelable(KEY_LOCATION));
         }
         Places.initialize(getActivity().getApplicationContext(), BuildConfig.MAPS_API_KEY);
     }
@@ -231,6 +238,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        bottomSheetView = getView().findViewById(R.id.pharmacy_details);
+        textViewTitle = bottomSheetView.findViewById(R.id.textView5);
+        textViewLocation = bottomSheetView.findViewById(R.id.textView6);
+        textViewDistance = bottomSheetView.findViewById(R.id.pharmacy_distance);
+        sharedLocationViewModel.getLocation().observe(getViewLifecycleOwner(), new Observer<Location>() {
+            @Override
+            public void onChanged(Location location) {
+                if(pharmacy != null) {
+                    textViewDistance.setText(getDistance(location, pharmacy));
+                }
+            }
+        });
     }
 
 
@@ -304,7 +323,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 if (locationResult.getLastLocation() != null) {
-                    onLocationChanged(locationResult.getLastLocation());
+                    Location location = locationResult.getLastLocation();
+                    sharedLocationViewModel.setLocation(location);
+                    onLocationChanged(location);
                 }
             }
         }, null);
@@ -313,7 +334,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private void onLocationChanged(@NonNull Location location) {
         lastKnownLocation = focus != MapFocus.CURRENT_POSITION ? lastKnownLocation : location;
         if (focus != MapFocus.DISABLED) mapInstance.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
-        sharedLocationViewModel.setLocation(location);
     }
 
     private void onLocationChanged(@NonNull LatLng coordinates) {
@@ -359,42 +379,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public boolean onMarkerClick(@NonNull Marker marker) {
         Log.d("MapFragment:onMarkerClick", MessageFormat.format("Selected: {0}", marker.getPosition()));
         focus = MapFocus.MARKER;
+        pharmacy = (Pharmacy) marker.getTag();
         onLocationChanged(marker.getPosition());
         unfocused();
 
         if (currentSelectedMarker != null) {
             PharmacyMarker.setActive(currentSelectedMarker, false);
         }
-        Pharmacy pharmacy = (Pharmacy) marker.getTag();
+
 
         if (pharmacy == null) {
             Log.e("MapFragment:onMarkerClick", "Pharmacy is null!");
             return false;
         }
 
-        View bottomSheetView = getView().findViewById(R.id.pharmacy_details);
-        TextView textViewTitle = bottomSheetView.findViewById(R.id.textView5);
-        TextView textViewLocation = bottomSheetView.findViewById(R.id.textView6);
-        TextView textViewDistance = bottomSheetView.findViewById(R.id.pharmacy_distance);
         Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, pharmacy.picture)).into((ImageView) bottomSheetView.findViewById(R.id.pharmacy_image));
-        sharedLocationViewModel.getLocation().observe(getViewLifecycleOwner(), new Observer<Location>() {
-            @Override
-            public void onChanged(Location location) {
-                textViewDistance.setText(getDistance(location, pharmacy));
-            }
-        });
+        textViewTitle.setText(pharmacy.name);
+        pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location location =
+                new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location();
+        location.lat = marker.getPosition().latitude;
+        location.lng = marker.getPosition().longitude;
+        textViewLocation.setText(
+                pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getAddress(location, getContext()));
 
-        if (textViewTitle != null && pharmacy != null) {
-            textViewTitle.setText(pharmacy.name);
-            pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location location =
-                    new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location();
-            location.lat = marker.getPosition().latitude;
-            location.lng = marker.getPosition().longitude;
-            textViewLocation.setText(
-                    pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getAddress(location, getContext()));
-
-            textViewDistance.setText(getDistance(sharedLocationViewModel.getLocation().getValue() , pharmacy));
-        }
+        //textViewDistance.setText(getDistance(sharedLocationViewModel.getLocation().getValue() , pharmacy));
         currentSelectedMarker = marker;
 
         PharmacyMarker.setActive(marker, true);

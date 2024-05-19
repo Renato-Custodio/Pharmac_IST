@@ -15,8 +15,10 @@ public class AccountSignup extends AppCompatActivity {
         setContentView(R.layout.fragment_signup);
 
         // Initialize buttons
-        Button logIn = (Button) findViewById(R.id.loginButton);
-        Button signUp = (Button) findViewById(R.id.signupButton);
+        Button logIn = (Button) findViewById(R.id.signup_login_button);
+        Button signUp = (Button) findViewById(R.id.signup_create_account_button);
+
+        findViewById(R.id.signup_back_button).setOnClickListener(e -> finish());
 
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -25,6 +27,7 @@ public class AccountSignup extends AppCompatActivity {
                     Intent mainIntent = new Intent(AccountSignup.this, MainActivity.class);
                     //choose info to pass to MainActivity
                     startActivity(mainIntent);
+                    finish();
                 }
             }
         });
@@ -33,6 +36,7 @@ public class AccountSignup extends AppCompatActivity {
             public void onClick(View v) {
                 Intent loginIntent = new Intent(AccountSignup.this, AccountLogin.class);
                 startActivity(loginIntent);
+                finish();
             }
         });
     }

@@ -402,7 +402,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         textViewLocation.setText(
                 pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getAddress(location, getContext()));
 
-        //textViewDistance.setText(getDistance(sharedLocationViewModel.getLocation().getValue() , pharmacy));
+        textViewDistance.setText(getDistance(sharedLocationViewModel.getLocation().getValue() , pharmacy));
         currentSelectedMarker = marker;
 
         PharmacyMarker.setActive(marker, true);

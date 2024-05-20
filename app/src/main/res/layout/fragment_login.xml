@@ -50,7 +50,7 @@
             android:layout_marginEnd="24dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/card">
+            app:layout_constraintTop_toBottomOf="@+id/login_card">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/username_edit_text"
@@ -97,7 +97,7 @@
 
         <Button
             android:id="@+id/createAccountButton"
-            style="@style/Widget.Material3.Button.TonalButton"
+            style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
@@ -132,7 +132,7 @@
             app:layout_constraintTop_toBottomOf="@+id/app_name" />
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card"
+            android:id="@+id/login_card"
             style="?attr/materialCardViewElevatedStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

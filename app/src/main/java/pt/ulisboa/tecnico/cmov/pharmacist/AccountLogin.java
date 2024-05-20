@@ -21,7 +21,7 @@ public class AccountLogin extends AppCompatActivity {
 
         logIn.setOnClickListener(v -> {
             if(isLoginValid()){
-                Intent mainIntent = new Intent(AccountLogin.this, MainActivity.class);
+                Intent mainIntent = new Intent(AccountLogin.this, Account.class);
                 //choose info to pass to MainActivity
                 startActivity(mainIntent);
                 finish();

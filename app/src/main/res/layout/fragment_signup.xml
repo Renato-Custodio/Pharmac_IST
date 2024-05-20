@@ -80,24 +80,63 @@
                 android:layout_height="match_parent"
                 android:hint="Password"
                 android:padding="4dp"
-                android:password="true"
+                android:inputType="textPassword"
                 android:singleLine="true" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
+            android:id="@+id/photo_button"
+            style="@style/Widget.Material3.Button.TonalButton.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:scaleX="1"
+            android:scaleY="1"
+            android:text="Choose profile photo"
+            app:icon="@drawable/gallery_thumbnail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/password_text_input" />
+
+        <RadioGroup
+            android:id="@+id/role_pick"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="24dp"
+            android:checkedButton="@+id/default_role"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/photo_button">
+
+            <RadioButton
+                android:id="@+id/default_role"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="I'm a Regular user" />
+
+            <RadioButton
+                android:id="@+id/owner_role"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="I'm a Pharmacy owner" />
+        </RadioGroup>
+
+        <Button
             android:id="@+id/signup_create_account_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:text="Create Account"
             app:layout_constraintEnd_toEndOf="@+id/password_text_input"
             app:layout_constraintStart_toStartOf="@+id/password_text_input"
-            app:layout_constraintTop_toBottomOf="@+id/password_text_input" />
+            app:layout_constraintTop_toBottomOf="@+id/role_pick" />
 
         <Button
             android:id="@+id/signup_login_button"
-            style="@style/Widget.Material3.Button.TonalButton"
+            style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"

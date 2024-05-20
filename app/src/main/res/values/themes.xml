@@ -14,5 +14,9 @@
         <item name="cornerSize">10%</item>
     </style>
 
+    <style name="CircleImage">
+        <item name="cornerSize">50%</item>
+    </style>
+
     <style name="Theme.PharmacIST" parent="Base.Theme.PharmacIST" />
 </resources>

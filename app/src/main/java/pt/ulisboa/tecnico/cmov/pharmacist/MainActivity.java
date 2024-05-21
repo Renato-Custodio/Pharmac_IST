@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -17,13 +18,20 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.databinding.ActivityMainBinding;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.MapFragment;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.SeedMapChunks;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicineDetails;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicinesFragment;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 
 public class MainActivity extends AppCompatActivity implements MedicinesRecyclerAdapter.OnItemClickListener, MedicineDetails.back{
 
@@ -34,8 +42,6 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
     Fragment details = new Fragment();
 
     int medicinesOrDetails = 0;
-
-    boolean isLoggedIn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
 
         replaceFragment(mapFragment);
 
+        AuthUtils.signAsAnonymous(this);
+
         binding.topAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -60,15 +68,13 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
 
                 if (id == R.id.account) {
                     // Handle click on the "Account" menu item
-                    if (isLoggedIn) {
+                    if (AuthUtils.isLoggedIn()) {
                         // If the user is logged in, navigate to AccountInfo activity
-                        //Intent accIntent = new Intent(MainActivity.this, AccountInfo.class);
-                        //startActivity(accIntent);
+                        Intent accIntent = new Intent(MainActivity.this, Account.class);
+                        startActivity(accIntent);
                         Log.d("MainActivity", "User is logged in");
                     } else {
-                        // If the user is not logged in, navigate to AccountLogin activity
-                        Intent accIntent = new Intent(MainActivity.this, AccountLogin.class);
-                        startActivity(accIntent);
+                        Log.d("MainActivity", "User is not logged in");
                     }
                 }
                 return true;

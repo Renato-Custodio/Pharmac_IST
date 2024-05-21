@@ -1,18 +1,43 @@
 package pt.ulisboa.tecnico.cmov.pharmacist;
 
+import static android.util.Patterns.EMAIL_ADDRESS;
+import static com.basgeekball.awesomevalidation.ValidationStyle.TEXT_INPUT_LAYOUT;
+import static com.basgeekball.awesomevalidation.ValidationStyle.UNDERLABEL;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.basgeekball.awesomevalidation.AwesomeValidation;
+import com.basgeekball.awesomevalidation.utility.custom.SimpleCustomValidation;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
+
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
+
 public class AccountSignup extends AppCompatActivity {
+
+    private static final String REGEX_PASSWORD = "(?=.*).{8,}";
+
+    private boolean isPharmacyOwner = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_signup);
+
+        AwesomeValidation mAwesomeValidation = new AwesomeValidation(TEXT_INPUT_LAYOUT);
+
+
+        mAwesomeValidation.addValidation((TextInputLayout)findViewById(R.id.signup_email_input), EMAIL_ADDRESS, "Please enter a valid email");
+        mAwesomeValidation.addValidation((TextInputLayout) findViewById(R.id.signup_username_input), s -> !s.isEmpty() && s.length() >= 2 && s.length() <= 20, "Username needs to be at least 2 and no more than 20 characters");
+        mAwesomeValidation.addValidation((TextInputLayout) findViewById(R.id.signup_password_input), REGEX_PASSWORD, "Password needs to be at least 8 characters");
 
         // Initialize buttons
         Button logIn = (Button) findViewById(R.id.signup_login_button);
@@ -20,28 +45,28 @@ public class AccountSignup extends AppCompatActivity {
 
         findViewById(R.id.signup_back_button).setOnClickListener(e -> finish());
 
-        signUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(isRegistrationValid()){
-                    Intent mainIntent = new Intent(AccountSignup.this, MainActivity.class);
-                    //choose info to pass to MainActivity
-                    startActivity(mainIntent);
-                    finish();
-                }
-            }
+        ( (RadioButton) findViewById(R.id.owner_role)).setOnCheckedChangeListener((buttonView, isChecked) -> {
+            isPharmacyOwner = isChecked;
         });
-        logIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent loginIntent = new Intent(AccountSignup.this, AccountLogin.class);
-                startActivity(loginIntent);
-                finish();
-            }
-        });
-    }
 
-    public boolean isRegistrationValid(){
-        return true;
+        signUp.setOnClickListener(v -> {
+            if(!mAwesomeValidation.validate()) {
+                return;
+            }
+
+            String email = ((EditText)findViewById(R.id.signup_email_text)).getText().toString();
+            String username = ((EditText)findViewById(R.id.signup_username_text)).getText().toString();
+            String password = ((EditText)findViewById(R.id.password_edit_text)).getText().toString();
+
+            AuthCredential credentials = EmailAuthProvider.getCredential(email, password);
+
+            AuthUtils.convertToPermanentAccount(getApplicationContext(), username, isPharmacyOwner, credentials, e -> finish());
+        });
+
+        logIn.setOnClickListener(v -> {
+            Intent loginIntent = new Intent(AccountSignup.this, AccountLogin.class);
+            startActivity(loginIntent);
+            finish();
+        });
     }
 }

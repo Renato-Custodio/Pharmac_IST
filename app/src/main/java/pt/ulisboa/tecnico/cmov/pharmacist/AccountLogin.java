@@ -14,7 +14,7 @@ public class AccountLogin extends AppCompatActivity {
         setContentView(R.layout.fragment_login);
 
         // Initialize buttons
-        Button logIn = findViewById(R.id.loginButton);
+        Button logIn = findViewById(R.id.login_button);
         Button signUp = findViewById(R.id.createAccountButton);
 
         findViewById(R.id.login_back_button).setOnClickListener(e -> finish());

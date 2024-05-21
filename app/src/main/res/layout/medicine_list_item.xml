@@ -12,7 +12,7 @@
         android:layout_margin="8dp">
 
         <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/medicine_image"
+            android:id="@+id/picture_medicine"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:background="#ECE6F0"
@@ -30,7 +30,7 @@
             android:text="Medicine Title"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@+id/medicine_image"
+            app:layout_constraintStart_toEndOf="@+id/picture_medicine"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -40,9 +40,18 @@
             android:layout_marginStart="16dp"
             android:text="Sample medicine description and possible side effects and all of that"
             android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/medicine_image"
+            app:layout_constraintEnd_toStartOf="@+id/medicine_list_buy"
+            app:layout_constraintStart_toEndOf="@+id/picture_medicine"
             app:layout_constraintTop_toBottomOf="@+id/medicine_title" />
+
+        <Button
+            android:id="@+id/medicine_list_buy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Buy"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

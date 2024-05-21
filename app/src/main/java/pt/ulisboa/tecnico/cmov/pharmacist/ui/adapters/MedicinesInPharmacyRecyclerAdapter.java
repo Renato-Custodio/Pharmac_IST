@@ -18,14 +18,13 @@ import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 
-public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecyclerAdapter.ViewHolder> {
+public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<MedicinesInPharmacyRecyclerAdapter.ViewHolder> {
     private static List<Medicine> localDataSet = null;
     private static Fragment fragment = null;
 
     public interface OnItemClickListener {
         void onItemClicked(Medicine medicine);
     }
-    private final OnItemClickListener itemClickListener;
 
     /**
      * Initialize the dataset of the Adapter
@@ -33,10 +32,9 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
      * @param dataSet String[] containing the data to populate views to be used
      * by RecyclerView
      */
-    public MedicinesRecyclerAdapter(List<Medicine> dataSet, Fragment incomingFragment, OnItemClickListener listener) {
+    public MedicinesInPharmacyRecyclerAdapter(List<Medicine> dataSet, Fragment incomingFragment) {
         localDataSet = dataSet;
         fragment = incomingFragment;
-        itemClickListener = listener;
     }
 
 
@@ -52,13 +50,11 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
         private final TextView buttonView;
         private final View rootView;
 
-        private final OnItemClickListener itemClickListener;
 
-        public ViewHolder(View view, OnItemClickListener itemClickListener) {
+        public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
             rootView = view;
-            this.itemClickListener = itemClickListener;
             rootView.setOnClickListener(this);
             titleView = view.findViewById(R.id.medicine_title);
             descriptionView = view.findViewById(R.id.medicine_description);
@@ -89,7 +85,6 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 Medicine clickedMedicine = localDataSet.get(position);
-                itemClickListener.onItemClicked(clickedMedicine);
             }
         }
     }
@@ -101,7 +96,7 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.medicine_list_item, viewGroup, false);
 
-        return new ViewHolder(view, itemClickListener);
+        return new ViewHolder(view);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -113,7 +108,6 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
         viewHolder.getTitleView().setText(localDataSet.get(position).name);
         viewHolder.getDescriptionView().setText(localDataSet.get(position).purpose);
         Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, localDataSet.get(position).picture)).into(viewHolder.getImageView());
-        viewHolder.getButtonView().setVisibility(View.GONE);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

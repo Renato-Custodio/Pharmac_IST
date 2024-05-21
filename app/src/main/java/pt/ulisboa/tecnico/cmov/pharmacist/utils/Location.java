@@ -52,10 +52,10 @@ public class Location {
         String distanceText;
         if (distanceInKilometers < 1) {
             // If distance is less than 1 km, display in meters
-            return Math.round(distanceInMeters) + "m";
+            return Math.round(distanceInMeters) + " m";
         } else {
             // If distance is 1 km or more, display in kilometers
-            return String.format("%.1fkm", distanceInKilometers);
+            return String.format("%.1f km", distanceInKilometers);
         }
     }
 }

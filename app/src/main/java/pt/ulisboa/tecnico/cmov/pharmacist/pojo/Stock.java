@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.pojo;
 
 public class Stock {
+    private String Id;
 
     private String medicineId;
 
@@ -9,6 +10,14 @@ public class Stock {
     private int stock;
 
     public Stock(){}
+
+    public String getId() {
+        return Id;
+    }
+
+    public void setId(String id) {
+        this.Id = id;
+    }
 
     public String getMedicineId() {
         return medicineId;

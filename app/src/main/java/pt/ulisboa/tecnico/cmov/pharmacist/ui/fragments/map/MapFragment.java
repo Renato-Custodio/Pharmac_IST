@@ -53,16 +53,29 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.search.SearchView;
+import com.google.firebase.Firebase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyDistance;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Stock;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.PlacesAutoCompleteAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 
@@ -111,7 +124,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     TextView textViewSlideMessage;
 
+    RecyclerView medicineList;
+
+    MedicinesInPharmacyRecyclerAdapter medicineListRecyclerAdapter;
+
+    RecyclerView.LayoutManager mLayoutManager;
+
     Pharmacy pharmacy;
+
+    List<Medicine> medicines;
 
     int bottomSheetState;
 
@@ -197,6 +218,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     }
                     bottomSheetState = state;
                 }else if(state == BottomSheetBehavior.STATE_HALF_EXPANDED){
+                    textViewSlideMessage.setVisibility(View.VISIBLE);
                     bottomSheetState = state;
                 }else if (state == BottomSheetBehavior.STATE_EXPANDED){
                     textViewSlideMessage.setVisibility(View.GONE);
@@ -261,6 +283,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         textViewLocation = bottomSheetView.findViewById(R.id.textView6);
         textViewDistance = bottomSheetView.findViewById(R.id.pharmacy_distance);
         textViewSlideMessage = bottomSheetView.findViewById(R.id.slide_up_message);
+        medicineList = bottomSheetView.findViewById(R.id.fragment_map_avaliable_medicines);
+        medicines = new ArrayList<>();
         sharedLocationViewModel.getLocation().observe(getViewLifecycleOwner(), new Observer<Location>() {
             @Override
             public void onChanged(Location location) {
@@ -394,6 +418,51 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 Double.valueOf(distance));
     }
 
+    private void getMedicines(){
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+        //get all medicines with the pharmacyId
+        DatabaseReference stockRef = database.getReference("stock");
+
+        Query query = stockRef.orderByChild("pharmacyId").equalTo(pharmacy.id);
+        query.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                medicines.clear();
+                List<Stock> stocks = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Stock stock = snapshot.getValue(Stock.class);
+                    stocks.add(stock);
+                }
+                // Now, for each stock, fetch its corresponding pharmacy
+                for (Stock stock : stocks) {
+                    DatabaseReference medicineRef = FirebaseDatabase.getInstance().getReference("medicines").child(stock.getMedicineId());
+                    medicineRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Medicine medicine = dataSnapshot.getValue(Medicine.class);
+                            if (medicine != null) {
+                                medicines.add(medicine);
+                            }
+                            medicineListRecyclerAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Log.e("Map fragment getting medicines", "Database error: " + databaseError.getMessage());
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Medicine Fragment getting medicines", "Database error: " + databaseError.getMessage());
+            }
+        });
+    }
+
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
         Log.d("MapFragment:onMarkerClick", MessageFormat.format("Selected: {0}", marker.getPosition()));
@@ -422,10 +491,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getAddress(location, getContext()));
 
         textViewDistance.setText(getDistance(sharedLocationViewModel.getLocation().getValue() , pharmacy));
+        //get medicines
+        medicines.clear();
+        this.getMedicines();
+
+        mLayoutManager = new LinearLayoutManager(getActivity());
+
+
+        medicineListRecyclerAdapter = new MedicinesInPharmacyRecyclerAdapter(medicines, this);
+        medicineList.setLayoutManager(mLayoutManager);
+        medicineList.setAdapter(medicineListRecyclerAdapter);
+
+
         currentSelectedMarker = marker;
 
         PharmacyMarker.setActive(marker, true);
-        bottomSheetBehavior.setHalfExpandedRatio(0.341f);
+        bottomSheetBehavior.setHalfExpandedRatio(0.34f);
         bottomSheetBehavior.setSkipCollapsed(true);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
         bottomSheetState = BottomSheetBehavior.STATE_HALF_EXPANDED;

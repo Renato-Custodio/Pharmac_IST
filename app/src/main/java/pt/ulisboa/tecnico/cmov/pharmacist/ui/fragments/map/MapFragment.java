@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -108,7 +109,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     TextView textViewLocation;
     TextView textViewDistance;
 
+    TextView textViewSlideMessage;
+
     Pharmacy pharmacy;
+
+    int bottomSheetState;
 
     // Fragment Lifecycle functions
 
@@ -181,8 +186,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             @Override
             public void onStateChanged(@NonNull View view, int state) {
                 if (state == BottomSheetBehavior.STATE_HIDDEN) {
-                    PharmacyMarker.setActive(currentSelectedMarker, false);
-                    currentSelectedMarker = null;
+                    textViewSlideMessage.setVisibility(View.VISIBLE);
+                    if (bottomSheetState == BottomSheetBehavior.STATE_EXPANDED) {
+                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+                        bottomSheetState = BottomSheetBehavior.STATE_HALF_EXPANDED;
+                        return;
+                    }else {
+                        PharmacyMarker.setActive(currentSelectedMarker, false);
+                        currentSelectedMarker = null;
+                    }
+                    bottomSheetState = state;
+                }else if(state == BottomSheetBehavior.STATE_HALF_EXPANDED){
+                    bottomSheetState = state;
+                }else if (state == BottomSheetBehavior.STATE_EXPANDED){
+                    textViewSlideMessage.setVisibility(View.GONE);
+                    bottomSheetState = state;
                 }
             }
 
@@ -242,6 +260,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         textViewTitle = bottomSheetView.findViewById(R.id.textView5);
         textViewLocation = bottomSheetView.findViewById(R.id.textView6);
         textViewDistance = bottomSheetView.findViewById(R.id.pharmacy_distance);
+        textViewSlideMessage = bottomSheetView.findViewById(R.id.slide_up_message);
         sharedLocationViewModel.getLocation().observe(getViewLifecycleOwner(), new Observer<Location>() {
             @Override
             public void onChanged(Location location) {
@@ -406,8 +425,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         currentSelectedMarker = marker;
 
         PharmacyMarker.setActive(marker, true);
-
+        bottomSheetBehavior.setHalfExpandedRatio(0.341f);
+        bottomSheetBehavior.setSkipCollapsed(true);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+        bottomSheetState = BottomSheetBehavior.STATE_HALF_EXPANDED;
         return true;
     }
 }

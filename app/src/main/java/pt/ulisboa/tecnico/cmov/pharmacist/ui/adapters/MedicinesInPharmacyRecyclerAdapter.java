@@ -20,17 +20,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.Transaction;
-import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;

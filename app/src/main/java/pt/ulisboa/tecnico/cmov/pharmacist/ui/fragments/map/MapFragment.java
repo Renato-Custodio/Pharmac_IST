@@ -58,12 +58,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
@@ -512,7 +510,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             return false;
         }
 
-        Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, pharmacy.getPicture())).into((ImageView) bottomSheetView.findViewById(R.id.pharmacy_image));
+        // TODO: Replace with ImageUtils
+        // Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, pharmacy.getPicture())).into((ImageView) bottomSheetView.findViewById(R.id.pharmacy_image));
         textViewTitle.setText(pharmacy.getName());
         pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location location =
                 new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location();

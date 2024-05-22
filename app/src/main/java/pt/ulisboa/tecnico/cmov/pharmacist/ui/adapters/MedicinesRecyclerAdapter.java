@@ -9,8 +9,6 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.squareup.picasso.Picasso;
-
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -110,7 +108,8 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
         // contents of the view with that element
         viewHolder.getTitleView().setText(localDataSet.get(position).name);
         viewHolder.getDescriptionView().setText(localDataSet.get(position).purpose);
-        Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, localDataSet.get(position).picture)).into(viewHolder.getImageView());
+        // TODO: Use ImageUtils
+        // Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, localDataSet.get(position).picture)).into(viewHolder.getImageView());
         viewHolder.getButtonView().setVisibility(View.GONE);
     }
 

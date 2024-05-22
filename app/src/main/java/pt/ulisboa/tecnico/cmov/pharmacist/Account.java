@@ -7,26 +7,18 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
-
-import java.text.MessageFormat;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
 public class Account extends AppCompatActivity {
 
@@ -41,7 +33,7 @@ public class Account extends AppCompatActivity {
                 findViewById(R.id.manage_pharmacies_card).setVisibility(View.GONE);
             } else {
                 ((TextView) findViewById(R.id.user_name)).setText(user.isAnonymous() ? user.getUid() : user.getDisplayName());
-                Picasso.get().load(user.getPhotoUrl()).placeholder(R.drawable.account_circle).into((ImageView) findViewById(R.id.user_image));
+                ImageUtils.loadImage(getApplicationContext(), String.format("/users/%s", user.getUid()), R.drawable.account_circle, findViewById(R.id.user_image));
                 findViewById(R.id.login_card).setVisibility(View.GONE);
                 findViewById(R.id.logout_button).setVisibility(View.VISIBLE);
                 findViewById(R.id.account_user_details).setVisibility(View.VISIBLE);

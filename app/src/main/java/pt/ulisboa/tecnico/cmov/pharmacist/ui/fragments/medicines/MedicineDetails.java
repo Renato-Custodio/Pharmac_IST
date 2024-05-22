@@ -33,9 +33,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -151,7 +149,8 @@ public class MedicineDetails extends Fragment {
             nearestPharmaciesAdapter = new ClosestPharmaciesRecyclerAdapter(recivedPharmacies, getContext());
             nameTextView.setText(mMedicine.name);
             purposeTextView.setText(mMedicine.purpose);
-            Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, mMedicine.picture)).into((ImageView) rootView.findViewById(R.id.medicine_details_image));
+            // TODO: Use ImageUtils
+            // Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, mMedicine.picture)).into((ImageView) rootView.findViewById(R.id.medicine_details_image));
             mLayoutManager = new LinearLayoutManager(getActivity());
             nearestPharmacies.setLayoutManager(mLayoutManager);
             nearestPharmacies.setAdapter(nearestPharmaciesAdapter);

@@ -252,13 +252,36 @@
                         android:id="@+id/mapView"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
-                        android:layout_marginBottom="12dp" />
+                        android:layout_marginBottom="14dp" />
 
-                    <TextView
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Avaliable Medicines:"
-                        android:textSize="20sp" />
+                        android:layout_height="wrap_content">
+
+                        <Button
+                            android:id="@+id/plus_medicine_button"
+                            style="?attr/materialIconButtonFilledStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="plus button"
+                            android:icon="@drawable/back_btn"
+                            android:scaleX="1.1"
+                            android:scaleY="1.1"
+                            app:icon="@drawable/plus"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Avaliable Medicines:"
+                            android:textSize="20sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/fragment_map_avaliable_medicines"

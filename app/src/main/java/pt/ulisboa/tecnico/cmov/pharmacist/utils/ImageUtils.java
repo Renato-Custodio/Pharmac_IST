@@ -32,6 +32,8 @@ import java.util.function.Consumer;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.GlideApp;
+import pt.ulisboa.tecnico.cmov.pharmacist.GlideRequest;
+import pt.ulisboa.tecnico.cmov.pharmacist.GlideRequests;
 
 public class ImageUtils {
 
@@ -115,6 +117,16 @@ public class ImageUtils {
     }
 
     public static void loadImage(Context context, String path, int placeholder, ImageView imageView) {
-        GlideApp.with(context).load(FirebaseStorage.getInstance().getReference(path)).placeholder(placeholder).centerCrop().into(imageView);
+        GlideRequest<Drawable> request = GlideApp.with(context).load(FirebaseStorage.getInstance().getReference(path)).centerCrop();
+
+        if (placeholder != -1) {
+            request.placeholder(placeholder);
+        }
+
+        request.into(imageView);
+    }
+
+    public static void loadImage(Context context, String path, ImageView imageView) {
+        loadImage(context, path, -1, imageView);
     }
 }

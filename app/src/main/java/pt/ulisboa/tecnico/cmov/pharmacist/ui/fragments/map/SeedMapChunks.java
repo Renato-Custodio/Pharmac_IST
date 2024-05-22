@@ -1,14 +1,11 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
-import android.annotation.SuppressLint;
 import android.os.Build;
 import android.util.Log;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import com.google.firebase.Firebase;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -16,12 +13,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MapChunk;
-import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 
 public class SeedMapChunks {
@@ -34,15 +27,14 @@ public class SeedMapChunks {
 
         pharmacyRef.addValueEventListener(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
-            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int vez = 1;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    System.out.println("snapshot: " + snapshot.getValue());
                     Pharmacy pharmacy = snapshot.getValue(Pharmacy.class);
-                    System.out.println("farmacias: "+pharmacy);
-                    double chunkLat = MapChunk.precisionRound(pharmacy.location.lat, 50);
-                    double chunkLng = MapChunk.precisionRound(pharmacy.location.lng, 50);
+                    double chunkLat = MapChunk.precisionRound(pharmacy.getLocation().lat, 50);
+                    double chunkLng = MapChunk.precisionRound(pharmacy.getLocation().lng, 50);
                     String chunkId = MapChunk.getMapChunk(chunkLat,chunkLng);
                     MapChunk mapChunk = new MapChunk(new Location(chunkLat, chunkLng), chunkId);
                     Query query = chunksRef.orderByChild("chunkId").equalTo(chunkId);
@@ -55,7 +47,7 @@ public class SeedMapChunks {
                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                     System.out.println("entrei1");
                                     MapChunk chunk = snapshot.getValue(MapChunk.class);
-                                    chunk.addPharmacyId(pharmacy.id);
+                                    chunk.addPharmacyId(pharmacy.getId());
                                     System.out.println(chunk.pharmaciesIDs);
                                     chunksRef.child(chunkId).setValue(chunk)
                                             .addOnSuccessListener(aVoid -> System.out.println("Chunk updated successfully"))
@@ -64,7 +56,7 @@ public class SeedMapChunks {
 
                             } else {
                                 System.out.println("entrei2");
-                                mapChunk.addPharmacyId(pharmacy.id);
+                                mapChunk.addPharmacyId(pharmacy.getId());
                                 chunksRef.child(chunkId).setValue(mapChunk);
                             }
                         }

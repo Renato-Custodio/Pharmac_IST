@@ -29,6 +29,7 @@ import pt.ulisboa.tecnico.cmov.pharmacist.databinding.ActivityMainBinding;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.MapFragment;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.SeedMapChunks;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicineDetails;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicinesFragment;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //SeedMapChunks.seedChuncks();
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 

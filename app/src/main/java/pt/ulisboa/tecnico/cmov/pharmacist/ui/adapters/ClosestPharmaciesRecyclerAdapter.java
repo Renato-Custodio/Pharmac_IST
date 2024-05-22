@@ -82,12 +82,11 @@ public class ClosestPharmaciesRecyclerAdapter extends RecyclerView.Adapter<Close
         Log.d("ClosestPharmaciesRecyclerAdapter", MessageFormat.format("{0}",localDataSet));
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
-        viewHolder.getTitleView().setText(localDataSet.get(position).pharmacy.name);
+        viewHolder.getTitleView().setText(localDataSet.get(position).pharmacy.getName());
 
 
         viewHolder.getDistanceView().setText(Location.getDistanceString(localDataSet.get(position).distance));
-        viewHolder.getAddressView().setText(Location.getAddress(localDataSet.get(position).pharmacy.location, context));
-
+        viewHolder.getAddressView().setText(Location.getAddress(localDataSet.get(position).pharmacy.getLocation(), context));
     }
 
     // Return the size of your dataset (invoked by the layout manager)

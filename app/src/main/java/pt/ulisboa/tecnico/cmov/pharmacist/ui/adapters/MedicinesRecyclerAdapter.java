@@ -84,8 +84,6 @@ public class MedicinesRecyclerAdapter extends RecyclerView.Adapter<MedicinesRecy
 
         @Override
         public void onClick(View v) {
-            // Perform your action here
-            // For example, you can get the clicked item position using getAdapterPosition()
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 Medicine clickedMedicine = localDataSet.get(position);

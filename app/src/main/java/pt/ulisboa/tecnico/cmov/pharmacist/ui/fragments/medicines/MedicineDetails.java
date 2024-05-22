@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines;
 
 import android.annotation.SuppressLint;
-import android.content.SyncAdapterType;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,7 +23,6 @@ import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyDistance;
-import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Stock;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.ClosestPharmaciesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 
@@ -88,39 +86,25 @@ public class MedicineDetails extends Fragment {
 
 
         //get all Pharmacies with the medicineId
-        DatabaseReference stockRef = database.getReference("stock");
+        DatabaseReference pharmacyRef = FirebaseDatabase.getInstance().getReference("pharmacies");
 
-        Query query = stockRef.orderByChild("medicineId").equalTo(medicineId);
+        Query query = pharmacyRef.orderByChild("stock/Key_ + " + medicineId).limitToFirst(5);
 
         query.addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 recivedPharmacies.clear();
-                List<Stock> stocks = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Stock stock = snapshot.getValue(Stock.class);
-                    stocks.add(stock);
-                }
-                // Now, for each stock, fetch its corresponding pharmacy
-                for (Stock stock : stocks) {
-                    DatabaseReference pharmacyRef = FirebaseDatabase.getInstance().getReference("pharmacies").child(stock.getPharmacyId());
-                    pharmacyRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            Pharmacy pharmacy = dataSnapshot.getValue(Pharmacy.class);
-                            if (pharmacy != null) {
-                                recivedPharmacies.add(new PharmacyDistance(pharmacy, pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(sharedLocationViewModel.getLocation().getValue() ,pharmacy.location)) );
-                            }
-                            nearestPharmaciesAdapter.notifyDataSetChanged();
-                        }
+                    Pharmacy pharmacy = snapshot.getValue(Pharmacy.class);
+                    if (pharmacy != null) {
+                        recivedPharmacies.add(new PharmacyDistance(pharmacy,
+                                pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(sharedLocationViewModel.getLocation().getValue()
+                                        ,pharmacy.getLocation())) );
+                    }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Log.e("Medicine Fragment getting pharmacies", "Database error: " + databaseError.getMessage());
-                        }
-                    });
                 }
+                nearestPharmaciesAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -128,9 +112,6 @@ public class MedicineDetails extends Fragment {
                 Log.e("Medicine Fragment getting medicines", "Database error: " + databaseError.getMessage());
             }
         });
-
-
-
     }
 
     @Override
@@ -161,7 +142,7 @@ public class MedicineDetails extends Fragment {
                     for (PharmacyDistance pharmacyDistance: recivedPharmacies) {
                         pharmacyDistance.distance =
                                 pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(
-                                        location, pharmacyDistance.pharmacy.location);
+                                        location, pharmacyDistance.pharmacy.getLocation());
                     }
                     nearestPharmaciesAdapter.notifyDataSetChanged();
                 }

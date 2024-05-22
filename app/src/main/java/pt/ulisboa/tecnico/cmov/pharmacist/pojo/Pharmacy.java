@@ -1,11 +1,17 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.pojo;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
+import java.util.Map;
+@IgnoreExtraProperties
 public class Pharmacy {
 
-    public String id;
-    public String name;
-    public String picture;
-    public Location location;
+    private String id;
+    private String name;
+    private String picture;
+    private Location location;
+    //key = medicineId // value = quantity
+    private Map<String, Object> stock;
 
     public Pharmacy(){}
 
@@ -39,5 +45,22 @@ public class Pharmacy {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+
+    public void addStock(String medicineId, int quantity){
+        this.stock.put(medicineId, String.valueOf(quantity));
+    }
+
+    public Map<String, Object> getStock() {
+        return stock;
+    }
+
+    public void setStock(Map<String, Object> stock) {
+        this.stock = stock;
+    }
+
+    public int getMedicineStock(String medicineId){
+        return Integer.parseInt((String) this.stock.get(medicineId)) ;
     }
 }

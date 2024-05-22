@@ -2,8 +2,6 @@ package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,7 +24,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +50,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.search.SearchView;
-import com.google.firebase.Firebase;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -62,20 +58,16 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
-import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyDistance;
-import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Stock;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.PlacesAutoCompleteAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 
@@ -413,7 +405,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private String getDistance(Location location, Pharmacy pharmacy){
         Float distance = pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(
-                location ,pharmacy.location);
+                location ,pharmacy.getLocation());
         return pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistanceString(
                 Double.valueOf(distance));
     }
@@ -422,22 +414,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         //get all medicines with the pharmacyId
-        DatabaseReference stockRef = database.getReference("stock");
+        DatabaseReference pharmaciesRef = database.getReference("pharmacies");
 
-        Query query = stockRef.orderByChild("pharmacyId").equalTo(pharmacy.id);
+        Query query = pharmaciesRef.orderByChild("id").equalTo(pharmacy.getId());
         query.addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 medicines.clear();
-                List<Stock> stocks = new ArrayList<>();
+                Pharmacy pharmacy1 = null;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Stock stock = snapshot.getValue(Stock.class);
-                    stocks.add(stock);
+                    pharmacy1 = snapshot.getValue(Pharmacy.class);
                 }
                 // Now, for each stock, fetch its corresponding pharmacy
-                for (Stock stock : stocks) {
-                    DatabaseReference medicineRef = FirebaseDatabase.getInstance().getReference("medicines").child(stock.getMedicineId());
+                for (String medicineId : pharmacy1.getStock().keySet()) {
+                    DatabaseReference medicineRef = FirebaseDatabase.getInstance().getReference("medicines").child(medicineId.substring(4));
                     medicineRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -481,8 +472,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             return false;
         }
 
-        Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, pharmacy.picture)).into((ImageView) bottomSheetView.findViewById(R.id.pharmacy_image));
-        textViewTitle.setText(pharmacy.name);
+        Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, pharmacy.getPicture())).into((ImageView) bottomSheetView.findViewById(R.id.pharmacy_image));
+        textViewTitle.setText(pharmacy.getName());
         pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location location =
                 new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location();
         location.lat = marker.getPosition().latitude;
@@ -498,7 +489,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mLayoutManager = new LinearLayoutManager(getActivity());
 
 
-        medicineListRecyclerAdapter = new MedicinesInPharmacyRecyclerAdapter(medicines, this);
+        medicineListRecyclerAdapter = new MedicinesInPharmacyRecyclerAdapter(medicines, this, pharmacy);
         medicineList.setLayoutManager(mLayoutManager);
         medicineList.setAdapter(medicineListRecyclerAdapter);
 

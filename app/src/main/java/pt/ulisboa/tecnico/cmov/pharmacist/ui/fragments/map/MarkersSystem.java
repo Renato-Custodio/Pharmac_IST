@@ -76,7 +76,8 @@ public class MarkersSystem {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             pharmacy = snapshot.getValue(Pharmacy.class);
                         }
-                        Marker marker = mapInstance.addMarker(PharmacyMarker.createNew(context, new LatLng(pharmacy.location.lat, pharmacy.location.lng)));
+                        Marker marker = mapInstance.addMarker(PharmacyMarker.createNew(context,
+                                new LatLng(pharmacy.getLocation().lat, pharmacy.getLocation().lng)));
 
                         if (marker != null) {
                             markers.add(marker);
@@ -87,7 +88,7 @@ public class MarkersSystem {
                             }
 
                             if (selectedPharmacy != null) {
-                                if (selectedPharmacy.id.equals(pharmacy.id)) {
+                                if (selectedPharmacy.getId().equals(pharmacy.getId())) {
                                     // Persist selected marker after points refresh
                                     selectedMarkerCallback.accept(marker);
                                 }

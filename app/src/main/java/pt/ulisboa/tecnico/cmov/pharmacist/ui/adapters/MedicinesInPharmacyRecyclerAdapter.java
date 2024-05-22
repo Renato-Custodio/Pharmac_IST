@@ -127,7 +127,8 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
         // contents of the view with that element
         viewHolder.getTitleView().setText(localDataSet.get(position).name);
         viewHolder.getDescriptionView().setText(localDataSet.get(position).purpose);
-        Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, localDataSet.get(position).picture)).into(viewHolder.getImageView());
+        // TODO: Replace with ImageUtils
+        // Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, localDataSet.get(position).picture)).into(viewHolder.getImageView());
         final String id = localDataSet.get(position).id;
         final String name = localDataSet.get(position).name;
         viewHolder.getButtonView().setOnClickListener(new View.OnClickListener() {

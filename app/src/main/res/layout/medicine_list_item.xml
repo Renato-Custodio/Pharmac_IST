@@ -17,6 +17,7 @@
             android:layout_height="100dp"
             android:background="#ECE6F0"
             android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearanceOverlay="@style/RoundedSquare" />
@@ -26,7 +27,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
             android:text="Medicine Title"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -38,6 +38,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginEnd="4dp"
             android:text="Sample medicine description and possible side effects and all of that"
             android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@+id/medicine_list_buy"

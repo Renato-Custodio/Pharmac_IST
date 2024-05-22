@@ -426,7 +426,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     pharmacy1 = snapshot.getValue(Pharmacy.class);
                 }
-                // Now, for each stock, fetch its corresponding pharmacy
+
                 for (String medicineId : pharmacy1.getStock().keySet()) {
                     DatabaseReference medicineRef = FirebaseDatabase.getInstance().getReference("medicines").child(medicineId.substring(4));
                     medicineRef.addListenerForSingleValueEvent(new ValueEventListener() {

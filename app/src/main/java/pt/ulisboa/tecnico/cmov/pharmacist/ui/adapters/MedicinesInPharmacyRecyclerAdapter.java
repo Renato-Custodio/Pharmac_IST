@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,7 +19,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -123,32 +126,48 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
         viewHolder.getDescriptionView().setText(localDataSet.get(position).purpose);
         Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, localDataSet.get(position).picture)).into(viewHolder.getImageView());
         final String id = localDataSet.get(position).id;
+        final String name = localDataSet.get(position).name;
         viewHolder.getButtonView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference db = database.getReference("pharmacies/" + pharmacy.getId() + "/stock/Key_" + id);
-                db.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        int stock = Integer.parseInt((String) dataSnapshot.getValue());
+                db.runTransaction(new Transaction.Handler() {
+                        @Override
+                        public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                            String stockStr = mutableData.getValue(String.class);
+                            if (stockStr == null) {
+                                return Transaction.success(mutableData); // No stock information
+                            }
 
-                        if(stock - 1 < 0){
-                            Toast.makeText(v.getContext(), "Not enough stock!", Toast.LENGTH_SHORT).show();
-                            return;
+                            int stock = Integer.parseInt(stockStr);
+
+                            if (stock - 1 < 0) {
+                                // Insufficient stock
+                                return Transaction.abort();
+                            }
+
+                            // Update stock
+                            mutableData.setValue(String.valueOf(stock - 1));
+                            return Transaction.success(mutableData);
                         }
 
-                        database.getReference("pharmacies/" + pharmacy.getId() + "/stock/Key_" + id)
-                                .setValue(String.valueOf(stock - 1));
-                        pharmacy.addStock("Key_" + id, stock - 1);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e("Map fragment getting medicines", "Database error: " + databaseError.getMessage());
-                    }
-                });
-
+                        @Override
+                        public void onComplete(@Nullable DatabaseError databaseError, boolean committed, @Nullable DataSnapshot dataSnapshot) {
+                            if (databaseError != null) {
+                                Log.e("Map fragment getting medicines", "Database error: " + databaseError.getMessage());
+                                Toast.makeText(v.getContext(), "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                            } else if (!committed) {
+                                // Transaction was not committed, likely due to insufficient stock
+                                Toast.makeText(v.getContext(), "Not available!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                // Transaction committed and stock updated
+                                int newStock = Integer.parseInt(dataSnapshot.getValue(String.class));
+                                pharmacy.addStock("Key_" + id, newStock);
+                                Toast.makeText(v.getContext(), "1 dose of " + name + " bought successfully!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
             }
         });
     }

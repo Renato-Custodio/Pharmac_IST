@@ -39,11 +39,13 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -82,6 +84,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private static final Float DEFAULT_ZOOM = 18f;
     private GoogleMap mapInstance;
+    private GoogleMap miniMapInstance;
     private final LatLng defaultLocationCoords = new LatLng(20.7580154, 72.1113358);
 
     private FusedLocationProviderClient fusedLocationClient;
@@ -126,6 +129,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     List<Medicine> medicines;
 
+    MapView pinInMap;
+
     int bottomSheetState;
 
     // Fragment Lifecycle functions
@@ -144,6 +149,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(KEY_LOCATION, lastKnownLocation);
+        pinInMap.onSaveInstanceState(outState);
     }
 
     @Override
@@ -204,29 +210,46 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
                         bottomSheetState = BottomSheetBehavior.STATE_HALF_EXPANDED;
                         return;
-                    }else {
+                    } else {
                         PharmacyMarker.setActive(currentSelectedMarker, false);
                         currentSelectedMarker = null;
                     }
                     bottomSheetState = state;
-                }else if(state == BottomSheetBehavior.STATE_HALF_EXPANDED){
+                } else if (state == BottomSheetBehavior.STATE_HALF_EXPANDED) {
                     textViewSlideMessage.setVisibility(View.VISIBLE);
                     bottomSheetState = state;
-                }else if (state == BottomSheetBehavior.STATE_EXPANDED){
+                } else if (state == BottomSheetBehavior.STATE_EXPANDED) {
                     textViewSlideMessage.setVisibility(View.GONE);
                     bottomSheetState = state;
                 }
             }
 
             @Override
-            public void onSlide(@NonNull View view, float v) {}
+            public void onSlide(@NonNull View view, float v) {
+            }
         });
 
         // Initialize places search
         addressResultsView = view.findViewById(R.id.address_search_results);
         searchView = view.findViewById(R.id.address_search_view);
         searchBar = view.findViewById(R.id.address_search_bar);
-
+        //init mini map
+        pinInMap = view.findViewById(R.id.mapView);
+        pinInMap.onCreate(savedInstanceState);
+        pinInMap.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull GoogleMap googleMap) {
+                googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getActivity().getApplicationContext(), R.raw.map_style));
+                googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                googleMap.setMyLocationEnabled(true);
+                // Save the mini map instance for later use
+                miniMapInstance = googleMap;
+            }
+        });
+        //
         mAutoCompleteAdapter = new PlacesAutoCompleteAdapter(getContext());
         addressResultsView.setLayoutManager(new LinearLayoutManager(getContext()));
         mAutoCompleteAdapter.setClickListener(new PlacesAutoCompleteAdapter.ClickListener() {
@@ -286,7 +309,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         });
     }
+    private void synchronizeMiniMap(LatLng location) {
+        if (miniMapInstance != null) {
+            miniMapInstance.moveCamera(CameraUpdateFactory.newLatLngZoom(location, DEFAULT_ZOOM));
+        }
+    }
 
+    private void synchronizeMarkers(LatLng location) {
+        if (miniMapInstance != null) {
+            miniMapInstance.clear(); // Clear existing markers
+            // Assuming you have a method to get all markers
+            MarkerOptions markerOptions = new MarkerOptions().position(location);
+            miniMapInstance.addMarker(markerOptions);
+        }
+    }
 
     // Location Permissions
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
@@ -368,13 +404,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private void onLocationChanged(@NonNull Location location) {
         lastKnownLocation = focus != MapFocus.CURRENT_POSITION ? lastKnownLocation : location;
-        if (focus != MapFocus.DISABLED) mapInstance.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
+        if (focus != MapFocus.DISABLED) {
+            mapInstance.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
+        }
     }
 
     private void onLocationChanged(@NonNull LatLng coordinates) {
         Location location = new Location("coordinates");
         location.setLatitude(coordinates.latitude);
         location.setLongitude(coordinates.longitude);
+        synchronizeMiniMap(coordinates);
+        synchronizeMarkers(coordinates);
         this.onLocationChanged(location);
     }
 

@@ -159,7 +159,7 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
                                 Toast.makeText(v.getContext(), "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                             } else if (!committed) {
                                 // Transaction was not committed, likely due to insufficient stock
-                                Toast.makeText(v.getContext(), "Not available!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(v.getContext(), "Not enough stock!", Toast.LENGTH_SHORT).show();
                             } else {
                                 // Transaction committed and stock updated
                                 int newStock = Integer.parseInt(dataSnapshot.getValue(String.class));

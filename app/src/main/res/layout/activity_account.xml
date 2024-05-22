@@ -8,6 +8,13 @@
     android:background="#FFFFFF"
     tools:context=".Account">
 
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/account_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

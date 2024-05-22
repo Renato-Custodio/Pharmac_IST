@@ -8,17 +8,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.MessageFormat;
 
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 
 public class Account extends AppCompatActivity {
@@ -47,22 +54,43 @@ public class Account extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
 
+        LinearProgressIndicator linearProgressIndicator = findViewById(R.id.account_progress);
+
         findViewById(R.id.account_back_button).setOnClickListener(e -> finish());
 
         findViewById(R.id.logout_button).setOnClickListener(e -> {
-            AuthUtils.logout();
-            fetchUserData();
+            linearProgressIndicator.setVisibility(View.VISIBLE);
+            // Revert to an anonymous account after logging out
+            AuthUtils.logout(() -> AuthUtils.signAsAnonymous(getApplicationContext(), firebaseUser -> {
+                linearProgressIndicator.setVisibility(View.GONE);
+                fetchUserData();
+            }));
         });
 
         findViewById(R.id.account_login_button).setOnClickListener(v -> {
             startActivity(new Intent(Account.this, AccountLogin.class));
+        });
+
+        AuthUtils.registerUserDataListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+
+                if (user == null) return;
+
+                findViewById(R.id.manage_pharmacies_card).setVisibility(user.isPharmacyOwner ? View.VISIBLE : View.GONE);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
         });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
         fetchUserData();
     }
 }

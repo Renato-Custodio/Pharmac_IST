@@ -7,6 +7,13 @@
     android:background="#FFFFFF"
     tools:context=".AccountSignup">
 
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/signup_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -44,7 +51,7 @@
             android:id="@+id/signup_email_input"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="75dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="24dp"
@@ -68,7 +75,7 @@
             android:id="@+id/signup_username_input"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="75dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             app:errorEnabled="true"
@@ -90,7 +97,7 @@
             android:id="@+id/signup_password_input"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="75dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             app:errorEnabled="true"
@@ -115,6 +122,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
             android:scaleX="1"
             android:scaleY="1"
             android:text="Choose profile photo"

@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
 
         replaceFragment(mapFragment);
 
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
         AuthUtils.signAsAnonymous(this);
 
         binding.topAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {

@@ -2,7 +2,6 @@ package pt.ulisboa.tecnico.cmov.pharmacist;
 
 import static android.util.Patterns.EMAIL_ADDRESS;
 import static com.basgeekball.awesomevalidation.ValidationStyle.TEXT_INPUT_LAYOUT;
-import static com.basgeekball.awesomevalidation.ValidationStyle.UNDERLABEL;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,7 +13,7 @@ import android.widget.RadioButton;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
-import com.basgeekball.awesomevalidation.utility.custom.SimpleCustomValidation;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -33,6 +32,7 @@ public class AccountSignup extends AppCompatActivity {
         setContentView(R.layout.fragment_signup);
 
         AwesomeValidation mAwesomeValidation = new AwesomeValidation(TEXT_INPUT_LAYOUT);
+        LinearProgressIndicator linearProgressIndicator = findViewById(R.id.signup_progress);
 
 
         mAwesomeValidation.addValidation((TextInputLayout)findViewById(R.id.signup_email_input), EMAIL_ADDRESS, "Please enter a valid email");
@@ -54,13 +54,18 @@ public class AccountSignup extends AppCompatActivity {
                 return;
             }
 
+            linearProgressIndicator.setVisibility(View.VISIBLE);
+
             String email = ((EditText)findViewById(R.id.signup_email_text)).getText().toString();
             String username = ((EditText)findViewById(R.id.signup_username_text)).getText().toString();
             String password = ((EditText)findViewById(R.id.password_edit_text)).getText().toString();
 
             AuthCredential credentials = EmailAuthProvider.getCredential(email, password);
 
-            AuthUtils.convertToPermanentAccount(getApplicationContext(), username, isPharmacyOwner, credentials, e -> finish());
+            AuthUtils.convertToPermanentAccount(getApplicationContext(), username, isPharmacyOwner, credentials, () -> {
+                linearProgressIndicator.setVisibility(View.GONE);
+                finish();
+            }, () -> linearProgressIndicator.setVisibility(View.GONE));
         });
 
         logIn.setOnClickListener(v -> {

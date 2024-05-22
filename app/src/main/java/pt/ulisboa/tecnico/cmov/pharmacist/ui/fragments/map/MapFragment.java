@@ -417,7 +417,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         DatabaseReference pharmaciesRef = database.getReference("pharmacies");
 
         Query query = pharmaciesRef.orderByChild("id").equalTo(pharmacy.getId());
-        query.addValueEventListener(new ValueEventListener() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

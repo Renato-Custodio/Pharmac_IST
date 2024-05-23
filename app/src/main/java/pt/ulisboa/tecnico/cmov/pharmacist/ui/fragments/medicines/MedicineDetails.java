@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +26,7 @@ import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyDistance;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.ClosestPharmaciesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
 import com.google.android.material.transition.MaterialSharedAxis;
 import com.google.firebase.database.DataSnapshot;
@@ -50,24 +52,45 @@ public class MedicineDetails extends Fragment {
     private ClosestPharmaciesRecyclerAdapter nearestPharmaciesAdapter;
 
     private List<PharmacyDistance> recivedPharmacies = new ArrayList<PharmacyDistance>();
-
-    public interface back {
-        void back();
+    private String origin;
+    private MedicineDetailsBack callback;
+    public interface MedicineDetailsBack {
+        void onBackButtonPressed(String origin);
     }
-    private final back back;
-    public MedicineDetails(MedicineDetails.back back) {
+
+    public MedicineDetails(MedicineDetails.MedicineDetailsBack back) {
         // Required empty public constructor
-        this.back = back;
+        this.callback = back;
     }
 
-    public static MedicineDetails newInstance(Medicine medicine, back back) {
+    public static MedicineDetails newInstance(Medicine medicine, MedicineDetailsBack back, String origin) {
         MedicineDetails fragment = new MedicineDetails(back);
         Bundle args = new Bundle();
         args.putParcelable(ARG_MEDICINE, medicine);
         fragment.setArguments(args);
+        fragment.origin = origin;
         return fragment;
     }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof MedicineDetailsBack) {
+            callback = (MedicineDetailsBack) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement MedicineDetailsBack");
+        }
+    }
 
+    public void setCallback(MedicineDetailsBack callback) {
+        this.callback = callback;
+    }
+
+    // Call this method when you want to pass data back to the activity
+    public void notifyBackButtonPressed() {
+        if (callback != null) {
+            callback.onBackButtonPressed(origin);
+        }
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,7 +151,7 @@ public class MedicineDetails extends Fragment {
             @Override
             public void onClick(View v) {
                 // Navigate back to the previous fragment
-                back.back();
+                notifyBackButtonPressed();
             }
         });
 
@@ -149,8 +172,9 @@ public class MedicineDetails extends Fragment {
             nearestPharmaciesAdapter = new ClosestPharmaciesRecyclerAdapter(recivedPharmacies, getContext());
             nameTextView.setText(mMedicine.name);
             purposeTextView.setText(mMedicine.purpose);
-            // TODO: Use ImageUtils
-            // Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, mMedicine.picture)).into((ImageView) rootView.findViewById(R.id.medicine_details_image));
+            // TODO
+            //change to mMedicine.picture
+            ImageUtils.loadImage(getContext(),"/users/0UTkbejLJQQnyfOyHEEobgqO1ml1",rootView.findViewById(R.id.medicine_details_image));
             mLayoutManager = new LinearLayoutManager(getActivity());
             nearestPharmacies.setLayoutManager(mLayoutManager);
             nearestPharmacies.setAdapter(nearestPharmaciesAdapter);

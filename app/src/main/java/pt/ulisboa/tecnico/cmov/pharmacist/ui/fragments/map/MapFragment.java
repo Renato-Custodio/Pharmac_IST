@@ -68,8 +68,11 @@ import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.PlacesAutoCompleteAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicinesFragment;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
 
 enum MapFocus {
@@ -117,6 +120,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     TextView textViewSlideMessage;
 
+    ImageView pharmacyImage;
+
     RecyclerView medicineList;
 
     MedicinesInPharmacyRecyclerAdapter medicineListRecyclerAdapter;
@@ -131,8 +136,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     int bottomSheetState;
 
+    private MedicinesInPharmacyRecyclerAdapter.OnItemClickListener listener;
+
     // Fragment Lifecycle functions
 
+
+    public static MapFragment newInstance(MedicinesInPharmacyRecyclerAdapter.OnItemClickListener listener){
+        MapFragment fragment = new MapFragment();
+        fragment.listener = listener;
+        return fragment;
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -297,6 +310,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         textViewDistance = bottomSheetView.findViewById(R.id.pharmacy_distance);
         textViewSlideMessage = bottomSheetView.findViewById(R.id.slide_up_message);
         medicineList = bottomSheetView.findViewById(R.id.fragment_map_avaliable_medicines);
+        pharmacyImage = bottomSheetView.findViewById(R.id.pharmacy_image);
         medicines = new ArrayList<>();
         sharedLocationViewModel.getLocation().observe(getViewLifecycleOwner(), new Observer<Location>() {
             @Override
@@ -510,8 +524,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             return false;
         }
 
-        // TODO: Replace with ImageUtils
-        // Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, pharmacy.getPicture())).into((ImageView) bottomSheetView.findViewById(R.id.pharmacy_image));
+        // TODO
+        // pharmacy.getPicture()
+        ImageUtils.loadImage(getContext(),"/users/0UTkbejLJQQnyfOyHEEobgqO1ml1", this.pharmacyImage);
         textViewTitle.setText(pharmacy.getName());
         pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location location =
                 new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location();
@@ -528,7 +543,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mLayoutManager = new LinearLayoutManager(getActivity());
 
 
-        medicineListRecyclerAdapter = new MedicinesInPharmacyRecyclerAdapter(medicines, this, pharmacy);
+        medicineListRecyclerAdapter = new MedicinesInPharmacyRecyclerAdapter(medicines, this, pharmacy, listener,getContext());
         medicineList.setLayoutManager(mLayoutManager);
         medicineList.setAdapter(medicineListRecyclerAdapter);
 

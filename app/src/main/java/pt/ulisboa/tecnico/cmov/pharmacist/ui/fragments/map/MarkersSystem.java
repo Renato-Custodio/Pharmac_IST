@@ -121,29 +121,26 @@ public class MarkersSystem {
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-            Query chunkRef = database.getReference("chunks").orderByChild("chunkId").equalTo(chunkId);
-            chunkRef.addValueEventListener(new ValueEventListener() {
+            database.getReference().child("chunks").child(chunkId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.exists()){
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()) {
                         Set<String> loadedChunkIds = new HashSet<>();
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            MapChunk chunk = snapshot.getValue(MapChunk.class);
+                        MapChunk chunk = dataSnapshot.getValue(MapChunk.class);
 
-                            mapCache.put(chunk.chunkId, chunk);
-                            loadedChunkIds.add(chunk.chunkId);
-                        }
-                        
+                        mapCache.put(chunk.chunkId, chunk);
+                        loadedChunkIds.add(chunk.chunkId);
+
                         Log.d("MarkersSystem", MessageFormat.format("Loaded chunks: {0}", loadedChunkIds));
                         refreshPoints(loadedChunkIds, selectedPharmacy, callback);
-                    }else {
-                        System.out.println("deu merda");
+                    } else {
+                        Log.w("MarkerSystem", MessageFormat.format("DataSnapshot: {0}", dataSnapshot.getChildren()));
                     }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.e("MarkerSystem getting chuncks", "Database error: " + databaseError.getMessage());
+                    Log.e("MarkerSystem", "Database error: " + databaseError.getMessage());
                 }
             });
         }

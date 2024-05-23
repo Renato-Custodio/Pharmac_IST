@@ -117,208 +117,214 @@
                     android:adjustViewBounds="false"
                     android:cropToPadding="false" />
 
-                <LinearLayout
+                <androidx.core.widget.NestedScrollView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:fillViewport="true">
 
-                    <com.google.android.material.chip.Chip
-
-                        android:id="@+id/pharmacy_distance"
-                        style="@style/Widget.Material3.Chip.Suggestion"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:layout_marginBottom="4dp"
-                        android:checkable="false"
-                        android:clickable="false"
-                        android:includeFontPadding="false"
-                        android:text="40m"
-                        android:textColor="#1D192B"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        app:checkedIconVisible="false"
-                        app:chipBackgroundColor="#E8DEF8"
-                        app:chipEndPadding="6dp"
-                        app:chipIcon="@drawable/distance"
-                        app:chipIconTint="#1D192B"
-                        app:chipIconVisible="true"
-                        app:chipStartPadding="6dp"
-                        app:chipStrokeColor="#E8DEF8"
-                        app:chipSurfaceColor="#6750A4"
-                        app:textStartPadding="6dp" />
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="12dp">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/pharmacy_image"
-                            android:layout_width="110dp"
-                            android:layout_height="110dp"
-                            android:background="#ECE6F0"
-                            android:scaleType="centerCrop"
-                            app:shapeAppearanceOverlay="@style/RoundedSquare"
-                            map:layout_constraintBottom_toBottomOf="parent"
-                            map:layout_constraintStart_toStartOf="parent"
-                            map:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/textView5"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:text="Farmácia de Telheiras"
-                            android:textSize="24sp"
-                            android:textStyle="bold"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            map:layout_constraintStart_toEndOf="@+id/pharmacy_image"
-                            map:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/textView6"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginTop="2dp"
-                            android:singleLine="false"
-                            android:text="Rua Professor Eduardo Araújo Coelho Nº5"
-                            android:textSize="16sp"
-                            map:layout_constraintEnd_toEndOf="parent"
-                            map:layout_constraintStart_toEndOf="@+id/pharmacy_image"
-                            map:layout_constraintTop_toBottomOf="@+id/textView5" />
-
-                        <Button
-                            android:id="@+id/routeButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginTop="8dp"
-                            android:text="Get route"
-                            app:icon="@drawable/route"
-                            map:layout_constraintStart_toEndOf="@+id/pharmacy_image"
-                            map:layout_constraintTop_toBottomOf="@+id/textView6" />
-
-                        <Button
-                            android:id="@+id/favouriteButton"
-                            style="?attr/materialIconButtonStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:contentDescription="Add to favorites"
-                            android:visibility="visible"
-                            app:icon="@drawable/favorite_outline"
-                            map:layout_constraintBottom_toBottomOf="parent"
-                            map:layout_constraintEnd_toStartOf="@+id/flagButton" />
-
-                        <Button
-                            android:id="@+id/flagButton"
-                            style="?attr/materialIconButtonStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:contentDescription="Report"
-                            android:visibility="visible"
-                            map:icon="@drawable/flag"
-                            map:layout_constraintBottom_toBottomOf="parent"
-                            map:layout_constraintEnd_toEndOf="parent" />
-
-                        <Button
-                            android:id="@+id/manageButton"
-                            style="?attr/materialIconButtonStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:contentDescription="Report"
-                            android:visibility="gone"
-                            map:icon="@drawable/settings"
-                            map:layout_constraintBottom_toBottomOf="parent"
-                            map:layout_constraintEnd_toEndOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <TextView
-                        android:id="@+id/slide_up_message"
-                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginBottom="12dp"
-                        android:drawablePadding="2dp"
-                        android:drawableTint="#8849454F"
-                        android:gravity="center_vertical"
-                        android:text="Slide up to see available medicines"
-                        android:textColor="#8849454F"
-                        app:drawableLeftCompat="@drawable/arrow_upward" />
+                        android:orientation="vertical">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/pharmacy_details_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        <com.google.android.material.chip.Chip
 
-                        <LinearLayout
-                            android:id="@+id/linearLayout4"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
+                            android:id="@+id/pharmacy_distance"
+                            style="@style/Widget.Material3.Chip.Suggestion"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:layout_marginBottom="4dp"
+                            android:checkable="false"
+                            android:clickable="false"
+                            android:includeFontPadding="false"
+                            android:text="40m"
+                            android:textColor="#1D192B"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            app:checkedIconVisible="false"
+                            app:chipBackgroundColor="#E8DEF8"
+                            app:chipEndPadding="6dp"
+                            app:chipIcon="@drawable/distance"
+                            app:chipIconTint="#1D192B"
+                            app:chipIconVisible="true"
+                            app:chipStartPadding="6dp"
+                            app:chipStrokeColor="#E8DEF8"
+                            app:chipSurfaceColor="#6750A4"
+                            app:textStartPadding="6dp" />
 
-                            <include
-                                layout="@layout/histogram_layout"
-                                android:layout_width="match_parent"
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="12dp">
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/pharmacy_image"
+                                android:layout_width="110dp"
+                                android:layout_height="110dp"
+                                android:background="#ECE6F0"
+                                android:scaleType="centerCrop"
+                                app:shapeAppearanceOverlay="@style/RoundedSquare"
+                                map:layout_constraintBottom_toBottomOf="parent"
+                                map:layout_constraintStart_toStartOf="parent"
+                                map:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/textView5"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:text="Farmácia de Telheiras"
+                                android:textSize="24sp"
+                                android:textStyle="bold"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                map:layout_constraintStart_toEndOf="@+id/pharmacy_image"
+                                map:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/textView6"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginTop="2dp"
+                                android:singleLine="false"
+                                android:text="Rua Professor Eduardo Araújo Coelho Nº5"
+                                android:textSize="16sp"
+                                map:layout_constraintEnd_toEndOf="parent"
+                                map:layout_constraintStart_toEndOf="@+id/pharmacy_image"
+                                map:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+                            <Button
+                                android:id="@+id/routeButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginTop="8dp"
+                                android:text="Get route"
+                                app:icon="@drawable/route"
+                                map:layout_constraintStart_toEndOf="@+id/pharmacy_image"
+                                map:layout_constraintTop_toBottomOf="@+id/textView6" />
+
+                            <Button
+                                android:id="@+id/favouriteButton"
+                                style="?attr/materialIconButtonStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:contentDescription="Add to favorites"
+                                android:visibility="visible"
+                                app:icon="@drawable/favorite_outline"
+                                map:layout_constraintBottom_toBottomOf="parent"
+                                map:layout_constraintEnd_toStartOf="@+id/flagButton" />
+
+                            <Button
+                                android:id="@+id/flagButton"
+                                style="?attr/materialIconButtonStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:contentDescription="Report"
+                                android:visibility="visible"
+                                map:icon="@drawable/flag"
+                                map:layout_constraintBottom_toBottomOf="parent"
+                                map:layout_constraintEnd_toEndOf="parent" />
+
+                            <Button
+                                android:id="@+id/manageButton"
+                                style="?attr/materialIconButtonStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:contentDescription="Report"
+                                android:visibility="gone"
+                                map:icon="@drawable/settings"
+                                map:layout_constraintBottom_toBottomOf="parent"
+                                map:layout_constraintEnd_toEndOf="parent" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <TextView
+                            android:id="@+id/slide_up_message"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginBottom="12dp"
+                            android:drawablePadding="2dp"
+                            android:drawableTint="#8849454F"
+                            android:gravity="center_vertical"
+                            android:text="Slide up to see available medicines"
+                            android:textColor="#8849454F"
+                            app:drawableLeftCompat="@drawable/arrow_upward" />
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/pharmacy_details_container"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:id="@+id/linearLayout4"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <include
+                                    layout="@layout/histogram_layout"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                            </LinearLayout>
+
+                            <com.google.android.gms.maps.MapView
+                                android:id="@+id/mapView"
+                                android:layout_width="match_parent"
+                                android:layout_height="200dp"
+                                android:layout_marginBottom="14dp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/linearLayout4" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <Button
+                                android:id="@+id/plus_medicine_button"
+                                style="?attr/materialIconButtonFilledStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:contentDescription="plus button"
+                                android:icon="@drawable/back_btn"
+                                android:scaleX="1.1"
+                                android:scaleY="1.1"
+                                app:icon="@drawable/plus"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
-                        </LinearLayout>
+                            <TextView
+                                android:id="@+id/textView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Avaliable Medicines:"
+                                android:textSize="20sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <com.google.android.gms.maps.MapView
-                            android:id="@+id/mapView"
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/fragment_map_avaliable_medicines"
                             android:layout_width="match_parent"
-                            android:layout_height="200dp"
-                            android:layout_marginBottom="14dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/linearLayout4" />
+                            android:layout_height="match_parent" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <Button
-                            android:id="@+id/plus_medicine_button"
-                            style="?attr/materialIconButtonFilledStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:contentDescription="plus button"
-                            android:icon="@drawable/back_btn"
-                            android:scaleX="1.1"
-                            android:scaleY="1.1"
-                            app:icon="@drawable/plus"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            android:id="@+id/textView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Avaliable Medicines:"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/fragment_map_avaliable_medicines"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-                </LinearLayout>
+                    </LinearLayout>
+                </androidx.core.widget.NestedScrollView>
 
             </LinearLayout>
 

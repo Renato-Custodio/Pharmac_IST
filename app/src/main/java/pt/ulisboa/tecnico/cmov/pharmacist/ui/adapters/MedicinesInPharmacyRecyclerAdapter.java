@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,7 @@ import java.util.List;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
 public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<MedicinesInPharmacyRecyclerAdapter.ViewHolder> {
     private static List<Medicine> localDataSet = null;
@@ -34,20 +36,24 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
 
     private static Pharmacy pharmacy = null;
 
-    public interface OnItemClickListener {
-        void onItemClicked(Medicine medicine);
-    }
+    private Context context;
 
+    public interface OnItemClickListener {
+        void onItemClicked(Medicine medicine, String origin);
+    }
+    private final MedicinesInPharmacyRecyclerAdapter.OnItemClickListener itemClickListener;
     /**
      * Initialize the dataset of the Adapter
      *
      * @param dataSet String[] containing the data to populate views to be used
      * by RecyclerView
      */
-    public MedicinesInPharmacyRecyclerAdapter(List<Medicine> dataSet, Fragment incomingFragment, Pharmacy inPharmacy) {
+    public MedicinesInPharmacyRecyclerAdapter(List<Medicine> dataSet, Fragment incomingFragment, Pharmacy inPharmacy, MedicinesInPharmacyRecyclerAdapter.OnItemClickListener listener, Context context) {
         localDataSet = dataSet;
         fragment = incomingFragment;
         pharmacy = inPharmacy;
+        this.context = context;
+        itemClickListener = listener;
     }
 
 
@@ -63,8 +69,9 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
         private final Button BuyButton;
         private final View rootView;
 
+        private final OnItemClickListener itemClickListener;
 
-        public ViewHolder(View view) {
+        public ViewHolder(View view, OnItemClickListener itemClickListener) {
             super(view);
             // Define click listener for the ViewHolder's View
             rootView = view;
@@ -73,6 +80,7 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
             descriptionView = view.findViewById(R.id.medicine_description);
             imageView = view.findViewById(R.id.picture_medicine);
             BuyButton = view.findViewById(R.id.medicine_list_buy);
+            this.itemClickListener = itemClickListener;
         }
 
         public TextView getTitleView() {
@@ -93,11 +101,10 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
 
         @Override
         public void onClick(View v) {
-            // Perform your action here
-            // For example, you can get the clicked item position using getAdapterPosition()
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 Medicine clickedMedicine = localDataSet.get(position);
+                itemClickListener.onItemClicked(clickedMedicine, "MedicinesInPharmacyRecyclerAdapter");
             }
         }
     }
@@ -109,7 +116,7 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.medicine_list_item, viewGroup, false);
 
-        return new ViewHolder(view);
+        return new ViewHolder(view, itemClickListener);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -120,8 +127,9 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
         // contents of the view with that element
         viewHolder.getTitleView().setText(localDataSet.get(position).name);
         viewHolder.getDescriptionView().setText(localDataSet.get(position).purpose);
-        // TODO: Replace with ImageUtils
-        // Picasso.get().load(MessageFormat.format("{0}/images/{1}", BuildConfig.SERVER_BASE_URL, localDataSet.get(position).picture)).into(viewHolder.getImageView());
+        // TODO
+        // localDataSet.get(position).picture
+        ImageUtils.loadImage(context,"/users/0UTkbejLJQQnyfOyHEEobgqO1ml1",viewHolder.getImageView());
         final String id = localDataSet.get(position).id;
         final String name = localDataSet.get(position).name;
         viewHolder.getButtonView().setOnClickListener(new View.OnClickListener() {

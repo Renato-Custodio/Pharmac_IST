@@ -26,7 +26,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.databinding.ActivityMainBinding;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.MapFragment;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.SeedMapChunks;
@@ -34,7 +36,7 @@ import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicineDetails
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicinesFragment;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 
-public class MainActivity extends AppCompatActivity implements MedicinesRecyclerAdapter.OnItemClickListener, MedicineDetails.back{
+public class MainActivity extends AppCompatActivity implements MedicinesRecyclerAdapter.OnItemClickListener, MedicineDetails.MedicineDetailsBack, MedicinesInPharmacyRecyclerAdapter.OnItemClickListener{
 
     ActivityMainBinding binding;
     MapFragment mapFragment;
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        mapFragment = new MapFragment();
+        mapFragment = MapFragment.newInstance(this);
         medicinesFragment = MedicinesFragment.newInstance(this);
 
         addFragment(mapFragment);
@@ -93,17 +95,8 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
                 if (menuItemId == R.id.pharmacies_map) {
                     replaceFragment(mapFragment);
                 } else if (menuItemId == R.id.medicines) {
-                    if(medicinesOrDetails == 0){
-                        replaceFragment(medicinesFragment);
-                    }else{
-                        if(!(current == details)) {
-                            addFragment(details);
-                            replaceFragment(details);
-                        }
-                    }
-
+                    replaceFragment(medicinesFragment);
                 }
-
                 return true;
             }
         });
@@ -130,11 +123,7 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         if (current != null) transaction.hide(current);
         transaction.show(fragment);
-        if(fragment == details){
-            this.medicinesOrDetails = 1;
-        } else if (fragment == medicinesFragment) {
-            this.medicinesOrDetails = 0;
-        }
+
         if(current == details && details != fragment) {
             transaction.remove(details);
         }
@@ -143,15 +132,21 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
     }
 
     @Override
-    public void onItemClicked(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine medicine) {
-        MedicineDetails newFragment = MedicineDetails.newInstance(medicine, this);
+    public void onItemClicked(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine medicine, String origin) {
+        MedicineDetails newFragment = MedicineDetails.newInstance(medicine, this, origin);
         details = newFragment;
+        binding.bottomNavigation.getMenu().getItem(1).setChecked(true);
         addFragment(newFragment);
         replaceFragment(newFragment);
     }
 
     @Override
-    public void back() {
-        replaceFragment(medicinesFragment);
+    public void onBackButtonPressed(String origin) {
+        if(origin.equals("MedicinesRecyclerAdapter")){
+            replaceFragment(medicinesFragment);
+        }else {
+            binding.bottomNavigation.getMenu().getItem(0).setChecked(true);
+            replaceFragment(mapFragment);
+        }
     }
 }

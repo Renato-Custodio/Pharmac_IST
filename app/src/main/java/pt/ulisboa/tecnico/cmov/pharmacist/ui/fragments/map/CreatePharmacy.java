@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -30,12 +31,18 @@ import androidx.lifecycle.ViewModelProvider;
 
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.transition.MaterialFadeThrough;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.MainActivity;
@@ -144,6 +151,9 @@ public class CreatePharmacy extends Fragment {
     private void savePharmacy() {
         String pharmacyName = nameEditText.getText().toString().trim();
         String address = addressEditText.getText().toString().trim();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference pharmacyRef = database.getReference("pharmacy");
+
 
         if (TextUtils.isEmpty(pharmacyName)) {
             nameEditText.setError("Pharmacy name is required");
@@ -155,14 +165,41 @@ public class CreatePharmacy extends Fragment {
             return;
         }
 
-        Toast.makeText(getActivity(), "Pharmacy saved: " + pharmacyName + ", " + address, Toast.LENGTH_SHORT).show();
+        // Add the new entry with a unique key
+        DatabaseReference newPharmacyRef = pharmacyRef.push();
 
-        // Replace the fragment
-        MapFragment newFragment = new MapFragment();
+        // Create a new stock entry
+        Map<String, Object> newPharmacyEntry = new HashMap<>();
+        newPharmacyEntry.put("id", newPharmacyRef.getKey());
+        newPharmacyEntry.put("name", pharmacyName);
+        //newPharmacyEntry.put("picture", picture);
 
-        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentContainerView, newFragment);
-        transaction.addToBackStack(null); // Add to back stack to allow back navigation
-        transaction.commit();
+        Map<String, Double> location = new HashMap<>();
+        location.put("lat", latlng.latitude);
+        location.put("lng", latlng.longitude);
+
+        newPharmacyEntry.put("location", location);
+
+        // Add the new entry to the database
+        newPharmacyRef.setValue(newPharmacyEntry)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Successfully added
+                        Log.d("Firebase", "Pharmacy entry added successfully with key: " + newPharmacyRef.getKey());
+                        Toast.makeText(getActivity(), "Pharmacy saved: " + pharmacyName + ", " + address, Toast.LENGTH_SHORT).show();
+
+                        Objects.requireNonNull(getActivity()).getSupportFragmentManager().popBackStack();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Failed to add
+                        Log.e("Firebase", "Failed to add pharmacy entry", e);
+                        Toast.makeText(getActivity(), "ERROR:Pharmacy did not save: " + pharmacyName + ", " + address, Toast.LENGTH_SHORT).show();
+
+                    }
+                });
     }
 }

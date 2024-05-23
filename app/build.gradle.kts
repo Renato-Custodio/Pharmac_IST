@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.places)
     implementation("com.basgeekball:awesome-validation:4.3")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)

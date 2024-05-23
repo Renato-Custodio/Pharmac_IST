@@ -37,6 +37,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MedicineDetails extends Fragment {
@@ -102,14 +104,12 @@ public class MedicineDetails extends Fragment {
         setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
     }
 
-    private void closestPharmacies(String medicineId, String lat, String lng) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-
+    private void closestPharmacies(String medicineId) {
 
         //get all Pharmacies with the medicineId
         DatabaseReference pharmacyRef = FirebaseDatabase.getInstance().getReference("pharmacies");
 
-        Query query = pharmacyRef.orderByChild("stock/Key_ + " + medicineId).limitToFirst(5);
+        Query query = pharmacyRef.orderByChild("stock/Key_ + " + medicineId);
 
         query.addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
@@ -123,8 +123,8 @@ public class MedicineDetails extends Fragment {
                                 pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(sharedLocationViewModel.getLocation().getValue()
                                         ,pharmacy.getLocation())) );
                     }
-
                 }
+                recivedPharmacies.sort(new PharmacyDistanceComparator());
                 nearestPharmaciesAdapter.notifyDataSetChanged();
             }
 
@@ -143,7 +143,6 @@ public class MedicineDetails extends Fragment {
         // Set name and purpose TextViews
         TextView nameTextView = rootView.findViewById(R.id.medicine_name);
         TextView purposeTextView = rootView.findViewById(R.id.medicine_purpose);
-        //TextView imageTextView = rootView.findViewById(R.id.imageView);
         nearestPharmacies = rootView.findViewById(R.id.nearest_pharmacies);
 
         Button backButton = rootView.findViewById(R.id.backButton);
@@ -165,6 +164,7 @@ public class MedicineDetails extends Fragment {
                                 pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(
                                         location, pharmacyDistance.pharmacy.getLocation());
                     }
+                    recivedPharmacies.sort(new PharmacyDistanceComparator());
                     nearestPharmaciesAdapter.notifyDataSetChanged();
                 }
             });
@@ -179,8 +179,7 @@ public class MedicineDetails extends Fragment {
             nearestPharmacies.setLayoutManager(mLayoutManager);
             nearestPharmacies.setAdapter(nearestPharmaciesAdapter);
 
-            closestPharmacies(mMedicine.id,String.valueOf((int) Math.round(currentLocation.getLatitude())),
-                    String.valueOf((int) Math.round(currentLocation.getLongitude())));
+            closestPharmacies(mMedicine.id);
         }
 
         return rootView;

@@ -30,10 +30,11 @@
 
             <TextView
                 android:id="@+id/average_rating"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="4.5"
-                android:textSize="56dp" />
+                android:textAlignment="center"
+                android:textSize="40dp" />
 
             <RatingBar
                 android:id="@+id/rating_bar"

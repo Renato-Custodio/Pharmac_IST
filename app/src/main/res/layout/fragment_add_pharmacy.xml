@@ -10,105 +10,138 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <Button
+            android:id="@+id/create_pharmacy_back_button"
+            style="?attr/materialIconButtonFilledStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="back button"
+            android:icon="@drawable/back_btn"
+            android:scaleX="1.1"
+            android:scaleY="1.1"
+            app:icon="@drawable/back_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 
         <TextView
             android:id="@+id/add_pharmacy_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
-            android:text="Add a pharmacy"
+            android:layout_marginTop="70dp"
+            android:text="New Pharmacy"
             android:textSize="34sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-
-        <EditText
-            android:id="@+id/nameEditText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="16dp"
-            android:hint="Pharmacy Name"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/picture_medicine"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="24dp"
+            android:background="#ECE6F0"
+            android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/add_pharmacy_text" />
-
-        <EditText
-            android:id="@+id/addressEditText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="16dp"
-            android:hint="Address"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nameEditText" />
+            app:layout_constraintTop_toBottomOf="@+id/add_pharmacy_text"
+            app:shapeAppearanceOverlay="@style/RoundedSquare" />
 
         <Button
+            android:id="@+id/pharmacy_upload_photo_button"
             style="@style/Widget.Material3.Button.TonalButton.Icon"
-            app:icon="@drawable/map"
-            android:id="@+id/selectOnMapButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Select on Map"
-            app:layout_constraintStart_toStartOf="@+id/addressEditText"
-            app:layout_constraintTop_toBottomOf="@+id/addressEditText" />
-
-        <Button
-            style="@style/Widget.Material3.Button.TonalButton.Icon"
-            app:icon="@drawable/near_me"
-            android:id="@+id/useCurrentLocationButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:text="Use Current Location"
-            app:layout_constraintBottom_toBottomOf="@+id/selectOnMapButton"
-            app:layout_constraintEnd_toEndOf="@+id/addressEditText"
-            app:layout_constraintStart_toEndOf="@+id/selectOnMapButton"
-            app:layout_constraintTop_toTopOf="@+id/selectOnMapButton" />
-
-        <Button
-            style="@style/Widget.Material3.Button.TonalButton.Icon"
-            android:id="@+id/addPictureButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Add Picture"
-            app:layout_constraintEnd_toEndOf="@+id/pictureImageView"
-            app:layout_constraintStart_toStartOf="@+id/pictureImageView"
-            app:layout_constraintTop_toBottomOf="@+id/pictureImageView" />
-
-        <ImageView
-            android:id="@+id/pictureImageView"
-            android:layout_width="250dp"
-            android:layout_height="200dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="32dp"
-            android:scaleType="fitCenter"
-            android:scaleX="1.2"
-            android:scaleY="1.2"
-            android:src="@drawable/placeholder_img"
+            android:scaleX="1"
+            android:scaleY="1"
+            android:text="Choose image"
+            app:icon="@drawable/gallery_thumbnail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/selectOnMapButton" />
+            app:layout_constraintTop_toBottomOf="@+id/picture_medicine" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/pharmacy_name_input"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="75dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/pharmacy_name_text"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:hint="Name"
+                android:inputType="text"
+                android:padding="4dp"
+                android:singleLine="true" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.search.SearchBar
+            android:id="@+id/pharmacy_address_search_bar"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="24dp"
+            android:hint="Search address"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pharmacy_upload_photo_button"
+            app:layout_goneMarginLeft="16dp" />
 
         <Button
 
             android:id="@+id/saveButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            android:text="Save"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="8dp"
+            android:text="Create pharmacy"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pharmacy_name_input" />
+
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pharmacy_address_search_bar">
+
+            <Button
+                android:id="@+id/selectOnMapButton"
+                style="@style/Widget.Material3.Button.TonalButton.Icon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Selected location"
+                app:icon="@drawable/map" />
+
+            <Button
+                android:id="@+id/useCurrentLocationButton"
+                style="@style/Widget.Material3.Button.TonalButton.Icon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_weight="1"
+                android:text="Current Location"
+                app:icon="@drawable/near_me" />
+        </LinearLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

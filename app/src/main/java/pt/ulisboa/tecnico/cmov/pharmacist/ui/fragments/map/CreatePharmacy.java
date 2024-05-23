@@ -20,19 +20,23 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.firebase.database.annotations.Nullable;
+import com.google.android.material.search.SearchBar;
+import com.google.android.material.transition.MaterialFadeThrough;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.MainActivity;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
@@ -47,7 +51,7 @@ public class CreatePharmacy extends Fragment {
     private LatLng latlng;
     private LatLng selectedLocation;
     private EditText nameEditText;
-    private EditText addressEditText;
+    private TextView addressEditText;
     private Button selectOnMapButton;
     private Button useCurrentLocationButton;
     private Button addPictureButton;
@@ -64,11 +68,23 @@ public class CreatePharmacy extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setEnterTransition(new MaterialFadeThrough());
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_pharmacy, container, false);
 
-        nameEditText = view.findViewById(R.id.nameEditText);
-        addressEditText = view.findViewById(R.id.addressEditText);
+        nameEditText = view.findViewById(R.id.pharmacy_name_text);
+        addressEditText = ( (SearchBar) view.findViewById(R.id.pharmacy_address_search_bar)).getTextView();
+
+        view.findViewById(R.id.create_pharmacy_back_button).setOnClickListener(e ->
+            Objects.requireNonNull(getActivity()).getSupportFragmentManager().popBackStack()
+        );
+
         if (latlng != null){
             Location location = new Location(""); // Set an empty string as provider
 
@@ -79,14 +95,16 @@ public class CreatePharmacy extends Fragment {
         }
         selectOnMapButton = view.findViewById(R.id.selectOnMapButton);
         useCurrentLocationButton = view.findViewById(R.id.useCurrentLocationButton);
-        addPictureButton = view.findViewById(R.id.addPictureButton);
-        pictureImageView = view.findViewById(R.id.pictureImageView);
+        // addPictureButton = view.findViewById(R.id.addPictureButton);
+        // pictureImageView = view.findViewById(R.id.pictureImageView);
         saveButton = view.findViewById(R.id.saveButton);
 
         selectOnMapButton.setOnClickListener(v -> selectOnMap());
         useCurrentLocationButton.setOnClickListener(v -> useCurrentLocation());
-        addPictureButton.setOnClickListener(v -> showPictureDialog());
+        // addPictureButton.setOnClickListener(v -> showPictureDialog());
         saveButton.setOnClickListener(v -> savePharmacy());
+
+
 
         return view;
     }
@@ -121,69 +139,6 @@ public class CreatePharmacy extends Fragment {
             e.printStackTrace();
         }
         return "Unknown Address";
-    }
-
-    private void showPictureDialog() {
-        AlertDialog.Builder pictureDialog = new AlertDialog.Builder(getActivity());
-        pictureDialog.setTitle("Select Action");
-        String[] pictureDialogItems = {
-                "Select photo from gallery",
-                "Capture photo from camera" };
-        pictureDialog.setItems(pictureDialogItems,
-                (dialog, which) -> {
-                    switch (which) {
-                        case 0:
-                            choosePhotoFromGallery();
-                            break;
-                        case 1:
-                            takePhotoFromCamera();
-                            break;
-                    }
-                });
-        pictureDialog.show();
-    }
-
-    public void choosePhotoFromGallery() {
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-        startActivityForResult(galleryIntent, REQUEST_IMAGE_PICK);
-    }
-
-    private void takePhotoFromCamera() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        } else {
-            Toast.makeText(getActivity(), "No camera app available", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_IMAGE_CAPTURE && data != null) {
-                Bundle extras = data.getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-                pictureImageView.setImageBitmap(imageBitmap);
-            } else if (requestCode == REQUEST_IMAGE_PICK && data != null) {
-                Uri contentURI = data.getData();
-                try {
-                    Bitmap bitmap;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        ImageDecoder.Source source = ImageDecoder.createSource(getActivity().getContentResolver(), contentURI);
-                        bitmap = ImageDecoder.decodeBitmap(source);
-                    } else {
-                        bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), contentURI);
-                    }
-                    pictureImageView.setImageBitmap(bitmap);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getActivity(), "Failed to load image from gallery", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
     }
 
     private void savePharmacy() {

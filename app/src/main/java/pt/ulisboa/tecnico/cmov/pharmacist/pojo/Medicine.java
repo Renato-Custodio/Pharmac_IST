@@ -1,9 +1,15 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.pojo;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 public class Medicine implements Parcelable {
 
@@ -65,6 +71,18 @@ public class Medicine implements Parcelable {
         name = in.readString();
         purpose = in.readString();
         picture = in.readString();
+    }
+
+    public Bitmap generateQrCode(){
+        String medicineJson = new Gson().toJson(this);
+        try {
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            BitMatrix bitMatrix = barcodeEncoder.encode(medicineJson, BarcodeFormat.QR_CODE, 400, 400);
+            return barcodeEncoder.createBitmap(bitMatrix);
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

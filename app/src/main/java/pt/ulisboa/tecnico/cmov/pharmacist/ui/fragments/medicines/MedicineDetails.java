@@ -19,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
@@ -37,15 +36,14 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class MedicineDetails extends Fragment {
 
     private static final String ARG_MEDICINE = "arg_medicine";
     private Medicine mMedicine;
-
+    private ImageView imageView;
+    private ImageView qrCode;
     private RecyclerView nearestPharmacies;
     private SharedLocationViewModel sharedLocationViewModel;
 
@@ -144,6 +142,8 @@ public class MedicineDetails extends Fragment {
         TextView nameTextView = rootView.findViewById(R.id.medicine_name);
         TextView purposeTextView = rootView.findViewById(R.id.medicine_purpose);
         nearestPharmacies = rootView.findViewById(R.id.nearest_pharmacies);
+        imageView = rootView.findViewById(R.id.medicine_details_image);
+        qrCode = rootView.findViewById(R.id.medicine_details_qrcode);
 
         Button backButton = rootView.findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -168,13 +168,13 @@ public class MedicineDetails extends Fragment {
                     nearestPharmaciesAdapter.notifyDataSetChanged();
                 }
             });
-            Location currentLocation = sharedLocationViewModel.getLocation().getValue();
             nearestPharmaciesAdapter = new ClosestPharmaciesRecyclerAdapter(recivedPharmacies, getContext());
             nameTextView.setText(mMedicine.name);
             purposeTextView.setText(mMedicine.purpose);
             // TODO
             //change to mMedicine.picture
-            ImageUtils.loadImage(getContext(),"/users/0UTkbejLJQQnyfOyHEEobgqO1ml1",rootView.findViewById(R.id.medicine_details_image));
+            ImageUtils.loadImage(getContext(),"/users/0UTkbejLJQQnyfOyHEEobgqO1ml1",imageView);
+            qrCode.setImageBitmap(mMedicine.generateQrCode());
             mLayoutManager = new LinearLayoutManager(getActivity());
             nearestPharmacies.setLayoutManager(mLayoutManager);
             nearestPharmacies.setAdapter(nearestPharmaciesAdapter);

@@ -136,6 +136,8 @@ public class MarkersSystem {
                         
                         Log.d("MarkersSystem", MessageFormat.format("Loaded chunks: {0}", loadedChunkIds));
                         refreshPoints(loadedChunkIds, selectedPharmacy, callback);
+                    }else {
+                        System.out.println("deu merda");
                     }
                 }
 

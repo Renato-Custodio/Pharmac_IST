@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -28,6 +29,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -68,10 +70,9 @@ import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.PlacesAutoCompleteAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicinesFragment;
+import pt.ulisboa.tecnico.cmov.pharmacist.QRCodeActivity;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
 
@@ -98,6 +99,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private FloatingActionButton focusButton;
     private FloatingActionButton zoomIn;
     private FloatingActionButton zoomOut;
+
+    private Button addMedicineButton;
     private BottomSheetBehavior bottomSheetBehavior;
 
     // Persistence
@@ -115,6 +118,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     View bottomSheetView;
     TextView textViewTitle;
+
+
     TextView textViewLocation;
     TextView textViewDistance;
 
@@ -244,6 +249,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         addressResultsView = view.findViewById(R.id.address_search_results);
         searchView = view.findViewById(R.id.address_search_view);
         searchBar = view.findViewById(R.id.address_search_bar);
+        addMedicineButton = view.findViewById(R.id.plus_medicine_button);
         //init mini map
         pinInMap = view.findViewById(R.id.mapView);
         pinInMap.onCreate(savedInstanceState);
@@ -535,6 +541,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         textViewLocation.setText(
                 pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getAddress(location, getContext()));
 
+
+        addMedicineButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start the QRCodeActivity
+                startActivity(new Intent(getContext(), QRCodeActivity.class));
+            }
+        });
         textViewDistance.setText(getDistance(sharedLocationViewModel.getLocation().getValue() , pharmacy));
         //get medicines
         medicines.clear();
@@ -546,7 +560,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         medicineListRecyclerAdapter = new MedicinesInPharmacyRecyclerAdapter(medicines, this, pharmacy, listener,getContext());
         medicineList.setLayoutManager(mLayoutManager);
         medicineList.setAdapter(medicineListRecyclerAdapter);
-
 
         currentSelectedMarker = marker;
 

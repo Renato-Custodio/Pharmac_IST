@@ -39,7 +39,7 @@ import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.SearchRecyclerAdapter;
 
 
 public class MedicinesFragment extends Fragment {
-
+    private static final int PAGE_SIZE = 4;
     RecyclerView recommendedMedicines;
     MedicinesRecyclerAdapter medicinesRecyclerAdapter;
     SearchRecyclerAdapter searchRecyclerAdapter;
@@ -89,14 +89,14 @@ public class MedicinesFragment extends Fragment {
 
 
         Query query1;
-        if(query.equals("")){
-            query1 = medicinesRef.limitToFirst(4);
+        if(query.isEmpty()){
+            query1 = medicinesRef.limitToFirst(PAGE_SIZE);
         }else{
             query = query.substring(0,1).toUpperCase() + query.substring(1);
             query1 = medicinesRef.orderByChild("name").
-                    startAt(query).endAt(query + "\uf8ff").limitToFirst(4);
-        }
+                    startAt(query).endAt(query + "\uf8ff").limitToFirst(PAGE_SIZE);
 
+        }
 
         query1.addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
@@ -108,7 +108,6 @@ public class MedicinesFragment extends Fragment {
                             snapshot.getValue(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine.class);
                     medicines.add(medicine);
                 }
-
                 backButton.setVisibility(View.VISIBLE);
                 searchResults.clear();
                 searchResults.addAll(medicines);

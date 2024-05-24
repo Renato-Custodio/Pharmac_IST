@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.cmov.pharmacist;
 
+import static com.basgeekball.awesomevalidation.ValidationStyle.TEXT_INPUT_LAYOUT;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
@@ -14,6 +16,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.basgeekball.awesomevalidation.AwesomeValidation;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,8 +33,12 @@ import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyDistance;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.PharmacyDistanceComparator;
 
 public class QRCodeActivity extends AppCompatActivity {
     private DecoratedBarcodeView barcodeView;
@@ -43,13 +52,19 @@ public class QRCodeActivity extends AppCompatActivity {
 
     private TextView currentStock;
 
-    private EditText addStock;
+    private TextView addStockMessage;
 
     private Button addStockButton;
+
+    private TextInputEditText addStockText;
 
     private String pharmacyId;
 
     private Context context;
+
+    private String medicineId;
+
+    private TextInputLayout addStockLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,17 +77,15 @@ public class QRCodeActivity extends AppCompatActivity {
         barcodeView = findViewById(R.id.medicine_details_scan);
         scanButton = findViewById(R.id.scan_button);
         backButton = findViewById(R.id.backButton_scan);
-        //add stock fields
+        //medicine and stock info fields
         medicineName = findViewById(R.id.medicine_name_scan);
         medicineDescription = findViewById(R.id.medicine_purpose_scan);
         currentStock = findViewById(R.id.stock_scan);
-        /*stockDisplay = findViewById(R.id.stock_display);
-        addStock = findViewById(R.id.add_stock_field);
-        addStockButton = findViewById(R.id.add_stock_button);*/
-        //set views GONE
-        /*stockDisplay.setVisibility(View.GONE);
-        addStock.setVisibility(View.GONE);
-        addStockButton.setVisibility(View.GONE);*/
+        //add stock fields
+        addStockMessage = findViewById(R.id.stock_message);
+        addStockButton = findViewById(R.id.add_stock_button);
+        addStockText = findViewById(R.id.add_stock_text);
+        addStockLayout = findViewById(R.id.add_stock_input);
         // Set click listener for backButton
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,10 +98,43 @@ public class QRCodeActivity extends AppCompatActivity {
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addStockLayout.setVisibility(View.GONE);
+                addStockMessage.setVisibility(View.GONE);
+                addStockButton.setVisibility(View.GONE);
+                addStockText.setVisibility(View.GONE);
                 medicineName.setVisibility(View.GONE);
                 medicineDescription.setVisibility(View.GONE);
                 scanButton.setVisibility(View.GONE);
+                currentStock.setVisibility(View.GONE);
                 startScanner();
+            }
+        });
+        AwesomeValidation mAwesomeValidation = new AwesomeValidation(TEXT_INPUT_LAYOUT);
+        mAwesomeValidation.addValidation(addStockLayout, (String s) -> {
+            try {
+                return Integer.parseInt(s) > 0;
+            }catch (NumberFormatException e){
+                return false;
+            }
+        } , "Amount has to be greater than 0");
+        addStockButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //validate params
+                if(!mAwesomeValidation.validate()) {
+                    return;
+                }
+
+                int amount = 0;
+                try {
+                    amount = Integer.parseInt(Objects.requireNonNull(addStockText.getText()).toString());
+                }catch (Exception e){
+                    return;
+                }
+                addStockText.getText().clear();
+                addStockText.clearFocus();
+                updateStock(medicineId, amount);
+                getCurrentStock(medicineId);
             }
         });
     }
@@ -104,12 +150,16 @@ public class QRCodeActivity extends AppCompatActivity {
             @Override
             public void barcodeResult(BarcodeResult result) {
                 if (result != null && result.getText() != null) {
-                    String medicineId = result.getText().replace("\"", "");
-                    System.out.println("Scanned data: " + medicineId);
+                    medicineId = result.getText().replace("\"", "");
                     getMedicine(medicineId);
                     getCurrentStock(medicineId);
+                    addStockMessage.setVisibility(View.VISIBLE);
+                    addStockButton.setVisibility(View.VISIBLE);
+                    addStockLayout.setVisibility(View.VISIBLE);
+                    addStockText.setVisibility(View.VISIBLE);
                 } else {
                     System.out.println("No barcode found");
+                    //create medicine
                 }
                 stopScanner();
                 scanButton.setVisibility(View.VISIBLE);
@@ -119,30 +169,31 @@ public class QRCodeActivity extends AppCompatActivity {
 
     public void getCurrentStock(String medicineId){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference db = database.getReference("pharmacies/" + pharmacyId + "/stock/Key_" + medicineId);
-        db.runTransaction(new Transaction.Handler() {
-            @NonNull
+
+        DatabaseReference db = database.getReference("pharmacies").child(pharmacyId).child("stock").child("Key_" + medicineId);
+
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
-            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
-                String stockStr = mutableData.getValue(String.class);
-                if (stockStr == null) {
-                    return Transaction.abort();
-                }
-                currentStock.setText(stockStr);
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String stock = dataSnapshot.getValue(String.class);
+                stock = "Stock: " + stock;
+                currentStock.setText(stock);
                 currentStock.setVisibility(View.VISIBLE);
-                return Transaction.success(mutableData);
             }
 
             @Override
-            public void onComplete(@Nullable DatabaseError databaseError, boolean committed, @Nullable DataSnapshot dataSnapshot) {}
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Medicine Fragment getting medicines", "Database error: " + databaseError.getMessage());
+            }
         });
-
     }
 
     public void updateStock(String medicineId, int value){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference db = database.getReference("pharmacies/" + pharmacyId + "/stock/Key_" + medicineId);
         db.runTransaction(new Transaction.Handler() {
+            @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
                 String stockStr = mutableData.getValue(String.class);
@@ -164,8 +215,8 @@ public class QRCodeActivity extends AppCompatActivity {
                     Toast.makeText(context, "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                 } else {
                     // Transaction committed and stock updated
-                    int newStock = Integer.parseInt(dataSnapshot.getValue(String.class));
-                    Toast.makeText(context, "stock updated successfully! Current stock: " + newStock, Toast.LENGTH_SHORT).show();
+                    int newStock = Integer.parseInt(Objects.requireNonNull(dataSnapshot.getValue(String.class)));
+                    Toast.makeText(context, "Stock updated successfully! Current stock: " + newStock, Toast.LENGTH_SHORT).show();
                 }
             }
         });

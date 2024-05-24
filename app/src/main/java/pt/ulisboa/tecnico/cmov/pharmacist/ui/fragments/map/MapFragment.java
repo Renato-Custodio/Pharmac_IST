@@ -386,9 +386,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mapInstance.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                // Add a marker at the long-pressed location
-                System.out.println("long press with lat: "+ latLng.latitude+" lng: "+latLng.longitude);
-                // Replace the fragment
                 CreatePharmacy newFragment = CreatePharmacy.newInstance(latLng);
 
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();

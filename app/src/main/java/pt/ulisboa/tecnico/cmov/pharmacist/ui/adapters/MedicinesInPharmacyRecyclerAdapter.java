@@ -136,8 +136,9 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
             @Override
             public void onClick(View v) {
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference db = database.getReference("pharmacies/" + pharmacy.getId() + "/stock/Key_" + id);
+                DatabaseReference db = database.getReference("pharmacies").child(pharmacy.getId()).child("stock").child("Key_" + id);
                 db.runTransaction(new Transaction.Handler() {
+                        @NonNull
                         @Override
                         public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
                             String stockStr = mutableData.getValue(String.class);

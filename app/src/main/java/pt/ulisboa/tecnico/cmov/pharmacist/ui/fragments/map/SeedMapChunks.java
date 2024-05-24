@@ -47,14 +47,12 @@ public class SeedMapChunks {
 
                                     MapChunk chunk = snapshot.getValue(MapChunk.class);
                                     chunk.addPharmacyId(pharmacy.getId());
-                                    System.out.println(chunk.pharmaciesIDs);
                                     chunksRef.child(chunkId).setValue(chunk)
                                             .addOnSuccessListener(aVoid -> System.out.println("Chunk updated successfully"))
                                             .addOnFailureListener(e -> System.err.println("Error updating chunk: " + e.getMessage()));
                                 }
 
                             } else {
-                                System.out.println("entrei2");
                                 mapChunk.addPharmacyId(pharmacy.getId());
                                 chunksRef.child(chunkId).setValue(mapChunk);
                             }

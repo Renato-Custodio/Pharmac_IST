@@ -39,7 +39,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/picture_medicine"
+            android:id="@+id/picture_pharmacy"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginTop="24dp"
@@ -62,7 +62,7 @@
             app:icon="@drawable/gallery_thumbnail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/picture_medicine" />
+            app:layout_constraintTop_toBottomOf="@+id/picture_pharmacy" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/pharmacy_name_input"

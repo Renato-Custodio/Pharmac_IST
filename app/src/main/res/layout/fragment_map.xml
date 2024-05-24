@@ -118,6 +118,7 @@
                     android:cropToPadding="false" />
 
                 <androidx.core.widget.NestedScrollView
+                    android:id="@+id/fragment_map_scroll"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:fillViewport="true">
@@ -273,8 +274,7 @@
                                     android:id="@+id/mapView"
                                     android:layout_width="match_parent"
                                     android:layout_height="200dp"
-                                    android:layout_marginBottom="14dp"
-                                    />
+                                    android:layout_marginBottom="14dp" />
 
                                 <include
                                     layout="@layout/histogram_layout"

@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
@@ -139,6 +140,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     MapView pinInMap;
 
+    NestedScrollView scrollView;
+
     int bottomSheetState;
 
     private MedicinesInPharmacyRecyclerAdapter.OnItemClickListener listener;
@@ -223,6 +226,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 if (state == BottomSheetBehavior.STATE_HIDDEN) {
                     textViewSlideMessage.setVisibility(View.VISIBLE);
                     if (bottomSheetState == BottomSheetBehavior.STATE_EXPANDED) {
+                        scrollView.fullScroll(View.FOCUS_UP);
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
                         bottomSheetState = BottomSheetBehavior.STATE_HALF_EXPANDED;
                         return;
@@ -250,6 +254,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         searchView = view.findViewById(R.id.address_search_view);
         searchBar = view.findViewById(R.id.address_search_bar);
         addMedicineButton = view.findViewById(R.id.plus_medicine_button);
+        scrollView = view.findViewById(R.id.fragment_map_scroll);
         //init mini map
         pinInMap = view.findViewById(R.id.mapView);
         pinInMap.onCreate(savedInstanceState);

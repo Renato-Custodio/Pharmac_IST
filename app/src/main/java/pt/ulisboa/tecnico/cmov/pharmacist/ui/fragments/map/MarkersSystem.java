@@ -32,6 +32,7 @@ import java.util.function.Consumer;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MapChunk;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
 
 
 public class MarkersSystem {
@@ -42,20 +43,13 @@ public class MarkersSystem {
 
     private final Context context;
 
+    private static final String TAG = "MarkersSystem";
+
     public MarkersSystem(GoogleMap mapInstance, Context context) {
         this.mapCache = new LruCache<>(50);
         this.markers = new ArrayList<>();
         this.mapInstance = mapInstance;
         this.context = context;
-    }
-
-    public double roundDecimal(double a, int dec) {
-        return (double) Math.round(a * dec) / dec;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public String getChunkId(LatLng coord) {
-        return Base64.getEncoder().encodeToString(MessageFormat.format("{0}{1}", coord.latitude, coord.longitude).getBytes());
     }
 
     public void refreshPoints(Set<String> newChunksIds, Pharmacy selectedPharmacy, Consumer<Marker> selectedMarkerCallback) {
@@ -65,6 +59,11 @@ public class MarkersSystem {
         }
 
         this.mapCache.snapshot().values().forEach((chunk) -> {
+
+            if (newChunksIds.contains(chunk.chunkId)) {
+                Log.d(TAG, MessageFormat.format("New pharmacies (Chunk {0}): {1}", chunk.chunkId, chunk.pharmaciesIDs.toString()));
+            }
+
             chunk.pharmaciesIDs.forEach((pharmacyId) -> {
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -97,7 +96,7 @@ public class MarkersSystem {
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e("MarkerSystem getting chuncks", "Database error: " + databaseError.getMessage());
+                        Log.e(TAG, "Database error: " + databaseError.getMessage());
                     }
                 });
 
@@ -106,18 +105,16 @@ public class MarkersSystem {
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public void update(LatLng coord, Marker selectedMarker, Consumer<Marker> callback) {
-        // Do we have this marker in the cache?
-        LatLng roundedCoord = new LatLng(roundDecimal(coord.latitude, 100), roundDecimal(coord.longitude, 100));
-        String chunkId = this.getChunkId(roundedCoord);
+        String chunkId = ChunkUtils.getChunkId(coord);
+        LatLng roundedCoord = new LatLng(ChunkUtils.precisionRound(coord.latitude, 100), ChunkUtils.precisionRound(coord.longitude, 100));
 
         Pharmacy selectedPharmacy = (selectedMarker != null) ? (Pharmacy) selectedMarker.getTag() : null;
 
-        Log.d("MarkersSystem", MessageFormat.format("Requested chunk: {0} / {1}", roundedCoord, chunkId));
+        Log.d(TAG, MessageFormat.format("Requested chunk: {0} / {1}", roundedCoord, chunkId));
 
         if (this.mapCache.get(chunkId) == null) {
-            Log.d("MarkersSystem", MessageFormat.format("Fetching chunk: {0} / {1} (Cached chunks: {2} / {3})", roundedCoord, chunkId, mapCache.size(), mapCache.maxSize()));
+            Log.d(TAG, MessageFormat.format("Fetching chunk: {0} / {1} (Cached chunks: {2} / {3})", roundedCoord, chunkId, mapCache.size(), mapCache.maxSize()));
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -131,16 +128,16 @@ public class MarkersSystem {
                         mapCache.put(chunk.chunkId, chunk);
                         loadedChunkIds.add(chunk.chunkId);
 
-                        Log.d("MarkersSystem", MessageFormat.format("Loaded chunks: {0}", loadedChunkIds));
+                        Log.d(TAG, MessageFormat.format("Loaded chunks: {0}", loadedChunkIds));
                         refreshPoints(loadedChunkIds, selectedPharmacy, callback);
                     } else {
-                        Log.w("MarkerSystem", MessageFormat.format("DataSnapshot: {0}", dataSnapshot.getChildren()));
+                        Log.w(TAG, MessageFormat.format("DataSnapshot: {0}", dataSnapshot.getChildren()));
                     }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.e("MarkerSystem", "Database error: " + databaseError.getMessage());
+                    Log.e(TAG, "Database error: " + databaseError.getMessage());
                 }
             });
         }

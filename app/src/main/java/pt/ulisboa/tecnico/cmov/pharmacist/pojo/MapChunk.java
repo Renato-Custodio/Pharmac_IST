@@ -16,8 +16,8 @@ public class MapChunk {
     public Location location;
     public String chunkId;
     public List<String> pharmaciesIDs;
-    public MapChunk(){}
 
+    public MapChunk() {}
 
     public MapChunk(Location location, String chunkId){
         this.chunkId = chunkId;
@@ -51,15 +51,5 @@ public class MapChunk {
 
     public void setChunkId(String chunkId) {
         this.chunkId = chunkId;
-    }
-
-
-    public static double precisionRound(double a, int dec) {
-        return (double) Math.round(a * dec) / dec;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public static String getMapChunk(double lat, double lng) {
-       return Base64.getEncoder().encodeToString(MessageFormat.format("{0}{1}", lat, lng).getBytes());
     }
 }

@@ -112,6 +112,8 @@ public class ImageUtils {
                 return;
             }
 
+            Log.d(TAG, MessageFormat.format("Uploaded image: {0}", imageRef.getPath()));
+
             onSuccess.accept(task.getResult().getMetadata());
         });
     }

@@ -455,7 +455,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     // Markers system
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onCameraIdle() {
         LatLng coordinates = mapInstance.getCameraPosition().target;
@@ -489,6 +488,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     pharmacy1 = snapshot.getValue(Pharmacy.class);
                 }
+
+                if (pharmacy1 == null || pharmacy1.getStock() == null) return;
 
                 for (String medicineId : pharmacy1.getStock().keySet()) {
                     DatabaseReference medicineRef = FirebaseDatabase.getInstance().getReference("medicines").child(medicineId.substring(4));
@@ -535,9 +536,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             return false;
         }
 
-        // TODO
-        // pharmacy.getPicture()
-        ImageUtils.loadImage(getContext(),"/users/0UTkbejLJQQnyfOyHEEobgqO1ml1", this.pharmacyImage);
+        ImageUtils.loadImage(getContext(),String.format("/pharmacies/%s", pharmacy.getId()), this.pharmacyImage);
         textViewTitle.setText(pharmacy.getName());
         pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location location =
                 new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location();
@@ -547,14 +546,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getAddress(location, getContext()));
 
 
-        addMedicineButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), QRCodeActivity.class);
-                intent.putExtra("pharmacyId", pharmacy.getId());
-                startActivity(intent);
-            }
+        addMedicineButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), QRCodeActivity.class);
+            intent.putExtra("pharmacyId", pharmacy.getId());
+            startActivity(intent);
         });
+
         textViewDistance.setText(getDistance(sharedLocationViewModel.getLocation().getValue() , pharmacy));
         //get medicines
         medicines.clear();

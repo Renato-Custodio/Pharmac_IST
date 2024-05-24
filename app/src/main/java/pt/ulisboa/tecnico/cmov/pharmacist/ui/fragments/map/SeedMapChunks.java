@@ -16,6 +16,7 @@ import com.google.firebase.database.ValueEventListener;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MapChunk;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
 
 public class SeedMapChunks {
     public static void seedChuncks(){
@@ -29,23 +30,21 @@ public class SeedMapChunks {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int vez = 1;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    System.out.println("snapshot: " + snapshot.getValue());
                     Pharmacy pharmacy = snapshot.getValue(Pharmacy.class);
-                    double chunkLat = MapChunk.precisionRound(pharmacy.getLocation().lat, 50);
-                    double chunkLng = MapChunk.precisionRound(pharmacy.getLocation().lng, 50);
-                    String chunkId = MapChunk.getMapChunk(chunkLat,chunkLng);
+                    double chunkLat = ChunkUtils.precisionRound(pharmacy.getLocation().lat, 100);
+                    double chunkLng = ChunkUtils.precisionRound(pharmacy.getLocation().lng, 100);
+
+                    String chunkId = ChunkUtils.getChunkId(chunkLat,chunkLng);
+
                     MapChunk mapChunk = new MapChunk(new Location(chunkLat, chunkLng), chunkId);
                     Query query = chunksRef.orderByChild("chunkId").equalTo(chunkId);
-                    System.out.println(vez);
-                    vez++;
                     query.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if (dataSnapshot.exists()) {
                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                    System.out.println("entrei1");
+
                                     MapChunk chunk = snapshot.getValue(MapChunk.class);
                                     chunk.addPharmacyId(pharmacy.getId());
                                     System.out.println(chunk.pharmaciesIDs);

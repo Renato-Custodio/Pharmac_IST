@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.transition.MaterialFadeThrough;
+import com.google.android.material.transition.MaterialSharedAxis;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,6 +35,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,6 +46,7 @@ import java.util.Objects;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageResultLaunchers;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MapChunk;
@@ -53,11 +56,9 @@ public class CreatePharmacy extends Fragment {
     private LatLng latlng;
     private EditText nameEditText;
     private TextView addressEditText;
-    private Button selectOnMapButton;
-    private Button useCurrentLocationButton;
-    private Button addPictureButton;
-    private Button saveButton;
     private Bitmap pharmacyPhoto = null;
+
+    private static final String TAG = "CreatePharmacy";
 
     public CreatePharmacy() {}
 
@@ -71,20 +72,27 @@ public class CreatePharmacy extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setEnterTransition(new MaterialFadeThrough());
+        setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_pharmacy, container, false);
 
+        // Get UI Elements
         nameEditText = view.findViewById(R.id.pharmacy_name_text);
         addressEditText = ( (SearchBar) view.findViewById(R.id.pharmacy_address_search_bar)).getTextView();
+        Button selectOnMapButton = view.findViewById(R.id.selectOnMapButton);
+        Button useCurrentLocationButton = view.findViewById(R.id.useCurrentLocationButton);
+        Button addPictureButton = view.findViewById(R.id.pharmacy_upload_photo_button);
+        Button saveButton = view.findViewById(R.id.saveButton);
 
+        // Init back button
         view.findViewById(R.id.create_pharmacy_back_button).setOnClickListener(e ->
             requireActivity().getSupportFragmentManager().popBackStack()
         );
 
+        // Parse address of location
         if (latlng != null){
             Location location = new Location(""); // Set an empty string as provider
 
@@ -93,18 +101,17 @@ public class CreatePharmacy extends Fragment {
             String address = getAddressFromLocation(location);
             addressEditText.setText(address);
         }
-        selectOnMapButton = view.findViewById(R.id.selectOnMapButton);
-        useCurrentLocationButton = view.findViewById(R.id.useCurrentLocationButton);
-        addPictureButton = view.findViewById(R.id.pharmacy_upload_photo_button);
-        saveButton = view.findViewById(R.id.saveButton);
 
+        // Location buttons callbacks
         selectOnMapButton.setOnClickListener(v -> selectOnMap());
         useCurrentLocationButton.setOnClickListener(v -> useCurrentLocation());
 
+        // Image dialogs
         ImageResultLaunchers imageResultLaunchers = ImageUtils.registerResultLaunchers(this, bitmap -> {
             ( (ImageView) view.findViewById(R.id.picture_pharmacy)).setImageBitmap(bitmap);
             pharmacyPhoto = bitmap;
         });
+
         addPictureButton.setOnClickListener(v -> {
             try {
                 ImageUtils.openDialog(getActivity(), imageResultLaunchers);
@@ -112,6 +119,7 @@ public class CreatePharmacy extends Fragment {
                 e.printStackTrace();
             }
         });
+
         saveButton.setOnClickListener(v -> savePharmacy());
 
         return view;
@@ -151,7 +159,7 @@ public class CreatePharmacy extends Fragment {
         String pharmacyName = nameEditText.getText().toString().trim();
         String address = addressEditText.getText().toString().trim();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference pharmacyRef = database.getReference("pharmacy");
+        DatabaseReference pharmacyRef = database.getReference("pharmacies");
 
         if (pharmacyPhoto == null) {
             Toast.makeText(getActivity(), "Please select a picture", Toast.LENGTH_SHORT).show();
@@ -184,57 +192,50 @@ public class CreatePharmacy extends Fragment {
 
         // Add the new entry to the database
         newPharmacyRef.setValue(newPharmacyEntry)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        ImageUtils.uploadImage(getActivity(), pharmacyPhoto, "pharmacies", newPharmacyRef.getKey(), metadata -> {
-                            Log.d("Firebase", "Image uploaded successfully");
-                        });
-                        Log.d("Firebase", "Pharmacy entry added successfully with key: " + newPharmacyRef.getKey());
-                        Toast.makeText(getActivity(), "Pharmacy saved: " + pharmacyName + ", " + address, Toast.LENGTH_SHORT).show();
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Pharmacy entry added successfully with key: " + newPharmacyRef.getKey());
+                    ImageUtils.uploadImage(getActivity(), pharmacyPhoto, "pharmacies", newPharmacyRef.getKey(), metadata -> {
                         updateMapChunk(newPharmacyRef.getKey(), latlng.latitude, latlng.longitude);
-                        requireActivity().getSupportFragmentManager().popBackStack();
-
-                    }
+                    });
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Failed to add
-                        Log.e("Firebase", "Failed to add pharmacy entry", e);
-                        Toast.makeText(getActivity(), "ERROR:Pharmacy did not save: " + pharmacyName + ", " + address, Toast.LENGTH_SHORT).show();
-
-                    }
+                .addOnFailureListener(e -> {
+                    // Failed to add
+                    Log.e("Firebase", "Failed to add pharmacy entry", e);
+                    Toast.makeText(getActivity(), "ERROR: Pharmacy did not save: " + pharmacyName + ", " + address, Toast.LENGTH_SHORT).show();
                 });
     }
     private void updateMapChunk(String pharmacyId, double latitude, double longitude) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference chunksRef = database.getReference("chunks");
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            String chunkId = MapChunk.getMapChunk(latitude, longitude);
-            chunksRef.child(chunkId).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    MapChunk mapChunk;
-                    if (snapshot.exists()) {
-                        mapChunk = snapshot.getValue(MapChunk.class);
-                        if (mapChunk != null) {
-                            mapChunk.addPharmacyId(pharmacyId);
-                        }
-                    } else {
-                        mapChunk = new MapChunk(new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location(latlng.latitude, latlng.longitude), chunkId);
-                        mapChunk.setPharmaciesIDs(new ArrayList<>(Collections.singletonList(pharmacyId)));
+
+        String chunkId = ChunkUtils.getChunkId(latitude, longitude);
+        chunksRef.child(chunkId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                MapChunk mapChunk;
+                if (snapshot.exists()) {
+                    mapChunk = snapshot.getValue(MapChunk.class);
+                    if (mapChunk != null) {
+                        mapChunk.addPharmacyId(pharmacyId);
                     }
-                    chunksRef.child(chunkId).setValue(mapChunk)
-                            .addOnSuccessListener(aVoid -> Log.d("Firebase", "MapChunk updated successfully"))
-                            .addOnFailureListener(e -> Log.e("Firebase", "Failed to update MapChunk", e));
+                } else {
+                    mapChunk = new MapChunk(new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location(latlng.latitude, latlng.longitude), chunkId);
+                    mapChunk.setPharmaciesIDs(new ArrayList<>(Collections.singletonList(pharmacyId)));
                 }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Log.e("Firebase", "Failed to read MapChunk", error.toException());
-                }
-            });
-        }
+                chunksRef.child(chunkId).setValue(mapChunk)
+                        .addOnSuccessListener(aVoid -> {
+                            Log.d(TAG, MessageFormat.format("MapChunk {0} updated successfully", chunkId));
+                            Toast.makeText(getActivity(), "Pharmacy saved", Toast.LENGTH_SHORT).show();
+                            requireActivity().getSupportFragmentManager().popBackStack();
+                        })
+                        .addOnFailureListener(e -> Log.e(TAG, "Failed to update MapChunk", e));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Failed to read MapChunk", error.toException());
+            }
+        });
     }
 }

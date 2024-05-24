@@ -24,7 +24,7 @@ android {
 
     defaultConfig {
         applicationId = "pt.ulisboa.tecnico.cmov.pharmacist"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -68,7 +68,6 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.ui.storage.v720)
-    implementation(libs.legacy.support.v4)
     annotationProcessor(libs.glide.compiler)
     implementation(libs.camera.view)
     testImplementation(libs.junit)

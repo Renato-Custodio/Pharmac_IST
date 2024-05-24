@@ -545,8 +545,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         addMedicineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Start the QRCodeActivity
-                startActivity(new Intent(getContext(), QRCodeActivity.class));
+                Intent intent = new Intent(getContext(), QRCodeActivity.class);
+                intent.putExtra("pharmacyId", pharmacy.getId());
+                startActivity(intent);
             }
         });
         textViewDistance.setText(getDistance(sharedLocationViewModel.getLocation().getValue() , pharmacy));

@@ -19,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
@@ -43,7 +42,8 @@ public class MedicineDetails extends Fragment {
 
     private static final String ARG_MEDICINE = "arg_medicine";
     private Medicine mMedicine;
-
+    private ImageView imageView;
+    private ImageView qrCode;
     private RecyclerView nearestPharmacies;
     private SharedLocationViewModel sharedLocationViewModel;
 
@@ -102,14 +102,12 @@ public class MedicineDetails extends Fragment {
         setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
     }
 
-    private void closestPharmacies(String medicineId, String lat, String lng) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-
+    private void closestPharmacies(String medicineId) {
 
         //get all Pharmacies with the medicineId
         DatabaseReference pharmacyRef = FirebaseDatabase.getInstance().getReference("pharmacies");
 
-        Query query = pharmacyRef.orderByChild("stock/Key_ + " + medicineId).limitToFirst(5);
+        Query query = pharmacyRef.orderByChild("stock/Key_ + " + medicineId);
 
         query.addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
@@ -123,8 +121,8 @@ public class MedicineDetails extends Fragment {
                                 pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(sharedLocationViewModel.getLocation().getValue()
                                         ,pharmacy.getLocation())) );
                     }
-
                 }
+                recivedPharmacies.sort(new PharmacyDistanceComparator());
                 nearestPharmaciesAdapter.notifyDataSetChanged();
             }
 
@@ -143,8 +141,9 @@ public class MedicineDetails extends Fragment {
         // Set name and purpose TextViews
         TextView nameTextView = rootView.findViewById(R.id.medicine_name);
         TextView purposeTextView = rootView.findViewById(R.id.medicine_purpose);
-        //TextView imageTextView = rootView.findViewById(R.id.imageView);
         nearestPharmacies = rootView.findViewById(R.id.nearest_pharmacies);
+        imageView = rootView.findViewById(R.id.medicine_details_image);
+        qrCode = rootView.findViewById(R.id.medicine_details_qrcode);
 
         Button backButton = rootView.findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -165,22 +164,22 @@ public class MedicineDetails extends Fragment {
                                 pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(
                                         location, pharmacyDistance.pharmacy.getLocation());
                     }
+                    recivedPharmacies.sort(new PharmacyDistanceComparator());
                     nearestPharmaciesAdapter.notifyDataSetChanged();
                 }
             });
-            Location currentLocation = sharedLocationViewModel.getLocation().getValue();
             nearestPharmaciesAdapter = new ClosestPharmaciesRecyclerAdapter(recivedPharmacies, getContext());
             nameTextView.setText(mMedicine.name);
             purposeTextView.setText(mMedicine.purpose);
             // TODO
             //change to mMedicine.picture
-            ImageUtils.loadImage(getContext(),"/users/0UTkbejLJQQnyfOyHEEobgqO1ml1",rootView.findViewById(R.id.medicine_details_image));
+            ImageUtils.loadImage(getContext(),"/users/0UTkbejLJQQnyfOyHEEobgqO1ml1",imageView);
+            qrCode.setImageBitmap(mMedicine.generateQrCode());
             mLayoutManager = new LinearLayoutManager(getActivity());
             nearestPharmacies.setLayoutManager(mLayoutManager);
             nearestPharmacies.setAdapter(nearestPharmaciesAdapter);
 
-            closestPharmacies(mMedicine.id,String.valueOf((int) Math.round(currentLocation.getLatitude())),
-                    String.valueOf((int) Math.round(currentLocation.getLongitude())));
+            closestPharmacies(mMedicine.id);
         }
 
         return rootView;

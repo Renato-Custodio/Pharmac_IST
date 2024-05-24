@@ -68,9 +68,12 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.ui.storage.v720)
+    implementation(libs.legacy.support.v4)
     annotationProcessor(libs.glide.compiler)
     implementation(libs.camera.view)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation ("com.journeyapps:zxing-android-embedded:4.2.0")
 }

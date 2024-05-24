@@ -72,7 +72,6 @@ import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.PlacesAutoCompleteAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
-import pt.ulisboa.tecnico.cmov.pharmacist.QRCodeActivity;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
 
@@ -546,7 +545,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             @Override
             public void onClick(View v) {
                 // Start the QRCodeActivity
-                startActivity(new Intent(getContext(), QRCodeActivity.class));
+                // startActivity(new Intent(getContext(), QRCodeActivity.class));
             }
         });
         textViewDistance.setText(getDistance(sharedLocationViewModel.getLocation().getValue() , pharmacy));

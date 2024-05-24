@@ -226,7 +226,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 if (state == BottomSheetBehavior.STATE_HIDDEN) {
                     textViewSlideMessage.setVisibility(View.VISIBLE);
                     if (bottomSheetState == BottomSheetBehavior.STATE_EXPANDED) {
-                        scrollView.fullScroll(View.FOCUS_UP);
+                        scrollView.scrollTo(0, 0);
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
                         bottomSheetState = BottomSheetBehavior.STATE_HALF_EXPANDED;
                         return;

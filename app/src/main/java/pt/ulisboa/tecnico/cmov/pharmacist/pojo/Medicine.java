@@ -74,7 +74,7 @@ public class Medicine implements Parcelable {
     }
 
     public Bitmap generateQrCode(){
-        String medicineJson = new Gson().toJson(this);
+        String medicineJson = new Gson().toJson(this.id);
         try {
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             BitMatrix bitMatrix = barcodeEncoder.encode(medicineJson, BarcodeFormat.QR_CODE, 400, 400);

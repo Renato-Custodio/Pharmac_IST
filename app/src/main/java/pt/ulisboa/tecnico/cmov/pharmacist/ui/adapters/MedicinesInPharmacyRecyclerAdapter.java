@@ -127,9 +127,7 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
         // contents of the view with that element
         viewHolder.getTitleView().setText(localDataSet.get(position).name);
         viewHolder.getDescriptionView().setText(localDataSet.get(position).purpose);
-        // TODO
-        // localDataSet.get(position).picture
-        ImageUtils.loadImage(context,"/users/0UTkbejLJQQnyfOyHEEobgqO1ml1",viewHolder.getImageView());
+        ImageUtils.loadImage(context,"/medicines/" + localDataSet.get(position).id,viewHolder.getImageView());
         final String id = localDataSet.get(position).id;
         final String name = localDataSet.get(position).name;
         viewHolder.getButtonView().setOnClickListener(new View.OnClickListener() {

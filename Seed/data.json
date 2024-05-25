@@ -252,482 +252,705 @@
     }
   },
   "pharmacies": {
-    "pharmacy1": {
-      "id": "pharmacy1",
-      "name": "Lisbon Pharmacy",
+    "1": {
+      "id": "1",
+      "name": "Lisbon ",
       "picture": "example_picture_url1",
       "location": {
         "lat": 38.7223,
         "lng": -9.1393
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy2": {
-      "id": "pharmacy2",
-      "name": "São Jorge Pharmacy",
+    "2": {
+      "id": "2",
+      "name": "São Jorge ",
       "picture": "example_picture_url2",
       "location": {
         "lat": 38.7369,
         "lng": -9.1426
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy3": {
-      "id": "pharmacy3",
-      "name": "Santa Maria Pharmacy",
+    "3": {
+      "id": "3",
+      "name": "Santa Maria ",
       "picture": "example_picture_url3",
       "location": {
         "lat": 38.7223,
         "lng": -9.1393
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy4": {
-      "id": "pharmacy4",
-      "name": "Alameda Pharmacy",
+    "4": {
+      "id": "4",
+      "name": "Alameda ",
       "picture": "example_picture_url4",
       "location": {
         "lat": 38.734,
         "lng": -9.1402
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy5": {
-      "id": "pharmacy5",
-      "name": "Belem Pharmacy",
+    "5": {
+      "id": "5",
+      "name": "Belem ",
       "picture": "example_picture_url5",
       "location": {
         "lat": 38.6972,
         "lng": -9.2064
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy6": {
-      "id": "pharmacy6",
-      "name": "Estrela Pharmacy",
+    "6": {
+      "id": "6",
+      "name": "Estrela ",
       "picture": "example_picture_url6",
       "location": {
         "lat": 38.7133,
         "lng": -9.1594
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy7": {
-      "id": "pharmacy7",
-      "name": "Alvalade Pharmacy",
+    "7": {
+      "id": "7",
+      "name": "Alvalade ",
       "picture": "example_picture_url7",
       "location": {
         "lat": 38.7487,
         "lng": -9.1449
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy8": {
-      "id": "pharmacy8",
-      "name": "Campo Grande Pharmacy",
+    "8": {
+      "id": "8",
+      "name": "Campo Grande ",
       "picture": "example_picture_url8",
       "location": {
         "lat": 38.7531,
         "lng": -9.1513
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy9": {
-      "id": "pharmacy9",
-      "name": "Arroios Pharmacy",
+    "9": {
+      "id": "9",
+      "name": "Arroios ",
       "picture": "example_picture_url9",
       "location": {
         "lat": 38.7262,
         "lng": -9.1346
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy10": {
-      "id": "pharmacy10",
-      "name": "Bairro Alto Pharmacy",
+    "10": {
+      "id": "10",
+      "name": "Bairro Alto ",
       "picture": "example_picture_url10",
       "location": {
         "lat": 38.7154,
         "lng": -9.1496
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy11": {
-      "id": "pharmacy11",
-      "name": "Areeiro Pharmacy",
+    "11": {
+      "id": "11",
+      "name": "Areeiro ",
       "picture": "example_picture_url11",
       "location": {
         "lat": 38.7403,
         "lng": -9.1391
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy12": {
-      "id": "pharmacy12",
-      "name": "Ajuda Pharmacy",
+    "12": {
+      "id": "12",
+      "name": "Ajuda ",
       "picture": "example_picture_url12",
       "location": {
         "lat": 38.7063,
         "lng": -9.1969
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy13": {
-      "id": "pharmacy13",
-      "name": "Anjos Pharmacy",
+    "13": {
+      "id": "13",
+      "name": "Anjos ",
       "picture": "example_picture_url13",
       "location": {
         "lat": 38.7281,
         "lng": -9.1359
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy14": {
-      "id": "pharmacy14",
-      "name": "Bica Pharmacy",
+    "14": {
+      "id": "14",
+      "name": "Bica ",
       "picture": "example_picture_url14",
       "location": {
         "lat": 38.7109,
         "lng": -9.1481
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy15": {
-      "id": "pharmacy15",
-      "name": "Benfica Pharmacy",
+    "15": {
+      "id": "15",
+      "name": "Benfica ",
       "picture": "example_picture_url15",
       "location": {
         "lat": 38.7413,
         "lng": -9.1933
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy16": {
-      "id": "pharmacy16",
-      "name": "Carnide Pharmacy",
+    "16": {
+      "id": "16",
+      "name": "Carnide ",
       "picture": "example_picture_url16",
       "location": {
         "lat": 38.7598,
         "lng": -9.184
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy17": {
-      "id": "pharmacy17",
-      "name": "Charneca Pharmacy",
+    "17": {
+      "id": "17",
+      "name": "Charneca ",
       "picture": "example_picture_url17",
       "location": {
         "lat": 38.6443,
         "lng": -9.2147
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy18": {
-      "id": "pharmacy18",
-      "name": "Graça Pharmacy",
+    "18": {
+      "id": "18",
+      "name": "Graça ",
       "picture": "example_picture_url18",
       "location": {
         "lat": 38.7193,
         "lng": -9.1288
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy19": {
-      "id": "pharmacy19",
-      "name": "Lumiar Pharmacy",
+    "19": {
+      "id": "19",
+      "name": "Lumiar ",
       "picture": "example_picture_url19",
       "location": {
         "lat": 38.7612,
         "lng": -9.157
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy20": {
-      "id": "pharmacy20",
-      "name": "Lapa Pharmacy",
+    "20": {
+      "id": "20",
+      "name": "Lapa ",
       "picture": "example_picture_url20",
       "location": {
         "lat": 38.7138,
         "lng": -9.1604
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy21": {
-      "id": "pharmacy21",
-      "name": "Madragoa Pharmacy",
+    "21": {
+      "id": "21",
+      "name": "Madragoa ",
       "picture": "example_picture_url21",
       "location": {
         "lat": 38.7067,
         "lng": -9.1557
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy22": {
-      "id": "pharmacy22",
-      "name": "Marvila Pharmacy",
+    "22": {
+      "id": "22",
+      "name": "Marvila ",
       "picture": "example_picture_url22",
       "location": {
         "lat": 38.738,
         "lng": -9.1039
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy23": {
-      "id": "pharmacy23",
-      "name": "Martim Moniz Pharmacy",
+    "23": {
+      "id": "23",
+      "name": "Martim Moniz ",
       "picture": "example_picture_url23",
       "location": {
         "lat": 38.7177,
         "lng": -9.1366
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy24": {
-      "id": "pharmacy24",
-      "name": "Olivais Pharmacy",
+    "24": {
+      "id": "24",
+      "name": "Olivais ",
       "picture": "example_picture_url24",
       "location": {
         "lat": 38.7705,
         "lng": -9.1239
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy25": {
-      "id": "pharmacy25",
-      "name": "Parque das Nações Pharmacy",
+    "25": {
+      "id": "25",
+      "name": "Parque das Nações ",
       "picture": "example_picture_url25",
       "location": {
         "lat": 38.7687,
         "lng": -9.0946
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy26": {
-      "id": "pharmacy26",
-      "name": "Penha de França Pharmacy",
+    "26": {
+      "id": "26",
+      "name": "Penha de França ",
       "picture": "example_picture_url26",
       "location": {
         "lat": 38.7302,
         "lng": -9.1261
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy27": {
-      "id": "pharmacy27",
-      "name": "Prazeres Pharmacy",
+    "27": {
+      "id": "27",
+      "name": "Prazeres ",
       "picture": "example_picture_url27",
       "location": {
         "lat": 38.7102,
         "lng": -9.1627
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy28": {
-      "id": "pharmacy28",
-      "name": "Rato Pharmacy",
+    "28": {
+      "id": "28",
+      "name": "Rato ",
       "picture": "example_picture_url28",
       "location": {
         "lat": 38.7202,
         "lng": -9.1514
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy29": {
-      "id": "pharmacy29",
-      "name": "Restauradores Pharmacy",
+    "29": {
+      "id": "29",
+      "name": "Restauradores ",
       "picture": "example_picture_url29",
       "location": {
         "lat": 38.7166,
         "lng": -9.1405
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy30": {
-      "id": "pharmacy30",
-      "name": "Rossio Pharmacy",
+    "30": {
+      "id": "30",
+      "name": "Rossio ",
       "picture": "example_picture_url30",
       "location": {
         "lat": 38.7144,
         "lng": -9.1397
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy31": {
-      "id": "pharmacy31",
-      "name": "Santa Apolónia Pharmacy",
+    "31": {
+      "id": "31",
+      "name": "Santa Apolónia ",
       "picture": "example_picture_url31",
       "location": {
         "lat": 38.714,
         "lng": -9.1239
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy32": {
-      "id": "pharmacy32",
-      "name": "Santos Pharmacy",
+    "32": {
+      "id": "32",
+      "name": "Santos ",
       "picture": "example_picture_url32",
       "location": {
         "lat": 38.7078,
         "lng": -9.155
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy33": {
-      "id": "pharmacy33",
-      "name": "Sete Rios Pharmacy",
+    "33": {
+      "id": "33",
+      "name": "Sete Rios ",
       "picture": "example_picture_url33",
       "location": {
         "lat": 38.7391,
         "lng": -9.1637
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy34": {
-      "id": "pharmacy34",
-      "name": "Sintra Pharmacy",
+    "34": {
+      "id": "34",
+      "name": "Sintra ",
       "picture": "example_picture_url34",
       "location": {
         "lat": 38.7972,
         "lng": -9.3905
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy35": {
-      "id": "pharmacy35",
-      "name": "Telheiras Pharmacy",
+    "35": {
+      "id": "35",
+      "name": "Telheiras ",
       "picture": "example_picture_url35",
       "location": {
         "lat": 38.7572,
         "lng": -9.1618
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy36": {
-      "id": "pharmacy36",
-      "name": "Xabregas Pharmacy",
+    "36": {
+      "id": "36",
+      "name": "Xabregas ",
       "picture": "example_picture_url36",
       "location": {
         "lat": 38.7261,
         "lng": -9.1115
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy37": {
-      "id": "pharmacy37",
-      "name": "Alges Pharmacy",
+    "37": {
+      "id": "37",
+      "name": "Alges ",
       "picture": "example_picture_url37",
       "location": {
         "lat": 38.7026,
         "lng": -9.2304
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy38": {
-      "id": "pharmacy38",
-      "name": "Amadora Pharmacy",
+    "38": {
+      "id": "38",
+      "name": "Amadora ",
       "picture": "example_picture_url38",
       "location": {
         "lat": 38.7578,
         "lng": -9.2296
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy39": {
-      "id": "pharmacy39",
-      "name": "Barreiro Pharmacy",
+    "39": {
+      "id": "39",
+      "name": "Barreiro ",
       "picture": "example_picture_url39",
       "location": {
         "lat": 38.6631,
         "lng": -9.0732
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy40": {
-      "id": "pharmacy40",
-      "name": "Caparica Pharmacy",
+    "40": {
+      "id": "40",
+      "name": "Caparica ",
       "picture": "example_picture_url40",
       "location": {
         "lat": 38.6803,
         "lng": -9.1537
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy41": {
-      "id": "pharmacy41",
-      "name": "Cascais Pharmacy",
+    "41": {
+      "id": "41",
+      "name": "Cascais ",
       "picture": "example_picture_url41",
       "location": {
         "lat": 38.697,
         "lng": -9.4215
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy42": {
-      "id": "pharmacy42",
-      "name": "Costa da Caparica Pharmacy",
+    "42": {
+      "id": "42",
+      "name": "Costa da Caparica ",
       "picture": "example_picture_url42",
       "location": {
         "lat": 38.6393,
         "lng": -9.2381
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy43": {
-      "id": "pharmacy43",
-      "name": "Loures Pharmacy",
+    "43": {
+      "id": "43",
+      "name": "Loures ",
       "picture": "example_picture_url43",
       "location": {
         "lat": 38.8309,
         "lng": -9.1687
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy44": {
-      "id": "pharmacy44",
-      "name": "Oeiras Pharmacy",
+    "44": {
+      "id": "44",
+      "name": "Oeiras ",
       "picture": "example_picture_url44",
       "location": {
         "lat": 38.6915,
         "lng": -9.3108
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy45": {
-      "id": "pharmacy45",
-      "name": "Parede Pharmacy",
+    "45": {
+      "id": "45",
+      "name": "Parede ",
       "picture": "example_picture_url45",
       "location": {
         "lat": 38.6998,
         "lng": -9.3573
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy46": {
-      "id": "pharmacy46",
-      "name": "Queluz Pharmacy",
+    "46": {
+      "id": "46",
+      "name": "Queluz ",
       "picture": "example_picture_url46",
       "location": {
         "lat": 38.7567,
         "lng": -9.2533
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy47": {
-      "id": "pharmacy47",
-      "name": "Seixal Pharmacy",
+    "47": {
+      "id": "47",
+      "name": "Seixal ",
       "picture": "example_picture_url47",
       "location": {
         "lat": 38.6404,
         "lng": -9.1043
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy48": {
-      "id": "pharmacy48",
-      "name": "Vila Franca Pharmacy",
+    "48": {
+      "id": "48",
+      "name": "Vila Franca ",
       "picture": "example_picture_url48",
       "location": {
         "lat": 38.9533,
         "lng": -8.9895
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy49": {
-      "id": "pharmacy49",
-      "name": "Linda-a-Velha Pharmacy",
+    "49": {
+      "id": "49",
+      "name": "Linda-a-Velha ",
       "picture": "example_picture_url49",
       "location": {
         "lat": 38.7111,
         "lng": -9.2494
-      }
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     },
-    "pharmacy50": {
-      "id": "pharmacy50",
-      "name": "Massamá Pharmacy",
+    "50": {
+      "id": "50",
+      "name": "Massamá ",
       "picture": "example_picture_url50",
       "location": {
         "lat": 38.757,
         "lng": -9.2802
-      }
-    }
-  },
-  "stock": {
-    "1": {
-      "medicineId": "1",
-      "pharmacyId": "pharmacy1",
-      "stock": 30
-    },
-    "2": {
-      "medicineId": "1",
-      "pharmacyId": "pharmacy2",
-      "stock": 30
-    },
-    "3": {
-      "medicineId": "1",
-      "pharmacyId": "pharmacy3",
-      "stock": 30
-    },
-    "4": {
-      "medicineId": "1",
-      "pharmacyId": "pharmacy4",
-      "stock": 30
-    },
-    "5": {
-      "medicineId": "1",
-      "pharmacyId": "pharmacy5",
-      "stock": 30
+      },
+      "stock": {
+    "Key_1": "30",
+    "Key_2": "24",
+    "Key_3": "55"
+  }
     }
   }
 }

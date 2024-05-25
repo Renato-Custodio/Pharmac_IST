@@ -66,6 +66,8 @@ public class QRCodeActivity extends AppCompatActivity {
 
     private TextInputLayout addStockLayout;
 
+    private Button createMedicineButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,11 +88,21 @@ public class QRCodeActivity extends AppCompatActivity {
         addStockButton = findViewById(R.id.add_stock_button);
         addStockText = findViewById(R.id.add_stock_text);
         addStockLayout = findViewById(R.id.add_stock_input);
+        createMedicineButton = findViewById(R.id.create_medicine_button);
         // Set click listener for backButton
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
+            }
+        });
+
+        createMedicineButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                barcodeView.pause();
+                scanButton.setVisibility(View.VISIBLE);
+                //launck create medicine
             }
         });
 
@@ -106,6 +118,7 @@ public class QRCodeActivity extends AppCompatActivity {
                 medicineDescription.setVisibility(View.GONE);
                 scanButton.setVisibility(View.GONE);
                 currentStock.setVisibility(View.GONE);
+                createMedicineButton.setVisibility(View.VISIBLE);
                 startScanner();
             }
         });
@@ -150,6 +163,7 @@ public class QRCodeActivity extends AppCompatActivity {
             @Override
             public void barcodeResult(BarcodeResult result) {
                 if (result != null && result.getText() != null) {
+                    createMedicineButton.setVisibility(View.GONE);
                     medicineId = result.getText().replace("\"", "");
                     getMedicine(medicineId);
                     getCurrentStock(medicineId);

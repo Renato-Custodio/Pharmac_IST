@@ -1,7 +1,9 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -22,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +54,8 @@ public class PharmacyDetails {
     private Query currentStockQuery;
     private ChildEventListener currentStockQueryEventListener;
     private RecyclerView medicineList;
+
+    private static final String TAG = PharmacyDetails.class.getName();
 
     public PharmacyDetails(Fragment fragment, View bottomSheetView, SharedLocationViewModel sharedLocationViewModel, MedicinesInPharmacyRecyclerAdapter.OnItemClickListener listener) {
 
@@ -89,7 +94,7 @@ public class PharmacyDetails {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-                String medicineKey = snapshot.getKey();
+                String medicineKey = snapshot.getKey().replace("Key_", "");
 
                 if (medicineKey != null) {
                     FirebaseDatabase.getInstance().getReference().child("medicines").child(medicineKey).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -97,13 +102,16 @@ public class PharmacyDetails {
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if (snapshot.exists()) {
                                 Medicine medicine = snapshot.getValue(Medicine.class);
+
                                 medicines.add(medicine);
                                 medicineListAdapter.notifyItemInserted(medicines.indexOf(medicine));
                             }
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError error) {}
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Log.e(TAG, MessageFormat.format("Failed to fetch medicine: ", error.getMessage()));
+                        }
                     });
 
                 }
@@ -148,6 +156,8 @@ public class PharmacyDetails {
 
         Query stockQuery = FirebaseDatabase.getInstance().getReference("pharmacies").child(currentPharmacy.getId()).child("stock").orderByValue();
 
+        Log.d(TAG, MessageFormat.format("Fetching stocks for {0}", currentPharmacy.getId()));
+
         if (startId == null) {
             stockQuery.limitToLast(4);
         } else {
@@ -159,13 +169,14 @@ public class PharmacyDetails {
         currentStockQuery.addChildEventListener(currentStockQueryEventListener);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void updateDetails() {
         ImageUtils.loadImage(fragmentContext, String.format("/pharmacies/%s", currentPharmacy.getId()), image);
         title.setText(currentPharmacy.getName());
         location.setText(Location.getAddress(currentPharmacy.getLocation(), fragmentContext));
-        medicines.clear();
-        synchronized (medicineListAdapter){
-            medicineListAdapter.notifyAll();
+        synchronized (medicineListAdapter) {
+            medicines.clear();
+            medicineListAdapter.notifyDataSetChanged();
         }
         fetchStock(null);
     }
@@ -182,6 +193,8 @@ public class PharmacyDetails {
                     pharmacy.setLocation(snapshot.child("location").getValue(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location.class));
                     pharmacy.setStock(new HashMap<>());
 
+                    Log.d(TAG, MessageFormat.format("Fetched details for pharmacy {0}", pharmacy.getId()));
+
                     if (pharmacy != null) {
                         currentPharmacy = pharmacy;
                         updateDetails();
@@ -191,6 +204,7 @@ public class PharmacyDetails {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                Log.w(TAG, MessageFormat.format("Could not fetch pharmacy details: {0}", error.getMessage()));
             }
         });
     }

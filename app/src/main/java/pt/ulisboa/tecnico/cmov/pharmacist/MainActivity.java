@@ -50,7 +50,9 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
         EdgeToEdge.enable(this);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -63,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
 
         replaceFragment(mapFragment);
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         //SeedMapChunks.seedChuncks();
         AuthUtils.signAsAnonymous(this);
 

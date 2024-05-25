@@ -119,6 +119,8 @@ public class ImageUtils {
     }
 
     public static void loadImage(Context context, String path, int placeholder, ImageView imageView) {
+        if (path.isEmpty()) return;
+
         GlideRequest<Drawable> request = GlideApp.with(context).load(FirebaseStorage.getInstance().getReference(path)).centerCrop();
 
         if (placeholder != -1) {

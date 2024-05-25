@@ -114,6 +114,7 @@ public class CreateMedicineActivity extends AppCompatActivity {
                 nameText.clearFocus();
                 purposeText.clearFocus();
                 quantityText.clearFocus();
+                imageView.setImageBitmap(null);
                 saveMedicine(name, purpose);
                 //updateStock(medicineId, amount);
             }
@@ -133,6 +134,7 @@ public class CreateMedicineActivity extends AppCompatActivity {
         //create new medicine
         Medicine medicine = new Medicine();
         medicine.setId(newMedicineRef.getKey());
+        name = name.substring(0, 1).toUpperCase() + name.substring(1);
         medicine.setName(name);
         medicine.setPurpose(purpose);
 
@@ -141,11 +143,12 @@ public class CreateMedicineActivity extends AppCompatActivity {
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "Medicine entry added successfully with key: " + newMedicineRef.getKey());
                     ImageUtils.uploadImage(this, medicinePhoto, "medicines", newMedicineRef.getKey(), metadata -> {});
+                    Toast.makeText(this, "Medicine added successfully!", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     // Failed to add
                     Log.e("Firebase", "Failed to add medicine entry", e);
-                    Toast.makeText(this, "ERROR: Pharmacy did not save: " + name + ", " + purpose, Toast.LENGTH_SHORT).show();
                 });
+
     }
 }

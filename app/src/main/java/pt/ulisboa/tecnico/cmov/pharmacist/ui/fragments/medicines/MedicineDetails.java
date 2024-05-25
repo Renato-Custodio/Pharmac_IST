@@ -171,9 +171,7 @@ public class MedicineDetails extends Fragment {
             nearestPharmaciesAdapter = new ClosestPharmaciesRecyclerAdapter(recivedPharmacies, getContext());
             nameTextView.setText(mMedicine.name);
             purposeTextView.setText(mMedicine.purpose);
-            // TODO
-            //change to mMedicine.picture
-            ImageUtils.loadImage(getContext(),"/users/0UTkbejLJQQnyfOyHEEobgqO1ml1",imageView);
+            ImageUtils.loadImage(getContext(),"/medicines/" + mMedicine.id,imageView);
             qrCode.setImageBitmap(mMedicine.generateQrCode());
             mLayoutManager = new LinearLayoutManager(getActivity());
             nearestPharmacies.setLayoutManager(mLayoutManager);

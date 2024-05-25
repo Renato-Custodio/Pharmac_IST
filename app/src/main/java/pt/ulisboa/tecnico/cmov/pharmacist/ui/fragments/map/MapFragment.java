@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -74,6 +75,7 @@ import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecycle
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.PlacesAutoCompleteAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.QRCodeActivity;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
 
@@ -144,6 +146,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     int bottomSheetState;
 
+    private double bottomSheetHalfExpandedRatio = 0.34f;
+
     private MedicinesInPharmacyRecyclerAdapter.OnItemClickListener listener;
 
     // Fragment Lifecycle functions
@@ -174,14 +178,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_map, container, false);
+
+        root.getViewTreeObserver().addOnGlobalLayoutListener(
+            new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                // We need to calculate the ratio of the half expanded bottom sheet
+                @Override
+                public void onGlobalLayout() {
+                    root.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    bottomSheetHalfExpandedRatio = ChunkUtils.precisionRound(794.58 / root.getHeight(), 100);
+                }
+            });
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map, container, false);
+        return root;
     }
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
 
         // Initialize zoom controls
         zoomIn = view.findViewById(R.id.zoom_in_action_button);
@@ -564,7 +583,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         currentSelectedMarker = marker;
 
         PharmacyMarker.setActive(marker, true);
-        bottomSheetBehavior.setHalfExpandedRatio(0.30f);
+
+        bottomSheetBehavior.setHalfExpandedRatio((float) bottomSheetHalfExpandedRatio);
         bottomSheetBehavior.setSkipCollapsed(true);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
         bottomSheetState = BottomSheetBehavior.STATE_HALF_EXPANDED;

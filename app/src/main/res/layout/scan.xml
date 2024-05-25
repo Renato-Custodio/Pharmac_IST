@@ -26,7 +26,7 @@
             app:layout_constraintEnd_toStartOf="@+id/stock_scan"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="visible" />
+            tools:visibility="gone" />
 
         <com.journeyapps.barcodescanner.DecoratedBarcodeView
             android:id="@+id/medicine_details_scan"
@@ -67,7 +67,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/medicine_name_scan"
-            tools:visibility="visible" />
+            tools:visibility="gone" />
 
         <Button
             android:id="@+id/backButton_scan"
@@ -114,7 +114,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/medicine_details_scan"
             app:textStartPadding="6dp"
-            tools:visibility="visible" />
+            tools:visibility="gone" />
 
         <TextView
             android:id="@+id/stock_message"
@@ -128,7 +128,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/medicine_purpose_scan"
-            tools:visibility="visible" />
+            tools:visibility="gone" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/add_stock_input"
@@ -143,7 +143,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/stock_message"
-            tools:visibility="visible">
+            tools:visibility="gone">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/add_stock_text"
@@ -154,7 +154,7 @@
                 android:padding="4dp"
                 android:singleLine="true"
                 android:visibility="gone"
-                tools:visibility="visible" />
+                tools:visibility="gone" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
@@ -167,7 +167,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/add_stock_input"
-            tools:visibility="visible" />
+            tools:visibility="gone" />
+
+        <Button
+            android:id="@+id/create_medicine_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create Medicine"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/medicine_name_scan" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

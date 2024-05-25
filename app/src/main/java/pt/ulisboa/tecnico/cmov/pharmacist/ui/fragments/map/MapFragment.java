@@ -317,7 +317,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         bottomSheetView = getView().findViewById(R.id.pharmacy_details);
         textViewSlideMessage = bottomSheetView.findViewById(R.id.slide_up_message);
 
-        pharmacyDetails = new PharmacyDetails(this, bottomSheetView, sharedLocationViewModel);
+        pharmacyDetails = new PharmacyDetails(this, bottomSheetView, sharedLocationViewModel, listener);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);

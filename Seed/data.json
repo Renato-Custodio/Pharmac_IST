@@ -1,252 +1,252 @@
 {
   "medicines": {
     "1": {
-      "id": 1,
+      "id": "1",
       "name": "Aspirin",
       "purpose": "Pain relief, fever reduction, anti-inflammatory"
     },
     "2": {
-      "id": 2,
+      "id": "2",
       "name": "Amoxicillin",
       "purpose": "Antibiotic used to treat bacterial infections"
     },
     "3": {
-      "id": 3,
+      "id": "3",
       "name": "Lisinopril",
       "purpose": "Blood pressure medication"
     },
     "4": {
-      "id": 4,
+      "id": "4",
       "name": "Atorvastatin",
       "purpose": "Cholesterol-lowering medication"
     },
     "5": {
-      "id": 5,
+      "id": "5",
       "name": "Ibuprofen",
       "purpose": "Pain relief, fever reduction, anti-inflammatory"
     },
     "6": {
-      "id": 6,
+      "id": "6",
       "name": "Metformin",
       "purpose": "Antidiabetic medication for type 2 diabetes"
     },
     "7": {
-      "id": 7,
+      "id": "7",
       "name": "Cetirizine",
       "purpose": "Antihistamine used to relieve allergy symptoms"
     },
     "8": {
-      "id": 8,
+      "id": "8",
       "name": "Omeprazole",
       "purpose": "Proton pump inhibitor for treating acid reflux and stomach ulcers"
     },
     "9": {
-      "id": 9,
+      "id": "9",
       "name": "Acetaminophen",
       "purpose": "Pain relief, fever reduction"
     },
     "10": {
-      "id": 10,
+      "id": "10",
       "name": "Simvastatin",
       "purpose": "Cholesterol-lowering medication"
     },
     "11": {
-      "id": 11,
+      "id": "11",
       "name": "Albuterol",
       "purpose": "Bronchodilator used to treat asthma and COPD"
     },
     "12": {
-      "id": 12,
+      "id": "12",
       "name": "Warfarin",
       "purpose": "Anticoagulant (blood thinner) to prevent blood clots"
     },
     "13": {
-      "id": 13,
+      "id": "13",
       "name": "Levothyroxine",
       "purpose": "Thyroid hormone replacement for hypothyroidism"
     },
     "14": {
-      "id": 14,
+      "id": "14",
       "name": "Diazepam",
       "purpose": "Benzodiazepine used to treat anxiety, muscle spasms, and seizures"
     },
     "15": {
-      "id": 15,
+      "id": "15",
       "name": "Metoprolol",
       "purpose": "Beta blocker for treating high blood pressure and heart problems"
     },
     "16": {
-      "id": 16,
+      "id": "16",
       "name": "Fluoxetine",
       "purpose": "Selective serotonin reuptake inhibitor (SSRI) antidepressant"
     },
     "17": {
-      "id": 17,
+      "id": "17",
       "name": "Ciprofloxacin",
       "purpose": "Antibiotic used to treat bacterial infections"
     },
     "18": {
-      "id": 18,
+      "id": "18",
       "name": "Prednisone",
       "purpose": "Corticosteroid used to treat inflammation and immune system disorders"
     },
     "19": {
-      "id": 19,
+      "id": "19",
       "name": "Gabapentin",
       "purpose": "Anticonvulsant used to treat seizures and nerve pain"
     },
     "20": {
-      "id": 20,
+      "id": "20",
       "name": "Hydrochlorothiazide",
       "purpose": "Diuretic used to treat high blood pressure and fluid retention"
     },
     "21": {
-      "id": 21,
+      "id": "21",
       "name": "Amlodipine",
       "purpose": "Calcium channel blocker for treating high blood pressure and angina"
     },
     "22": {
-      "id": 22,
+      "id": "22",
       "name": "Ranitidine",
       "purpose": "H2 blocker for treating acid reflux and stomach ulcers"
     },
     "23": {
-      "id": 23,
+      "id": "23",
       "name": "Cephalexin",
       "purpose": "Antibiotic used to treat bacterial infections"
     },
     "24": {
-      "id": 24,
+      "id": "24",
       "name": "Sertraline",
       "purpose": "Selective serotonin reuptake inhibitor (SSRI) antidepressant"
     },
     "25": {
-      "id": 25,
+      "id": "25",
       "name": "Furosemide",
       "purpose": "Loop diuretic used to treat high blood pressure and fluid buildup"
     },
     "26": {
-      "id": 26,
+      "id": "26",
       "name": "Clonazepam",
       "purpose": "Benzodiazepine used to treat panic disorder and seizures"
     },
     "27": {
-      "id": 27,
+      "id": "27",
       "name": "Losartan",
       "purpose": "Angiotensin II receptor blocker for treating high blood pressure and heart failure"
     },
     "28": {
-      "id": 28,
+      "id": "28",
       "name": "Levofloxacin",
       "purpose": "Antibiotic used to treat bacterial infections"
     },
     "29": {
-      "id": 29,
+      "id": "29",
       "name": "Tramadol",
       "purpose": "Opioid analgesic used to treat moderate to severe pain"
     },
     "30": {
-      "id": 30,
+      "id": "30",
       "name": "Metronidazole",
       "purpose": "Antibiotic and antiprotozoal medication used to treat infections"
     },
     "31": {
-      "id": 31,
+      "id": "31",
       "name": "Trazodone",
       "purpose": "Antidepressant used to treat depression and insomnia"
     },
     "32": {
-      "id": 32,
+      "id": "32",
       "name": "Doxycycline",
       "purpose": "Antibiotic used to treat bacterial infections"
     },
     "33": {
-      "id": 33,
+      "id": "33",
       "name": "Carvedilol",
       "purpose": "Beta blocker for treating high blood pressure and heart failure"
     },
     "34": {
-      "id": 34,
+      "id": "34",
       "name": "Pantoprazole",
       "purpose": "Proton pump inhibitor for treating acid reflux and stomach ulcers"
     },
     "35": {
-      "id": 35,
+      "id": "35",
       "name": "Fluticasone",
       "purpose": "Corticosteroid used to treat asthma and allergic rhinitis"
     },
     "36": {
-      "id": 36,
+      "id": "36",
       "name": "Bupropion",
       "purpose": "Atypical antidepressant used to treat depression and smoking cessation"
     },
     "37": {
-      "id": 37,
+      "id": "37",
       "name": "Venlafaxine",
       "purpose": "Serotonin-norepinephrine reuptake inhibitor (SNRI) antidepressant"
     },
     "38": {
-      "id": 38,
+      "id": "38",
       "name": "Hydrocodone",
       "purpose": "Opioid analgesic used to treat moderate to severe pain"
     },
     "39": {
-      "id": 39,
+      "id": "39",
       "name": "Montelukast",
       "purpose": "Leukotriene receptor antagonist used to treat asthma and allergic rhinitis"
     },
     "40": {
-      "id": 40,
+      "id": "40",
       "name": "Esomeprazole",
       "purpose": "Proton pump inhibitor for treating acid reflux and stomach ulcers"
     },
     "41": {
-      "id": 41,
+      "id": "41",
       "name": "Metoprolol Succinate",
       "purpose": "Beta blocker for treating high blood pressure and heart failure"
     },
     "42": {
-      "id": 42,
+      "id": "42",
       "name": "Hydroxyzine",
       "purpose": "Antihistamine used to treat anxiety, itching, and allergies"
     },
     "43": {
-      "id": 43,
+      "id": "43",
       "name": "Fluconazole",
       "purpose": "Antifungal medication used to treat fungal infections"
     },
     "44": {
-      "id": 44,
+      "id": "44",
       "name": "Propranolol",
       "purpose": "Beta blocker for treating high blood pressure, angina, and migraines"
     },
     "45": {
-      "id": 45,
+      "id": "45",
       "name": "Amitriptyline",
       "purpose": "Tricyclic antidepressant used to treat depression, neuropathic pain, and migraines"
     },
     "46": {
-      "id": 46,
+      "id": "46",
       "name": "Loratadine",
       "purpose": "Antihistamine used to relieve allergy symptoms"
     },
     "47": {
-      "id": 47,
+      "id": "47",
       "name": "Azithromycin",
       "purpose": "Antibiotic used to treat bacterial infections"
     },
     "48": {
-      "id": 48,
+      "id": "48",
       "name": "Duloxetine",
       "purpose": "Serotonin-norepinephrine reuptake inhibitor (SNRI) antidepressant"
     },
     "49": {
-      "id": 49,
+      "id": "49",
       "name": "Quetiapine",
       "purpose": "Atypical antipsychotic used to treat schizophrenia, bipolar disorder, and depression"
     },
     "50": {
-      "id": 50,
+      "id": "50",
       "name": "Paroxetine",
       "purpose": "Selective serotonin reuptake inhibitor (SSRI) antidepressant"
     }

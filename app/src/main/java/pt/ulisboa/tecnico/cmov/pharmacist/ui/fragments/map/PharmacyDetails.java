@@ -2,13 +2,14 @@ package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,7 +18,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.MessageFormat;
+import java.util.List;
+import java.util.Objects;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.QRCodeActivity;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
@@ -33,8 +35,6 @@ public class PharmacyDetails {
     private final ImageView image;
     private Pharmacy currentPharmacy;
     private final Context fragmentContext;
-
-    private final String TAG = PharmacyDetails.class.getName();
     private RecyclerView.LayoutManager mLayoutManager;
     private MedicinesInPharmacyRecyclerAdapter medicineListAdapter;
 
@@ -82,7 +82,6 @@ public class PharmacyDetails {
                 if (snapshot.exists()) {
                     Pharmacy pharmacy = snapshot.getValue(Pharmacy.class);
                     if (pharmacy != null) {
-                        Log.w(TAG, MessageFormat.format("Fetched pharmacy: {0}", pharmacy.getId()));
                         currentPharmacy = pharmacy;
                         updateDetails();
                     }
@@ -91,7 +90,7 @@ public class PharmacyDetails {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.w(TAG, MessageFormat.format("Error while fetching pharmacy: {0}", error.getMessage()));
+
             }
         });
     }

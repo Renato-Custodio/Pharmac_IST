@@ -27,7 +27,6 @@ import java.util.ArrayList;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.databinding.ActivityMainBinding;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
-import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MedicineStock;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
@@ -65,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
         replaceFragment(mapFragment);
 
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        // SeedMapChunks.seedChuncks();
+        //SeedMapChunks.seedChuncks();
         AuthUtils.signAsAnonymous(this);
 
         binding.topAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -133,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
     }
 
     @Override
-    public void onItemClicked(MedicineStock medicine, String origin) {
+    public void onItemClicked(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine medicine, String origin) {
         MedicineDetails newFragment = MedicineDetails.newInstance(medicine, this, origin);
         details = newFragment;
         binding.bottomNavigation.getMenu().getItem(1).setChecked(true);

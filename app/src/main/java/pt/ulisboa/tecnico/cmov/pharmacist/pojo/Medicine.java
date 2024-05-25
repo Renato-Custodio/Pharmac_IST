@@ -19,14 +19,11 @@ public class Medicine implements Parcelable {
 
     public String purpose;
 
-    public String picture;
-
     // Constructor
-    public Medicine(String id, String name, String purpose, String picture) {
+    public Medicine(String id, String name, String purpose) {
         this.id = id;
         this.name = name;
         this.purpose = purpose;
-        this.picture = picture;
     }
 
     // Default no-argument constructor
@@ -37,8 +34,8 @@ public class Medicine implements Parcelable {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = String.valueOf(id);
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -57,20 +54,11 @@ public class Medicine implements Parcelable {
         this.purpose = purpose;
     }
 
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
-    }
-
     // Parcelable implementation
     protected Medicine(Parcel in) {
         id = in.readString();
         name = in.readString();
         purpose = in.readString();
-        picture = in.readString();
     }
 
     public Bitmap generateQrCode(){
@@ -90,7 +78,6 @@ public class Medicine implements Parcelable {
         dest.writeString(id);
         dest.writeString(name);
         dest.writeString(purpose);
-        dest.writeString(picture);
     }
 
     @Override

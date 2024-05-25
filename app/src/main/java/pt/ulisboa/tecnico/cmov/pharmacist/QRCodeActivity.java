@@ -4,6 +4,7 @@ import static com.basgeekball.awesomevalidation.ValidationStyle.TEXT_INPUT_LAYOU
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -102,7 +103,7 @@ public class QRCodeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 barcodeView.pause();
                 scanButton.setVisibility(View.VISIBLE);
-                //launck create medicine
+                startActivity(new Intent(context, CreateMedicineActivity.class));
             }
         });
 
@@ -122,6 +123,10 @@ public class QRCodeActivity extends AppCompatActivity {
                 startScanner();
             }
         });
+        initTextValidation();
+    }
+
+    private void initTextValidation(){
         AwesomeValidation mAwesomeValidation = new AwesomeValidation(TEXT_INPUT_LAYOUT);
         mAwesomeValidation.addValidation(addStockLayout, (String s) -> {
             try {

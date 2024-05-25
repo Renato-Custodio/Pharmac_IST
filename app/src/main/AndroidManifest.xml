@@ -57,6 +57,9 @@
         <activity
             android:name=".QRCodeActivity"
             android:exported="true"></activity>
+        <activity
+            android:name=".CreateMedicineActivity"
+            android:exported="true"></activity>
     </application>
 
 </manifest>

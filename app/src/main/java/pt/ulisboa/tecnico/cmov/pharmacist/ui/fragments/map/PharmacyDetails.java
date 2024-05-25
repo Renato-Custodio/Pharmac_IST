@@ -46,7 +46,7 @@ public class PharmacyDetails {
     private Pharmacy currentPharmacy;
     private final Context fragmentContext;
     private RecyclerView.LayoutManager mLayoutManager;
-    private MedicinesInPharmacyRecyclerAdapter medicineListAdapter;
+    private final MedicinesInPharmacyRecyclerAdapter medicineListAdapter;
     private List<Medicine> medicines = new ArrayList<>();
     private Query currentStockQuery;
     private ChildEventListener currentStockQueryEventListener;
@@ -164,8 +164,9 @@ public class PharmacyDetails {
         title.setText(currentPharmacy.getName());
         location.setText(Location.getAddress(currentPharmacy.getLocation(), fragmentContext));
         medicines.clear();
-        medicineListAdapter.notifyAll();
-
+        synchronized (medicineListAdapter){
+            medicineListAdapter.notifyAll();
+        }
         fetchStock(null);
     }
 

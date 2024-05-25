@@ -71,6 +71,10 @@ public class MarkersSystem {
                 Log.d(TAG, MessageFormat.format("New pharmacies (Chunk {0}): {1}", chunk.chunkId, chunk.pharmacies.stream().map(chunkPharmacyData -> chunkPharmacyData.pharmacyId).collect(Collectors.toSet())));
             }
 
+            if(chunk.pharmacies == null){
+                return;
+            }
+
             chunk.pharmacies.forEach((pharmacyChunkData) -> {
 
                 Marker marker = mapInstance.addMarker(PharmacyMarker.createNew(context,

@@ -45,6 +45,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyChunkData;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageResultLaunchers;
@@ -179,19 +181,14 @@ public class CreatePharmacy extends Fragment {
         // Add the new entry with a unique key
         DatabaseReference newPharmacyRef = pharmacyRef.push();
 
-        // Create a new stock entry
-        Map<String, Object> newPharmacyEntry = new HashMap<>();
-        newPharmacyEntry.put("id", newPharmacyRef.getKey());
-        newPharmacyEntry.put("name", pharmacyName);
-
-        Map<String, Double> location = new HashMap<>();
-        location.put("lat", latlng.latitude);
-        location.put("lng", latlng.longitude);
-
-        newPharmacyEntry.put("location", location);
+        // Create new pharmacy
+        Pharmacy pharmacy = new Pharmacy();
+        pharmacy.setId(newPharmacyRef.getKey());
+        pharmacy.setName(pharmacyName);
+        pharmacy.setLocation(new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location(latlng.latitude, latlng.longitude));
 
         // Add the new entry to the database
-        newPharmacyRef.setValue(newPharmacyEntry)
+        newPharmacyRef.setValue(pharmacy)
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "Pharmacy entry added successfully with key: " + newPharmacyRef.getKey());
                     ImageUtils.uploadImage(getActivity(), pharmacyPhoto, "pharmacies", newPharmacyRef.getKey(), metadata -> {
@@ -206,6 +203,7 @@ public class CreatePharmacy extends Fragment {
     }
     private void updateMapChunk(String pharmacyId, double latitude, double longitude) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
+
         DatabaseReference chunksRef = database.getReference("chunks");
 
         String chunkId = ChunkUtils.getChunkId(latitude, longitude);
@@ -213,14 +211,22 @@ public class CreatePharmacy extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 MapChunk mapChunk;
+
+                PharmacyChunkData pharmacyChunkData = new PharmacyChunkData(pharmacyId, new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location(latitude, longitude));
+
                 if (snapshot.exists()) {
                     mapChunk = snapshot.getValue(MapChunk.class);
+
                     if (mapChunk != null) {
-                        mapChunk.addPharmacyId(pharmacyId);
+                        if (mapChunk.pharmacies == null) {
+                            mapChunk.pharmacies = new ArrayList<>();
+                        }
+
+                        mapChunk.addPharmacy(pharmacyChunkData);
                     }
                 } else {
-                    mapChunk = new MapChunk(new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location(latlng.latitude, latlng.longitude), chunkId);
-                    mapChunk.setPharmaciesIDs(new ArrayList<>(Collections.singletonList(pharmacyId)));
+                    mapChunk = new MapChunk(new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location(ChunkUtils.precisionRound(latlng.latitude, 100), ChunkUtils.precisionRound(latlng.longitude, 100)), chunkId);
+                    mapChunk.setPharmacies(Collections.singletonList(pharmacyChunkData));
                 }
 
                 chunksRef.child(chunkId).setValue(mapChunk)

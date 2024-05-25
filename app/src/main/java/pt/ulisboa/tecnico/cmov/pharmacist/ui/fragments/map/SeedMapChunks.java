@@ -16,6 +16,7 @@ import com.google.firebase.database.ValueEventListener;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MapChunk;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyChunkData;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
 
 public class SeedMapChunks {
@@ -46,14 +47,14 @@ public class SeedMapChunks {
                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
                                     MapChunk chunk = snapshot.getValue(MapChunk.class);
-                                    chunk.addPharmacyId(pharmacy.getId());
+                                    chunk.addPharmacy(new PharmacyChunkData(pharmacy.getId(), pharmacy.getLocation()));
                                     chunksRef.child(chunkId).setValue(chunk)
                                             .addOnSuccessListener(aVoid -> System.out.println("Chunk updated successfully"))
                                             .addOnFailureListener(e -> System.err.println("Error updating chunk: " + e.getMessage()));
                                 }
 
                             } else {
-                                mapChunk.addPharmacyId(pharmacy.getId());
+                                mapChunk.addPharmacy(new PharmacyChunkData(pharmacy.getId(), pharmacy.getLocation()));
                                 chunksRef.child(chunkId).setValue(mapChunk);
                             }
                         }

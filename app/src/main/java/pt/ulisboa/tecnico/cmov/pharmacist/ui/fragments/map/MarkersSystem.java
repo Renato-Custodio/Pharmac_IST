@@ -28,12 +28,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MapChunk;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
 
+
+/**
+ * Markers Algorithm:
+ * 1 - Fetch chunks main and around
+ * 2 -
+ */
 
 public class MarkersSystem {
     private final LruCache<String, MapChunk> mapCache;
@@ -46,13 +53,13 @@ public class MarkersSystem {
     private static final String TAG = "MarkersSystem";
 
     public MarkersSystem(GoogleMap mapInstance, Context context) {
-        this.mapCache = new LruCache<>(50);
+        this.mapCache = new LruCache<>(20);
         this.markers = new ArrayList<>();
         this.mapInstance = mapInstance;
         this.context = context;
     }
 
-    public void refreshPoints(Set<String> newChunksIds, Pharmacy selectedPharmacy, Consumer<Marker> selectedMarkerCallback) {
+    public void refreshPoints(Set<String> newChunksIds, String selectedPharmacyId, Consumer<Marker> selectedMarkerCallback) {
         if (!this.markers.isEmpty()) {
             this.markers.forEach(Marker::remove);
             this.markers.clear();
@@ -60,47 +67,30 @@ public class MarkersSystem {
 
         this.mapCache.snapshot().values().forEach((chunk) -> {
 
-            if (newChunksIds.contains(chunk.chunkId)) {
-                Log.d(TAG, MessageFormat.format("New pharmacies (Chunk {0}): {1}", chunk.chunkId, chunk.pharmaciesIDs.toString()));
+            if (newChunksIds.contains(chunk.chunkId) && chunk.pharmacies != null) {
+                Log.d(TAG, MessageFormat.format("New pharmacies (Chunk {0}): {1}", chunk.chunkId, chunk.pharmacies.stream().map(chunkPharmacyData -> chunkPharmacyData.pharmacyId).collect(Collectors.toSet())));
             }
 
-            chunk.pharmaciesIDs.forEach((pharmacyId) -> {
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
+            chunk.pharmacies.forEach((pharmacyChunkData) -> {
 
-                Query pharmacyRef = database.getReference("pharmacies").orderByChild("id").equalTo(pharmacyId);
-                pharmacyRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Pharmacy pharmacy = null;
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            pharmacy = snapshot.getValue(Pharmacy.class);
-                        }
-                        Marker marker = mapInstance.addMarker(PharmacyMarker.createNew(context,
-                                new LatLng(pharmacy.getLocation().lat, pharmacy.getLocation().lng)));
+                Marker marker = mapInstance.addMarker(PharmacyMarker.createNew(context,
+                        new LatLng(pharmacyChunkData.getLocation().lat, pharmacyChunkData.getLocation().lng)));
 
-                        if (marker != null) {
-                            markers.add(marker);
-                            marker.setTag(pharmacy);
+                if (marker != null) {
+                    markers.add(marker);
+                    marker.setTag(pharmacyChunkData.pharmacyId);
 
-                            if (newChunksIds.contains(chunk.chunkId)) {
-                                ObjectAnimator.ofFloat(marker, "alpha", 0f, 1f).setDuration(500).start();
-                            }
+                    if (newChunksIds.contains(chunk.chunkId)) {
+                        ObjectAnimator.ofFloat(marker, "alpha", 0f, 1f).setDuration(500).start();
+                    }
 
-                            if (selectedPharmacy != null) {
-                                if (selectedPharmacy.getId().equals(pharmacy.getId())) {
-                                    // Persist selected marker after points refresh
-                                    selectedMarkerCallback.accept(marker);
-                                }
-                            }
+                    if (selectedPharmacyId != null) {
+                        if (selectedPharmacyId.equals(pharmacyChunkData.pharmacyId)) {
+                            // Persist selected marker after points refresh
+                            selectedMarkerCallback.accept(marker);
                         }
                     }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e(TAG, "Database error: " + databaseError.getMessage());
-                    }
-                });
-
-
+                }
             });
         });
     }
@@ -109,7 +99,7 @@ public class MarkersSystem {
         String chunkId = ChunkUtils.getChunkId(coord);
         LatLng roundedCoord = new LatLng(ChunkUtils.precisionRound(coord.latitude, 100), ChunkUtils.precisionRound(coord.longitude, 100));
 
-        Pharmacy selectedPharmacy = (selectedMarker != null) ? (Pharmacy) selectedMarker.getTag() : null;
+        String selectedPharmacyId = (selectedMarker != null) ? (String) selectedMarker.getTag() : null;
 
         Log.d(TAG, MessageFormat.format("Requested chunk: {0} / {1}", roundedCoord, chunkId));
 
@@ -129,7 +119,7 @@ public class MarkersSystem {
                         loadedChunkIds.add(chunk.chunkId);
 
                         Log.d(TAG, MessageFormat.format("Loaded chunks: {0}", loadedChunkIds));
-                        refreshPoints(loadedChunkIds, selectedPharmacy, callback);
+                        refreshPoints(loadedChunkIds, selectedPharmacyId, callback);
                     } else {
                         Log.w(TAG, MessageFormat.format("DataSnapshot: {0}", dataSnapshot.getChildren()));
                     }

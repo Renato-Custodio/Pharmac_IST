@@ -15,26 +15,26 @@ import java.util.concurrent.CompletableFuture;
 public class MapChunk {
     public Location location;
     public String chunkId;
-    public List<String> pharmaciesIDs;
+    public List<PharmacyChunkData> pharmacies;
 
     public MapChunk() {}
 
     public MapChunk(Location location, String chunkId){
         this.chunkId = chunkId;
         this.location = location;
-        this.pharmaciesIDs = new ArrayList<>();
+        this.pharmacies = new ArrayList<>();
     }
 
-    public void addPharmacyId(String pharmacyId){
-        this.pharmaciesIDs.add(pharmacyId);
+    public void addPharmacy(PharmacyChunkData pharmacy){
+        this.pharmacies.add(pharmacy);
     }
 
-    public List<String> getPharmaciesIDs() {
-        return pharmaciesIDs;
+    public List<PharmacyChunkData> getPharmacies() {
+        return pharmacies;
     }
 
-    public void setPharmaciesIDs(List<String> pharmaciesIDs) {
-        this.pharmaciesIDs = pharmaciesIDs;
+    public void setPharmacies(List<PharmacyChunkData> pharmacies) {
+        this.pharmacies = pharmacies;
     }
 
     public Location getLocation() {
@@ -51,5 +51,14 @@ public class MapChunk {
 
     public void setChunkId(String chunkId) {
         this.chunkId = chunkId;
+    }
+
+    @Override
+    public String toString() {
+        return "MapChunk{" +
+                "location=" + location +
+                ", chunkId='" + chunkId + '\'' +
+                ", pharmacies=" + pharmacies +
+                '}';
     }
 }

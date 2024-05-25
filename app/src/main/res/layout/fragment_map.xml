@@ -130,7 +130,7 @@
 
                         <com.google.android.material.chip.Chip
 
-                            android:id="@+id/pharmacy_distance"
+                            android:id="@+id/details_pharmacy_distance"
                             style="@style/Widget.Material3.Chip.Suggestion"
                             android:layout_width="wrap_content"
                             android:layout_height="40dp"
@@ -171,7 +171,7 @@
                                 map:layout_constraintTop_toTopOf="parent" />
 
                             <TextView
-                                android:id="@+id/textView5"
+                                android:id="@+id/details_pharmacy_title"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="16dp"
@@ -183,7 +183,7 @@
                                 map:layout_constraintTop_toTopOf="parent" />
 
                             <TextView
-                                android:id="@+id/textView6"
+                                android:id="@+id/details_pharmacy_location"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="16dp"
@@ -193,7 +193,7 @@
                                 android:textSize="16sp"
                                 map:layout_constraintEnd_toEndOf="parent"
                                 map:layout_constraintStart_toEndOf="@+id/pharmacy_image"
-                                map:layout_constraintTop_toBottomOf="@+id/textView5" />
+                                map:layout_constraintTop_toBottomOf="@+id/details_pharmacy_title" />
 
                             <Button
                                 android:id="@+id/routeButton"
@@ -204,7 +204,7 @@
                                 android:text="Get route"
                                 app:icon="@drawable/route"
                                 map:layout_constraintStart_toEndOf="@+id/pharmacy_image"
-                                map:layout_constraintTop_toBottomOf="@+id/textView6" />
+                                map:layout_constraintTop_toBottomOf="@+id/details_pharmacy_location" />
 
                             <Button
                                 android:id="@+id/favouriteButton"
@@ -292,7 +292,7 @@
                             android:layout_height="wrap_content">
 
                             <Button
-                                android:id="@+id/plus_medicine_button"
+                                android:id="@+id/details_add_stock_button"
                                 style="?attr/materialIconButtonFilledStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

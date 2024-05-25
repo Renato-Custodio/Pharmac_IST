@@ -118,27 +118,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private PlacesAutoCompleteAdapter mAutoCompleteAdapter;
     private SearchBar searchBar;
 
-
     View bottomSheetView;
-    TextView textViewTitle;
-
-
-    TextView textViewLocation;
-    TextView textViewDistance;
-
     TextView textViewSlideMessage;
-
-    ImageView pharmacyImage;
-
-    RecyclerView medicineList;
-
-    MedicinesInPharmacyRecyclerAdapter medicineListRecyclerAdapter;
-
-    RecyclerView.LayoutManager mLayoutManager;
-
-    Pharmacy pharmacy;
-
-    List<Medicine> medicines;
 
     MapView pinInMap;
 
@@ -149,6 +130,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private double bottomSheetHalfExpandedRatio = 0.34f;
 
     private MedicinesInPharmacyRecyclerAdapter.OnItemClickListener listener;
+
+    private PharmacyDetails pharmacyDetails;
 
     // Fragment Lifecycle functions
 
@@ -272,8 +255,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         addressResultsView = view.findViewById(R.id.address_search_results);
         searchView = view.findViewById(R.id.address_search_view);
         searchBar = view.findViewById(R.id.address_search_bar);
-        addMedicineButton = view.findViewById(R.id.plus_medicine_button);
         scrollView = view.findViewById(R.id.fragment_map_scroll);
+
         //init mini map
         pinInMap = view.findViewById(R.id.mapView);
         pinInMap.onCreate(savedInstanceState);
@@ -290,7 +273,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 miniMapInstance = googleMap;
             }
         });
-        //
+
+
         mAutoCompleteAdapter = new PlacesAutoCompleteAdapter(getContext());
         addressResultsView.setLayoutManager(new LinearLayoutManager(getContext()));
         mAutoCompleteAdapter.setClickListener(new PlacesAutoCompleteAdapter.ClickListener() {
@@ -330,26 +314,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         });
 
+        bottomSheetView = getView().findViewById(R.id.pharmacy_details);
+        textViewSlideMessage = bottomSheetView.findViewById(R.id.slide_up_message);
+
+        pharmacyDetails = new PharmacyDetails(this, bottomSheetView, sharedLocationViewModel);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        bottomSheetView = getView().findViewById(R.id.pharmacy_details);
-        textViewTitle = bottomSheetView.findViewById(R.id.textView5);
-        textViewLocation = bottomSheetView.findViewById(R.id.textView6);
-        textViewDistance = bottomSheetView.findViewById(R.id.pharmacy_distance);
-        textViewSlideMessage = bottomSheetView.findViewById(R.id.slide_up_message);
-        medicineList = bottomSheetView.findViewById(R.id.fragment_map_avaliable_medicines);
-        pharmacyImage = bottomSheetView.findViewById(R.id.pharmacy_image);
-        medicines = new ArrayList<>();
-        sharedLocationViewModel.getLocation().observe(getViewLifecycleOwner(), new Observer<Location>() {
-            @Override
-            public void onChanged(Location location) {
-                if(pharmacy != null) {
-                    textViewDistance.setText(getDistance(location, pharmacy));
-                }
-            }
-        });
     }
     private void synchronizeMiniMap(LatLng location) {
         if (miniMapInstance != null) {
@@ -481,64 +453,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         });
     }
 
-    private String getDistance(Location location, Pharmacy pharmacy){
-        Float distance = pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(
-                location ,pharmacy.getLocation());
-        return pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistanceString(
-                Double.valueOf(distance));
-    }
-
-    private void getMedicines(){
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-
-        //get all medicines with the pharmacyId
-        DatabaseReference pharmaciesRef = database.getReference("pharmacies");
-
-        Query query = pharmaciesRef.orderByChild("id").equalTo(pharmacy.getId());
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                medicines.clear();
-                Pharmacy pharmacy1 = null;
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    pharmacy1 = snapshot.getValue(Pharmacy.class);
-                }
-
-                if (pharmacy1 == null || pharmacy1.getStock() == null) return;
-
-                for (String medicineId : pharmacy1.getStock().keySet()) {
-                    DatabaseReference medicineRef = FirebaseDatabase.getInstance().getReference("medicines").child(medicineId.substring(4));
-                    medicineRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            Medicine medicine = dataSnapshot.getValue(Medicine.class);
-                            if (medicine != null) {
-                                medicines.add(medicine);
-                            }
-                            medicineListRecyclerAdapter.notifyDataSetChanged();
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Log.e("Map fragment getting medicines", "Database error: " + databaseError.getMessage());
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("Medicine Fragment getting medicines", "Database error: " + databaseError.getMessage());
-            }
-        });
-    }
 
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
         Log.d("MapFragment:onMarkerClick", MessageFormat.format("Selected: {0}", marker.getPosition()));
         focus = MapFocus.MARKER;
-        pharmacy = (Pharmacy) marker.getTag();
         onLocationChanged(marker.getPosition());
         unfocused();
 
@@ -546,39 +465,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             PharmacyMarker.setActive(currentSelectedMarker, false);
         }
 
+        pharmacyDetails.update((String) marker.getTag());
 
-        if (pharmacy == null) {
-            Log.e("MapFragment:onMarkerClick", "Pharmacy is null!");
-            return false;
-        }
-
-        ImageUtils.loadImage(getContext(),String.format("/pharmacies/%s", pharmacy.getId()), this.pharmacyImage);
-        textViewTitle.setText(pharmacy.getName());
-        pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location location =
-                new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location();
-        location.lat = marker.getPosition().latitude;
-        location.lng = marker.getPosition().longitude;
-        textViewLocation.setText(
-                pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getAddress(location, getContext()));
-
-
-        addMedicineButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), QRCodeActivity.class);
-            intent.putExtra("pharmacyId", pharmacy.getId());
-            startActivity(intent);
-        });
-
-        textViewDistance.setText(getDistance(sharedLocationViewModel.getLocation().getValue() , pharmacy));
-        //get medicines
-        medicines.clear();
-        this.getMedicines();
-
-        mLayoutManager = new LinearLayoutManager(getActivity());
-
-
-        medicineListRecyclerAdapter = new MedicinesInPharmacyRecyclerAdapter(medicines, this, pharmacy, listener,getContext());
-        medicineList.setLayoutManager(mLayoutManager);
-        medicineList.setAdapter(medicineListRecyclerAdapter);
 
         currentSelectedMarker = marker;
 

@@ -58,4 +58,8 @@ public class Location {
             return String.format("%.1f km", distanceInKilometers);
         }
     }
+
+    public static String getDistanceString(Float distance) {
+        return getDistanceString(Double.valueOf(distance));
+    }
 }

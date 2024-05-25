@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MedicineStock;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyDistance;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.ClosestPharmaciesRecyclerAdapter;
@@ -63,7 +64,7 @@ public class MedicineDetails extends Fragment {
         this.callback = back;
     }
 
-    public static MedicineDetails newInstance(Medicine medicine, MedicineDetailsBack back, String origin) {
+    public static MedicineDetails newInstance(MedicineStock medicine, MedicineDetailsBack back, String origin) {
         MedicineDetails fragment = new MedicineDetails(back);
         Bundle args = new Bundle();
         args.putParcelable(ARG_MEDICINE, medicine);

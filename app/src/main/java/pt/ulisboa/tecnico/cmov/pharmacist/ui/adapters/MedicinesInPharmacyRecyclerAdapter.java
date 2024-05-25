@@ -27,11 +27,12 @@ import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MedicineStock;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
 public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<MedicinesInPharmacyRecyclerAdapter.ViewHolder> {
-    private static List<Medicine> localDataSet = null;
+    private static List<MedicineStock> localDataSet = null;
     private static Fragment fragment = null;
 
     private static Pharmacy pharmacy = null;
@@ -39,7 +40,7 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
     private Context context;
 
     public interface OnItemClickListener {
-        void onItemClicked(Medicine medicine, String origin);
+        void onItemClicked(MedicineStock medicine, String origin);
     }
     private final MedicinesInPharmacyRecyclerAdapter.OnItemClickListener itemClickListener;
     /**
@@ -48,7 +49,7 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
      * @param dataSet String[] containing the data to populate views to be used
      * by RecyclerView
      */
-    public MedicinesInPharmacyRecyclerAdapter(List<Medicine> dataSet, Fragment incomingFragment, Pharmacy inPharmacy, MedicinesInPharmacyRecyclerAdapter.OnItemClickListener listener, Context context) {
+    public MedicinesInPharmacyRecyclerAdapter(List<MedicineStock> dataSet, Fragment incomingFragment, Pharmacy inPharmacy, MedicinesInPharmacyRecyclerAdapter.OnItemClickListener listener, Context context) {
         localDataSet = dataSet;
         fragment = incomingFragment;
         pharmacy = inPharmacy;
@@ -103,7 +104,7 @@ public class MedicinesInPharmacyRecyclerAdapter extends RecyclerView.Adapter<Med
         public void onClick(View v) {
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-                Medicine clickedMedicine = localDataSet.get(position);
+                MedicineStock clickedMedicine = localDataSet.get(position);
                 itemClickListener.onItemClicked(clickedMedicine, "MedicinesInPharmacyRecyclerAdapter");
             }
         }

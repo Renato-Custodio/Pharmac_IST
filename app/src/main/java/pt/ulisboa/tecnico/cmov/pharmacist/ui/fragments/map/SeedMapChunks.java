@@ -45,19 +45,26 @@ public class SeedMapChunks {
                     String chunkId = ChunkUtils.getChunkId(chunkLat,chunkLng);
 
                     MapChunk mapChunk = new MapChunk(new Location(chunkLat, chunkLng), chunkId);
-                    //DatabaseReference db = chunksRef.child(chunkId);
-                    Query query = chunksRef.orderByChild("chunkId").equalTo(chunkId);
-                    /*db.runTransaction(new Transaction.Handler() {
+                    DatabaseReference db = chunksRef.child(chunkId);
+                    db.runTransaction(new Transaction.Handler() {
                         @NonNull
                         @Override
                         public Transaction.Result doTransaction(MutableData mutableData) {
 
-                            if (mutableData == null){
-                                System.out.println("num tem nada");
-                                return Transaction.abort();
-                            }
                             MapChunk chunk = mutableData.getValue(MapChunk.class);
                             if (chunk == null) {
+                                chunksRef.runTransaction((new Transaction.Handler() {
+                                    @NonNull
+                                    @Override
+                                    public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                                        mapChunk.addPharmacy(new PharmacyChunkData(pharmacy.getId(), pharmacy.getLocation()));
+                                        mutableData.child(chunkId).setValue(mapChunk);
+                                        return Transaction.success(mutableData);
+                                    }
+
+                                    @Override
+                                    public void onComplete(@Nullable DatabaseError databaseError, boolean committed, @Nullable DataSnapshot dataSnapshot) {}
+                                }));
                                 return Transaction.abort();
                             }
 
@@ -76,30 +83,6 @@ public class SeedMapChunks {
                                 // Transaction committed and stock updated
                                System.out.println("success");
                             }
-                        }
-                    });*/
-                    query.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            /*if (dataSnapshot.exists()) {
-                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                    System.out.println("entrei1");
-                                    MapChunk chunk = snapshot.getValue(MapChunk.class);
-                                    chunk.addPharmacy(new PharmacyChunkData(pharmacy.getId(), pharmacy.getLocation()));
-                                    chunksRef.child(chunkId).setValue(chunk)
-                                            .addOnSuccessListener(aVoid -> System.out.println("Chunk updated successfully"))
-                                            .addOnFailureListener(e -> System.err.println("Error updating chunk: " + e.getMessage()));
-                                }
-
-                            } else {*/
-                                mapChunk.addPharmacy(new PharmacyChunkData(pharmacy.getId(), pharmacy.getLocation()));
-                                chunksRef.child(chunkId).setValue(mapChunk);
-                            //}
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            System.err.println("Database error: " + databaseError.getMessage());
                         }
                     });
                 }

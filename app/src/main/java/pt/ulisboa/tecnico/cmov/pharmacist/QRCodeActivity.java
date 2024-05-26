@@ -145,9 +145,15 @@ public class QRCodeActivity extends AppCompatActivity {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         if (data != null) {
-                            String medicine = data.getStringExtra("medicineId");
+                            medicineId = data.getStringExtra("medicineId");
                             String amount = data.getStringExtra("quantity");
-                            createStock(medicine, amount);
+                            createStock(medicineId, amount);
+                            getMedicine(medicineId);
+                            getCurrentStock(medicineId);
+                            addStockMessage.setVisibility(View.VISIBLE);
+                            addStockButton.setVisibility(View.VISIBLE);
+                            addStockLayout.setVisibility(View.VISIBLE);
+                            addStockText.setVisibility(View.VISIBLE);
                         }
                     }
                 }

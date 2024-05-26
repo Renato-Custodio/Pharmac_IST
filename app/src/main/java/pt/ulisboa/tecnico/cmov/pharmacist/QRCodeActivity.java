@@ -1,8 +1,10 @@
 package pt.ulisboa.tecnico.cmov.pharmacist;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.TEXT_INPUT_LAYOUT;
+import static com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +15,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,8 +39,11 @@ import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.SplittableRandom;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
@@ -68,6 +77,8 @@ public class QRCodeActivity extends AppCompatActivity {
     private TextInputLayout addStockLayout;
 
     private Button createMedicineButton;
+
+    private String stock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +114,8 @@ public class QRCodeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 barcodeView.pause();
                 scanButton.setVisibility(View.VISIBLE);
-                startActivity(new Intent(context, CreateMedicineActivity.class));
+                Intent intent = new Intent(new Intent(context, CreateMedicineActivity.class));
+                activityResultLauncher.launch(intent);
             }
         });
 
@@ -119,11 +131,49 @@ public class QRCodeActivity extends AppCompatActivity {
                 medicineDescription.setVisibility(View.GONE);
                 scanButton.setVisibility(View.GONE);
                 currentStock.setVisibility(View.GONE);
-                createMedicineButton.setVisibility(View.VISIBLE);
                 startScanner();
             }
         });
         initTextValidation();
+    }
+
+    private ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            String medicine = data.getStringExtra("medicineId");
+                            String amount = data.getStringExtra("quantity");
+                            createStock(medicine, amount);
+                        }
+                    }
+                }
+            }
+    );
+
+    private void createStock(String medicine ,String amount){
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference db = database.getReference("pharmacies").child(pharmacyId).child("stock");
+
+        // Create a new map entry
+        Map<String, Object> stockEntry = new HashMap<>();
+        stockEntry.put(medicine, amount);
+
+        // Update the value in Firebase
+        db.updateChildren(stockEntry, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    Log.e("Stock update", "Database error: " + databaseError.getMessage());
+                    Toast.makeText(context, "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Stock updated successfully!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void initTextValidation(){
@@ -151,8 +201,13 @@ public class QRCodeActivity extends AppCompatActivity {
                 }
                 addStockText.getText().clear();
                 addStockText.clearFocus();
-                updateStock(medicineId, amount);
-                getCurrentStock(medicineId);
+                if(stock == null){
+                    createStock(medicineId, String.valueOf(amount));
+                }else{
+                    System.out.println(stock);
+                    updateStock(medicineId, amount);
+                }
+
             }
         });
     }
@@ -168,7 +223,6 @@ public class QRCodeActivity extends AppCompatActivity {
             @Override
             public void barcodeResult(BarcodeResult result) {
                 if (result != null && result.getText() != null) {
-                    createMedicineButton.setVisibility(View.GONE);
                     medicineId = result.getText().replace("\"", "");
                     getMedicine(medicineId);
                     getCurrentStock(medicineId);
@@ -189,15 +243,15 @@ public class QRCodeActivity extends AppCompatActivity {
     public void getCurrentStock(String medicineId){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-        DatabaseReference db = database.getReference("pharmacies").child(pharmacyId).child("stock").child("Key_" + medicineId);
+        DatabaseReference db = database.getReference("pharmacies").child(pharmacyId).child("stock").child(medicineId);
 
-        db.addListenerForSingleValueEvent(new ValueEventListener() {
+        db.addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String stock = dataSnapshot.getValue(String.class);
-                stock = "Stock: " + stock;
-                currentStock.setText(stock);
+                stock = dataSnapshot.getValue(String.class);
+                String text = "Stock: " + stock;
+                currentStock.setText(text);
                 currentStock.setVisibility(View.VISIBLE);
             }
 
@@ -210,7 +264,7 @@ public class QRCodeActivity extends AppCompatActivity {
 
     public void updateStock(String medicineId, int value){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference db = database.getReference("pharmacies/" + pharmacyId + "/stock/Key_" + medicineId);
+        DatabaseReference db = database.getReference("pharmacies").child(pharmacyId).child("stock").child(medicineId);
         db.runTransaction(new Transaction.Handler() {
             @NonNull
             @Override

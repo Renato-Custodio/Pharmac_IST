@@ -3,6 +3,8 @@ package pt.ulisboa.tecnico.cmov.pharmacist;
 import static android.content.ContentValues.TAG;
 import static com.basgeekball.awesomevalidation.ValidationStyle.TEXT_INPUT_LAYOUT;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
@@ -115,13 +117,12 @@ public class CreateMedicineActivity extends AppCompatActivity {
                 purposeText.clearFocus();
                 quantityText.clearFocus();
                 imageView.setImageBitmap(null);
-                saveMedicine(name, purpose);
-                //updateStock(medicineId, amount);
+                saveMedicine(name, purpose, amount);
             }
         });
     }
 
-    private void saveMedicine(String name, String purpose){
+    private void saveMedicine(String name, String purpose, int amount){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference medicinesRef = database.getReference("medicines");
 
@@ -149,6 +150,11 @@ public class CreateMedicineActivity extends AppCompatActivity {
                     // Failed to add
                     Log.e("Firebase", "Failed to add medicine entry", e);
                 });
-
+        //return to update stock
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("medicineId", medicine.id);
+        returnIntent.putExtra("quantity", String.valueOf(amount));
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
     }
 }

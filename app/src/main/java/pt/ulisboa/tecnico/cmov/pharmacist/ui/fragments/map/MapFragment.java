@@ -46,7 +46,6 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.search.SearchBar;
@@ -170,33 +169,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         zoomIn = view.findViewById(R.id.zoom_in_action_button);
         zoomOut = view.findViewById(R.id.zoom_out_action_button);
 
-        zoomIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                unfocused();
-                mapInstance.animateCamera(CameraUpdateFactory.zoomIn());
-            }
+        zoomIn.setOnClickListener(v -> {
+            unfocused();
+            mapInstance.animateCamera(CameraUpdateFactory.zoomIn());
         });
 
-        zoomOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                unfocused();
-                mapInstance.animateCamera(CameraUpdateFactory.zoomOut());
-            }
+        zoomOut.setOnClickListener(v -> {
+            unfocused();
+            mapInstance.animateCamera(CameraUpdateFactory.zoomOut());
         });
 
         // Initialize focus
         focusButton = view.findViewById(R.id.focus_action_button);
         focusButton.setVisibility(View.INVISIBLE);
 
-        focusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                focus = MapFocus.CURRENT_POSITION;
-                onLocationChanged(lastKnownLocation);
-                focusButton.setVisibility(View.INVISIBLE);
-            }
+        focusButton.setOnClickListener(v -> {
+            focus = MapFocus.CURRENT_POSITION;
+            onLocationChanged(lastKnownLocation);
+            focusButton.setVisibility(View.INVISIBLE);
         });
 
         // Initialize bottom sheet
@@ -214,8 +204,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                         bottomSheetState = BottomSheetBehavior.STATE_HALF_EXPANDED;
                         return;
                     } else {
-                        PharmacyMarker.setActive(currentSelectedMarker, false);
-                        currentSelectedMarker = null;
+                        dismissDetails();
                     }
                     bottomSheetState = state;
                 } else if (state == BottomSheetBehavior.STATE_HALF_EXPANDED) {
@@ -258,19 +247,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         mAutoCompleteAdapter = new PlacesAutoCompleteAdapter(getContext());
         addressResultsView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAutoCompleteAdapter.setClickListener(new PlacesAutoCompleteAdapter.ClickListener() {
-            @Override
-            public void click(Place place) {
-                searchView.setText(place.getAddress());
-                searchBar.setText(searchView.getText());
-                searchView.hide();
+        mAutoCompleteAdapter.setClickListener(place -> {
+            searchView.setText(place.getAddress());
+            searchBar.setText(searchView.getText());
+            searchView.hide();
 
-                LatLng position = place.getLatLng();
+            LatLng position = place.getLatLng();
 
-                if (position != null) {
-                    unfocused();
-                    mapInstance.animateCamera(CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM));
-                }
+            if (position != null) {
+                unfocused();
+                mapInstance.animateCamera(CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM));
             }
         });
 
@@ -345,7 +331,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mapInstance = googleMap;
         mapInstance.setMapStyle(MapStyleOptions.loadRawResourceStyle(getActivity().getApplicationContext(), R.raw.map_style));
 
-        markersSystem = new MarkersSystem(mapInstance, getContext(), this::onMarkerClick);
+        markersSystem = new MarkersSystem(mapInstance, getContext(), marker -> internalMarkerClick(marker, true));
 
         if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.w("MapFragment", "Location is not enabled, requesting permissions...");
@@ -355,16 +341,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             return;
         }
 
-        mapInstance.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-                CreatePharmacy newFragment = CreatePharmacy.newInstance(latLng);
+        mapInstance.setOnMapLongClickListener(latLng -> {
+            CreatePharmacy newFragment = CreatePharmacy.newInstance(latLng);
 
-                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragmentContainerView, newFragment);
-                transaction.addToBackStack(null); // Add to back stack to allow back navigation
-                transaction.commit();
-            }
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragmentContainerView, newFragment);
+            transaction.addToBackStack(null); // Add to back stack to allow back navigation
+            transaction.commit();
         });
 
         mapInstance.getUiSettings().setMyLocationButtonEnabled(false);
@@ -388,11 +371,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 if (locationResult.getLastLocation() != null) {
                     Location location = locationResult.getLastLocation();
                     sharedLocationViewModel.setLocation(location);
-                    /*if (focus == MapFocus.CURRENT_POSITION) {
-                        markersSystem.checkPharmacyDistance(
+
+
+                    if (focus == MapFocus.CURRENT_POSITION) {
+                        markersSystem.findNearestPharmacy(
                                 ChunkUtils.getChunkId(location.getLatitude(), location.getLongitude()),
                                 location);
-                    }*/
+                    }
+
                     onLocationChanged(location);
                 }
             }
@@ -435,16 +421,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         markersSystem.update(coordinates);
     }
 
+    private void dismissDetails() {
+        PharmacyMarker.setActive(currentSelectedMarker, false);
+        currentSelectedMarker = null;
+    }
 
-    @Override
-    public boolean onMarkerClick(@NonNull Marker marker) {
+    /**
+     * Handles marker click, if isTrackingMarker is set to true then focus will not change
+     * @param marker
+     * @param isTrackingMarker
+     */
+    private void internalMarkerClick(@NonNull Marker marker, boolean isTrackingMarker) {
         Log.d("MapFragment:onMarkerClick", MessageFormat.format("Selected: {0}", marker.getPosition()));
 
-        focus = MapFocus.MARKER;
-
-        onLocationChanged(marker.getPosition());
-
-        unfocused();
+        if (!isTrackingMarker) {
+            focus = MapFocus.MARKER;
+            onLocationChanged(marker.getPosition());
+            unfocused();
+        }
 
         if (currentSelectedMarker != null) {
             PharmacyMarker.setActive(currentSelectedMarker, false);
@@ -460,6 +454,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         bottomSheetBehavior.setSkipCollapsed(true);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
         bottomSheetState = BottomSheetBehavior.STATE_HALF_EXPANDED;
+    }
+
+
+    @Override
+    public boolean onMarkerClick(@NonNull Marker marker) {
+        internalMarkerClick(marker, false);
         return true;
     }
 }

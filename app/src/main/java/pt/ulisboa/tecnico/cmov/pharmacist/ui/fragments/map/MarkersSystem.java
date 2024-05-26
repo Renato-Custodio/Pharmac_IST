@@ -135,7 +135,7 @@ public class MarkersSystem {
         }
     }
 
-    public void checkPharmacyDistance(String chunkId, android.location.Location currentLocation){
+    public void findNearestPharmacy(String chunkId, android.location.Location currentLocation){
         Log.d(TAG, "Checking distance...");
 
         PharmacyChunkData closestPharmacy = null;

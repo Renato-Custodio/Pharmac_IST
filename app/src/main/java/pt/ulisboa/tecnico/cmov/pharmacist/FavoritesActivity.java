@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.pharmacist;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +37,16 @@ public class FavoritesActivity extends AppCompatActivity {
 
     private static final String TAG = FavoritesActivity.class.getSimpleName();
 
+    private void checkEmpty() {
+        if (pharmacies.isEmpty()) {
+            findViewById(R.id.favorites_empty_card).setVisibility(View.VISIBLE);
+            favoritePharmaciesList.setVisibility(View.GONE);
+        } else {
+            favoritePharmaciesList.setVisibility(View.VISIBLE);
+            findViewById(R.id.favorites_empty_card).setVisibility(View.GONE);
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +80,7 @@ public class FavoritesActivity extends AppCompatActivity {
 
                                 pharmacies.add(pharmacy);
                                 favoritePharmaciesListAdapter.notifyItemInserted(pharmacies.indexOf(pharmacy));
+                                checkEmpty();
                             }
                         }
 
@@ -87,6 +99,7 @@ public class FavoritesActivity extends AppCompatActivity {
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
                 AdapterUtils.removeChild(snapshot.getKey(), pharmacies, favoritePharmaciesListAdapter);
+                checkEmpty();
             }
 
             @Override
@@ -97,6 +110,8 @@ public class FavoritesActivity extends AppCompatActivity {
                 Log.w(TAG, MessageFormat.format("Could not fetch favorite pharmacies: {0}", error.toException()));
             }
         });
+
+        checkEmpty();
 
     }
 

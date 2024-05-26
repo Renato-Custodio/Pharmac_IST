@@ -230,18 +230,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         //init mini map
         pinInMap = view.findViewById(R.id.mapView);
         pinInMap.onCreate(savedInstanceState);
-        pinInMap.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(@NonNull GoogleMap googleMap) {
-                googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getActivity().getApplicationContext(), R.raw.map_style));
-                googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                googleMap.setMyLocationEnabled(true);
-                // Save the mini map instance for later use
-                miniMapInstance = googleMap;
+        pinInMap.getMapAsync(googleMap -> {
+            googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getActivity().getApplicationContext(), R.raw.map_style));
+            googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
             }
+            googleMap.setMyLocationEnabled(true);
+            // Save the mini map instance for later use
+            miniMapInstance = googleMap;
         });
 
 
@@ -331,7 +328,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mapInstance = googleMap;
         mapInstance.setMapStyle(MapStyleOptions.loadRawResourceStyle(getActivity().getApplicationContext(), R.raw.map_style));
 
-        markersSystem = new MarkersSystem(mapInstance, getContext(), marker -> internalMarkerClick(marker, true));
+        markersSystem = new MarkersSystem(mapInstance, getContext(), marker -> internalMarkerClick(marker, true), this::dismissDetails);
 
         if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.w("MapFragment", "Location is not enabled, requesting permissions...");
@@ -422,8 +419,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void dismissDetails() {
+        if (currentSelectedMarker == null) return;
+
         PharmacyMarker.setActive(currentSelectedMarker, false);
         currentSelectedMarker = null;
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomSheetState = BottomSheetBehavior.STATE_HIDDEN;
     }
 
     /**

@@ -39,9 +39,11 @@ public class MarkersSystem {
     private String currentClosestPharmacyId;
 
     private final Consumer<Marker> closestPharmacyCallBack;
+    private Runnable onDismiss;
 
-    public MarkersSystem(GoogleMap mapInstance, Context context, Consumer<Marker> closestPharmacyCallBack) {
+    public MarkersSystem(GoogleMap mapInstance, Context context, Consumer<Marker> closestPharmacyCallBack, Runnable onDismiss) {
         this.closestPharmacyCallBack = closestPharmacyCallBack;
+        this.onDismiss = onDismiss;
         this.chunksRefsCache = new LruCache<>(20);
         this.mapInstance = mapInstance;
         this.context = context;
@@ -135,7 +137,7 @@ public class MarkersSystem {
         }
     }
 
-    public void findNearestPharmacy(String chunkId, android.location.Location currentLocation){
+    public void findNearestPharmacy(String chunkId, android.location.Location currentLocation) {
         Log.d(TAG, "Checking distance...");
 
         PharmacyChunkData closestPharmacy = null;
@@ -155,14 +157,23 @@ public class MarkersSystem {
             }
         }
 
-        if(closestPharmacy == null){
-            return;
-        }
+        if(closestPharmacy == null) return;
+
 
         if((Math.round(minDistance) <= 100 && currentClosestPharmacyId == null) || (Math.round(minDistance) <= 100 && !currentClosestPharmacyId.equals(closestPharmacy.pharmacyId))){
             this.closestPharmacyCallBack.accept(this.markers.get(closestPharmacy.pharmacyId));
             currentClosestPharmacyId = closestPharmacy.pharmacyId;
+        } else {
+            if (currentClosestPharmacyId != null) {
+                LatLng current = markers.get(currentClosestPharmacyId).getPosition();
+                Float distance = Location.getDistance(currentLocation, new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location(current.latitude, current.longitude));
+                if (Math.round(distance) > 100) {
+                    onDismiss.run();
+                    currentClosestPharmacyId = null;
+                }
+            }
         }
+
     }
 
     public void update(LatLng coord) {

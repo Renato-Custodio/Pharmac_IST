@@ -39,6 +39,8 @@ public class PharmacyMarker {
     }
 
     public static void setActive(Marker marker, boolean active) {
+        if (marker == null) return;
+
         marker.setIcon(BitmapDescriptorFactory.fromBitmap(active ? activeIconBitmap : defaultIconBitmap));
     }
 

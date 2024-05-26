@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -18,22 +17,17 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.navigation.NavigationBarView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.ArrayList;
-
 import pt.ulisboa.tecnico.cmov.pharmacist.databinding.ActivityMainBinding;
-import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
-import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.MapFragment;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.SeedMapChunks;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicineDetails;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicinesFragment;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.seed.SeedMapChunks;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.seed.SeedMedicines;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.seed.SeedPharmacies;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 
 public class MainActivity extends AppCompatActivity implements MedicinesRecyclerAdapter.OnItemClickListener, MedicineDetails.MedicineDetailsBack, MedicinesInPharmacyRecyclerAdapter.OnItemClickListener{
@@ -65,7 +59,10 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
 
         replaceFragment(mapFragment);
 
+        //SeedMedicines.seedMedicine(this);
+        //SeedPharmacies.seedPharmacy(this);
         //SeedMapChunks.seedChuncks();
+
         AuthUtils.signAsAnonymous(this);
 
         binding.topAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {

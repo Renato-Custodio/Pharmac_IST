@@ -119,7 +119,7 @@ public class PharmacyDetails {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-                String medicineKey = snapshot.getKey().replace("Key_", "");
+                String medicineKey = snapshot.getKey();
 
                 if (medicineKey != null) {
                     FirebaseDatabase.getInstance().getReference().child("medicines").child(medicineKey).addListenerForSingleValueEvent(new ValueEventListener() {

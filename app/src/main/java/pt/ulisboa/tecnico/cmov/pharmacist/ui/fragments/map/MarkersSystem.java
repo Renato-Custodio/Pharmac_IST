@@ -1,15 +1,9 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
 import android.animation.ObjectAnimator;
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
 import android.util.Log;
 import android.util.LruCache;
-import android.view.View;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -18,26 +12,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MapChunk;
-import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyChunkData;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.Location;
 
 
 public class MarkersSystem {
@@ -49,13 +36,18 @@ public class MarkersSystem {
     private final Context context;
     private static final String TAG = MarkersSystem.class.getSimpleName();
 
-    public MarkersSystem(GoogleMap mapInstance, Context context) {
+    private String currentClosestPharmacyId;
+
+    private final Consumer<Marker> closestPharmacyCallBack;
+
+    public MarkersSystem(GoogleMap mapInstance, Context context, Consumer<Marker> closestPharmacyCallBack) {
+        this.closestPharmacyCallBack = closestPharmacyCallBack;
         this.chunksRefsCache = new LruCache<>(20);
         this.mapInstance = mapInstance;
         this.context = context;
         this.chunksCache = new HashMap<>();
         this.markers = new HashMap<>();
-
+        this.currentClosestPharmacyId = null;
         chunkListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -82,7 +74,8 @@ public class MarkersSystem {
 
         if (oldChunk == null || oldChunk.chunkId == null) {
             Log.d(TAG, MessageFormat.format("{0} is a new chunk", chunk.getChunkId()));
-
+            if(chunk.pharmacies == null)
+                return;
             // New chunk, load all the markers
             chunk.pharmacies.forEach(pharmacyChunkData -> {
                 Log.d(TAG, MessageFormat.format("   > Adding: {0}", pharmacyChunkData.pharmacyId));
@@ -142,6 +135,36 @@ public class MarkersSystem {
         }
     }
 
+    public void checkPharmacyDistance(String chunkId, android.location.Location currentLocation){
+        Log.d(TAG, "Checking distance...");
+
+        PharmacyChunkData closestPharmacy = null;
+        double minDistance = Float.MAX_VALUE;
+        // Chunk was unloaded, remove ref and pharmacies markers
+        if(chunksCache.get(chunkId) == null){
+            return;
+        }
+
+        if (chunksCache.get(chunkId).pharmacies != null && !chunksCache.get(chunkId).pharmacies.isEmpty()) {
+            for (PharmacyChunkData pharmacyChunkData : chunksCache.get(chunkId).pharmacies) {
+                Float distance = Location.getDistance(currentLocation, pharmacyChunkData.location);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestPharmacy = pharmacyChunkData;
+                }
+            }
+        }
+
+        if(closestPharmacy == null){
+            return;
+        }
+
+        if((Math.round(minDistance) <= 100 && currentClosestPharmacyId == null) || (Math.round(minDistance) <= 100 && !currentClosestPharmacyId.equals(closestPharmacy.pharmacyId))){
+            this.closestPharmacyCallBack.accept(this.markers.get(closestPharmacy.pharmacyId));
+            currentClosestPharmacyId = closestPharmacy.pharmacyId;
+        }
+    }
+
     public void update(LatLng coord) {
         String chunkId = ChunkUtils.getChunkId(coord);
         LatLng roundedCoord = new LatLng(ChunkUtils.precisionRound(coord.latitude, 100), ChunkUtils.precisionRound(coord.longitude, 100));
@@ -165,6 +188,5 @@ public class MarkersSystem {
 
             chunkRef.addValueEventListener(chunkListener);
         }
-
     }
 }

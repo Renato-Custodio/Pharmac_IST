@@ -107,19 +107,19 @@ public class MedicineDetails extends Fragment {
         //get all Pharmacies with the medicineId
         DatabaseReference pharmacyRef = FirebaseDatabase.getInstance().getReference("pharmacies");
 
-        Query query = pharmacyRef.orderByChild("stock/Key_ + " + medicineId);
-
-        query.addValueEventListener(new ValueEventListener() {
+        pharmacyRef.addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 recivedPharmacies.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Pharmacy pharmacy = snapshot.getValue(Pharmacy.class);
-                    if (pharmacy != null) {
-                        recivedPharmacies.add(new PharmacyDistance(pharmacy,
-                                pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(sharedLocationViewModel.getLocation().getValue()
-                                        ,pharmacy.getLocation())) );
+                    if (pharmacy != null && pharmacy.getStock() != null) {
+                        if(pharmacy.getStock().get(medicineId) != null) {
+                            recivedPharmacies.add(new PharmacyDistance(pharmacy,
+                                    pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(sharedLocationViewModel.getLocation().getValue()
+                                            , pharmacy.getLocation())));
+                        }
                     }
                 }
                 recivedPharmacies.sort(new PharmacyDistanceComparator());

@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
+package pt.ulisboa.tecnico.cmov.pharmacist.ui.seed;
 
 import android.os.Build;
 import android.util.Log;

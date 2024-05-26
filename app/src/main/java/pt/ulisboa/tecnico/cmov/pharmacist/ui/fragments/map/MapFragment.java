@@ -1,10 +1,8 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 
 import android.Manifest;
@@ -14,12 +12,10 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,7 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -56,27 +51,15 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.search.SearchView;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
-import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
-import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.PlacesAutoCompleteAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
-import pt.ulisboa.tecnico.cmov.pharmacist.QRCodeActivity;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
-import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
 
 enum MapFocus {
@@ -182,8 +165,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
 
         // Initialize zoom controls
         zoomIn = view.findViewById(R.id.zoom_in_action_button);
@@ -364,7 +345,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mapInstance = googleMap;
         mapInstance.setMapStyle(MapStyleOptions.loadRawResourceStyle(getActivity().getApplicationContext(), R.raw.map_style));
 
-        markersSystem = new MarkersSystem(mapInstance, getContext());
+        markersSystem = new MarkersSystem(mapInstance, getContext(), this::onMarkerClick);
 
         if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.w("MapFragment", "Location is not enabled, requesting permissions...");
@@ -407,6 +388,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 if (locationResult.getLastLocation() != null) {
                     Location location = locationResult.getLastLocation();
                     sharedLocationViewModel.setLocation(location);
+                    /*if (focus == MapFocus.CURRENT_POSITION) {
+                        markersSystem.checkPharmacyDistance(
+                                ChunkUtils.getChunkId(location.getLatitude(), location.getLongitude()),
+                                location);
+                    }*/
                     onLocationChanged(location);
                 }
             }
@@ -453,8 +439,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
         Log.d("MapFragment:onMarkerClick", MessageFormat.format("Selected: {0}", marker.getPosition()));
+
         focus = MapFocus.MARKER;
+
         onLocationChanged(marker.getPosition());
+
         unfocused();
 
         if (currentSelectedMarker != null) {
@@ -462,7 +451,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         pharmacyDetails.update((String) marker.getTag());
-
 
         currentSelectedMarker = marker;
 

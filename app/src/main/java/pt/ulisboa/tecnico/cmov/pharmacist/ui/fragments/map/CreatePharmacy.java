@@ -60,7 +60,7 @@ public class CreatePharmacy extends Fragment {
     private TextView addressEditText;
     private Bitmap pharmacyPhoto = null;
 
-    private static final String TAG = "CreatePharmacy";
+    private static final String TAG = CreatePharmacy.class.getSimpleName();
 
     public CreatePharmacy() {}
 

@@ -206,36 +206,50 @@
                                 map:layout_constraintStart_toEndOf="@+id/pharmacy_image"
                                 map:layout_constraintTop_toBottomOf="@+id/details_pharmacy_location" />
 
-                            <Button
+                            <com.google.android.material.button.MaterialButton
                                 android:id="@+id/favouriteButton"
                                 style="?attr/materialIconButtonStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:contentDescription="Add to favorites"
-                                android:visibility="visible"
                                 app:icon="@drawable/favorite_outline"
                                 map:layout_constraintBottom_toBottomOf="parent"
                                 map:layout_constraintEnd_toStartOf="@+id/flagButton" />
 
-                            <Button
+                            <com.google.android.material.button.MaterialButton
                                 android:id="@+id/flagButton"
                                 style="?attr/materialIconButtonStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:contentDescription="Report"
-                                android:visibility="visible"
                                 map:icon="@drawable/flag"
                                 map:layout_constraintBottom_toBottomOf="parent"
                                 map:layout_constraintEnd_toEndOf="parent" />
 
-                            <Button
-                                android:id="@+id/manageButton"
-                                style="?attr/materialIconButtonStyle"
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/owner_chip"
+                                style="@style/Widget.Material3.Chip.Suggestion"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:contentDescription="Report"
+                                android:layout_height="40dp"
+                                android:layout_gravity="center"
+                                android:layout_marginBottom="4dp"
+                                android:checkable="false"
+                                android:clickable="false"
+                                android:includeFontPadding="false"
+                                android:text="Owner"
+                                android:textColor="#1D192B"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
                                 android:visibility="gone"
-                                map:icon="@drawable/settings"
+                                app:checkedIconVisible="false"
+                                app:chipBackgroundColor="#E8DEF8"
+                                app:chipEndPadding="6dp"
+                                app:chipIconTint="#1D192B"
+                                app:chipIconVisible="true"
+                                app:chipStartPadding="6dp"
+                                app:chipStrokeColor="#E8DEF8"
+                                app:chipSurfaceColor="#6750A4"
+                                app:textStartPadding="6dp"
                                 map:layout_constraintBottom_toBottomOf="parent"
                                 map:layout_constraintEnd_toEndOf="parent" />
 

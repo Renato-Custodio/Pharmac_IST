@@ -7,19 +7,21 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
@@ -29,16 +31,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.OptionalInt;
-import java.util.stream.IntStream;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.QRCodeActivity;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.AdapterUtils;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.Location;
 
@@ -46,6 +48,7 @@ import pt.ulisboa.tecnico.cmov.pharmacist.utils.Location;
 public class PharmacyDetails {
     private final TextView title, location, distance;
     private final ImageView image;
+    private final MaterialButton favouriteButton;
     private Pharmacy currentPharmacy;
     private final Context fragmentContext;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -54,8 +57,9 @@ public class PharmacyDetails {
     private Query currentStockQuery;
     private ChildEventListener currentStockQueryEventListener;
     private RecyclerView medicineList;
+    private Map<String, Boolean> favoritePharmacies;
 
-    private static final String TAG = PharmacyDetails.class.getName();
+    private static final String TAG = PharmacyDetails.class.getSimpleName();
 
     public PharmacyDetails(Fragment fragment, View bottomSheetView, SharedLocationViewModel sharedLocationViewModel, MedicinesInPharmacyRecyclerAdapter.OnItemClickListener listener) {
 
@@ -64,6 +68,7 @@ public class PharmacyDetails {
         distance = bottomSheetView.findViewById(R.id.details_pharmacy_distance);
         image = bottomSheetView.findViewById(R.id.pharmacy_image);
         medicineList = bottomSheetView.findViewById(R.id.fragment_map_avaliable_medicines);
+        favouriteButton = bottomSheetView.findViewById(R.id.favouriteButton);
 
         fragmentContext = fragment.getContext();
 
@@ -89,6 +94,26 @@ public class PharmacyDetails {
         medicineListAdapter = new MedicinesInPharmacyRecyclerAdapter(medicines, fragment, currentPharmacy, listener, fragmentContext);
         medicineList.setLayoutManager(mLayoutManager);
         medicineList.setAdapter(medicineListAdapter);
+
+        // Register user updates handler
+        AuthUtils.registerUserDataListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+
+                if (user == null) return;
+
+                favoritePharmacies = user.getFavoritePharmaciesIds();
+                updateUserActions();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        favouriteButton.setOnClickListener(v -> updateFavorite());
 
         currentStockQueryEventListener = new ChildEventListener() {
             @Override
@@ -119,24 +144,11 @@ public class PharmacyDetails {
             }
 
             @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {}
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                String medicineId = snapshot.getKey();
-
-                if (medicineId == null) return;
-
-                OptionalInt index = IntStream.range(0, medicines.size())
-                        .filter(i -> medicineId.equals(medicines.get(i).id))
-                        .findFirst();
-
-                if (!index.isPresent()) return;
-
-                medicines.remove(index.getAsInt());
-                medicineListAdapter.notifyItemRemoved(index.getAsInt());
+                AdapterUtils.removeChild(snapshot.getKey(), medicines, medicineListAdapter);
             }
 
             @Override
@@ -147,7 +159,6 @@ public class PharmacyDetails {
         };
 
     }
-
 
     private void fetchStock(String startId) {
         if (currentStockQuery != null) {
@@ -182,6 +193,7 @@ public class PharmacyDetails {
     }
 
     public void update(String pharmacyId) {
+        Log.d(TAG, MessageFormat.format("Fetching details for pharmacy {0}", pharmacyId));
         FirebaseDatabase.getInstance().getReference("pharmacies").child(pharmacyId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -193,11 +205,13 @@ public class PharmacyDetails {
                     pharmacy.setLocation(snapshot.child("location").getValue(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location.class));
                     pharmacy.setStock(new HashMap<>());
 
+
                     Log.d(TAG, MessageFormat.format("Fetched details for pharmacy {0}", pharmacy.getId()));
 
                     if (pharmacy != null) {
                         currentPharmacy = pharmacy;
                         updateDetails();
+                        updateUserActions();
                     }
                 }
             }
@@ -207,5 +221,47 @@ public class PharmacyDetails {
                 Log.w(TAG, MessageFormat.format("Could not fetch pharmacy details: {0}", error.getMessage()));
             }
         });
+    }
+
+
+    // User related actions
+    private void updateUserActions() {
+        if (currentPharmacy == null) return;
+
+        favouriteButton.setIcon(ContextCompat.getDrawable(fragmentContext, (favoritePharmacies.containsKey(currentPharmacy.getId())) ? R.drawable.favorite_fill : R.drawable.favorite_outline));
+    }
+
+    private void updateFavorite() {
+        if (currentPharmacy == null) return;
+
+        if (!favoritePharmacies.containsKey(currentPharmacy.getId())) {
+            // Add to favorites
+            AuthUtils.getUserRef().child("favoritePharmaciesIds").child(currentPharmacy.getId())
+            .setValue(true)
+            .addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    Log.e(TAG, "Failed to add pharmacy to favorites:", task.getException());
+                    Toast.makeText(fragmentContext, "Failed to add pharmacy to favorites", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Log.d(TAG, "Added pharmacy to favorites: " + currentPharmacy.getId());
+                Toast.makeText(fragmentContext, "Pharmacy added to favorites", Toast.LENGTH_SHORT).show();
+            });
+        } else {
+            // Remove from favorites
+            AuthUtils.getUserRef().child("favoritePharmaciesIds").child(currentPharmacy.getId())
+            .removeValue()
+            .addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    Log.e(TAG, "Failed to remove pharmacy from favorites:", task.getException());
+                    Toast.makeText(fragmentContext, "Failed to remove pharmacy from favorites", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Log.d(TAG, "Removed pharmacy to favorites: " + currentPharmacy.getId());
+                Toast.makeText(fragmentContext, "Pharmacy removed from favorites", Toast.LENGTH_SHORT).show();
+            });
+        }
     }
 }

@@ -2,7 +2,10 @@ package pt.ulisboa.tecnico.cmov.pharmacist.pojo;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @IgnoreExtraProperties
@@ -10,18 +13,25 @@ public class User {
     public String username;
     public String photoUrl;
     public List<String> ownedPharmaciesIds;
-    public List<String> favoritePharmaciesIds;
+    public Map<String, Boolean> favoritePharmaciesIds;
     public boolean isPharmacyOwner = false;
 
     public User() {
     }
 
-    public User(String username, String photoUrl, List<String> ownedPharmaciesIds, List<String> favoritePharmaciesIds, boolean isPharmacyOwner) {
+    public User(String username, String photoUrl, List<String> ownedPharmaciesIds, Map<String, Boolean> favoritePharmaciesIds, boolean isPharmacyOwner) {
         this.username = username;
         this.photoUrl = photoUrl;
         this.ownedPharmaciesIds = ownedPharmaciesIds;
         this.favoritePharmaciesIds = favoritePharmaciesIds;
         this.isPharmacyOwner = isPharmacyOwner;
+    }
+
+    public Map<String, Boolean> getFavoritePharmaciesIds() {
+
+        if (favoritePharmaciesIds == null) return new HashMap<>();
+
+        return favoritePharmaciesIds;
     }
 
     public void setUsername(String username) {
@@ -36,7 +46,7 @@ public class User {
         this.ownedPharmaciesIds = ownedPharmaciesIds;
     }
 
-    public void setFavoritePharmaciesIds(List<String> favoritePharmaciesIds) {
+    public void setFavoritePharmaciesIds(Map<String, Boolean> favoritePharmaciesIds) {
         this.favoritePharmaciesIds = favoritePharmaciesIds;
     }
 

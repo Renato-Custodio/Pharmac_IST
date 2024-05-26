@@ -4,7 +4,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.Map;
 @IgnoreExtraProperties
-public class Pharmacy {
+public class Pharmacy implements Indexed {
 
     private String id;
     private String name;

@@ -11,7 +11,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
-public class Medicine implements Parcelable {
+public class Medicine implements Parcelable, Indexed {
 
     public String id;
 

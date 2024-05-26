@@ -37,7 +37,7 @@ import pt.ulisboa.tecnico.cmov.pharmacist.GlideRequests;
 
 public class ImageUtils {
 
-    private static final String TAG = "ImageUtils";
+    private static final String TAG = ImageUtils.class.getSimpleName();
     private static Uri tempUri = null;
 
     private static Bitmap getBitmapFromUri(Context context, Uri uri) throws IOException {

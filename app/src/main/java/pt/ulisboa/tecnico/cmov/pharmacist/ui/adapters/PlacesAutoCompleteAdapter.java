@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class PlacesAutoCompleteAdapter extends RecyclerView.Adapter<PlacesAutoCompleteAdapter.PredictionHolder> implements Filterable {
-    private static final String TAG = "PlacesAutoAdapter";
+    private static final String TAG = PlacesAutoCompleteAdapter.class.getSimpleName();
     private ArrayList<PlaceAutocomplete> mResultList = new ArrayList<>();
 
     private final Context mContext;

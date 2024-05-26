@@ -17,6 +17,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -24,7 +25,7 @@ import java.util.function.Consumer;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 
 public class AuthUtils {
-    private static final String TAG = "AuthUtils";
+    private static final String TAG = AuthUtils.class.getSimpleName();
 
     private static final List<ValueEventListener> userChangesListeners = new ArrayList<>();
     private static DatabaseReference userRef = null;
@@ -60,7 +61,7 @@ public class AuthUtils {
                 // Create account data in the DB
                 FirebaseUser user = auth.getCurrentUser();
 
-                User newUserData = new User("anonymous", "", new ArrayList<>(), new ArrayList<>(), false);
+                User newUserData = new User("anonymous", "", new ArrayList<>(), new HashMap<>(), false);
 
                 db.child("users").child(user.getUid()).setValue(newUserData).addOnCompleteListener(dbTask -> {
                     if (dbTask.isSuccessful()) {
@@ -125,6 +126,10 @@ public class AuthUtils {
                 onFail.run();
             }
         });
+    }
+
+    public static DatabaseReference getUserRef() {
+        return userRef;
     }
 
     public static void convertToPermanentAccount(Context context, String username, boolean isPharmacyOwner, AuthCredential credentials, Runnable onSuccess, Runnable onFail) {

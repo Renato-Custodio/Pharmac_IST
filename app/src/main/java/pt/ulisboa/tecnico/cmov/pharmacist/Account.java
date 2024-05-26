@@ -59,9 +59,9 @@ public class Account extends AppCompatActivity {
             }));
         });
 
-        findViewById(R.id.account_login_button).setOnClickListener(v -> {
-            startActivity(new Intent(Account.this, AccountLogin.class));
-        });
+        findViewById(R.id.account_login_button).setOnClickListener(v -> startActivity(new Intent(Account.this, AccountLogin.class)));
+
+        findViewById(R.id.account_menu_favorites).setOnClickListener(v -> startActivity(new Intent(Account.this, FavoritesActivity.class)));
 
         AuthUtils.registerUserDataListener(new ValueEventListener() {
             @Override

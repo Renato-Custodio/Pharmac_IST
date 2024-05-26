@@ -47,7 +47,7 @@ public class MarkersSystem {
     private final ValueEventListener chunkListener;
     private final GoogleMap mapInstance;
     private final Context context;
-    private static final String TAG = MarkersSystem.class.getName();
+    private static final String TAG = MarkersSystem.class.getSimpleName();
 
     public MarkersSystem(GoogleMap mapInstance, Context context) {
         this.chunksRefsCache = new LruCache<>(20);

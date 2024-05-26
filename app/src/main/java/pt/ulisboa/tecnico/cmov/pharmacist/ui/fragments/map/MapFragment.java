@@ -446,11 +446,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onCameraIdle() {
         LatLng coordinates = mapInstance.getCameraPosition().target;
-        markersSystem.update(coordinates, currentSelectedMarker, (marker) -> {
-            Log.d("MapFragment", "Replaced current marker");
-            currentSelectedMarker = marker;
-            PharmacyMarker.setActive(marker, true);
-        });
+        markersSystem.update(coordinates);
     }
 
 

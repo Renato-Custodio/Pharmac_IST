@@ -152,8 +152,8 @@ public class SeedPharmacies {
             Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.__wa3uibb2uizmvpt6reyk8g);
             newPharmacyRef.setValue(pharmacy)
                     .addOnSuccessListener(aVoid -> {
-                        Log.d(TAG, "Pharmacy entry added successfully with key: " + pharmaciesRef.getKey());
-                        ImageUtils.uploadImage(context, bitmap, "pharmacies", pharmaciesRef.getKey(), metadata -> {});
+                        Log.d(TAG, "Pharmacy entry added successfully with key: " + newPharmacyRef.getKey());
+                        ImageUtils.uploadImage(context, bitmap, "pharmacies", newPharmacyRef.getKey(), metadata -> {});
                         Toast.makeText(context, "Pharmacy added successfully!", Toast.LENGTH_SHORT).show();
                     })
                     .addOnFailureListener(e -> {

@@ -2,6 +2,5 @@
     <string name="app_name">PharmacIST</string>
     <string name="menu_pharmacies">Pharmacies near me</string>
     <string name="menu_medicines">Medicines</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="Medicine">Medicine</string>
 </resources>

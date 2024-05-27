@@ -28,6 +28,7 @@ import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicinesFragme
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.seed.SeedMapChunks;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.seed.SeedMedicines;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.seed.SeedPharmacies;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.seed.SeedReviews;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 
 public class MainActivity extends AppCompatActivity implements MedicinesRecyclerAdapter.OnItemClickListener, MedicineDetails.MedicineDetailsBack, MedicinesInPharmacyRecyclerAdapter.OnItemClickListener{
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
         //SeedMedicines.seedMedicine(this);
         //SeedPharmacies.seedPharmacy(this);
         //SeedMapChunks.seedChuncks();
+        //SeedReviews.seedReviews(this);
 
         AuthUtils.signAsAnonymous(this);
 

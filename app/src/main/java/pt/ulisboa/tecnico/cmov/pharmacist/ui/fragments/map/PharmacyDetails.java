@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,9 +20,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
@@ -58,6 +63,13 @@ public class PharmacyDetails {
     private ChildEventListener currentStockQueryEventListener;
     private RecyclerView medicineList;
     private Map<String, Boolean> favoritePharmacies;
+    private RatingBar userRatingBar;
+    private TextView averageRatingTextView;
+    private LinearProgressIndicator fiveStarProgressBar;
+    private LinearProgressIndicator fourStarProgressBar;
+    private LinearProgressIndicator threeStarProgressBar;
+    private LinearProgressIndicator twoStarProgressBar;
+    private LinearProgressIndicator oneStarProgressBar;
 
     private static final String TAG = PharmacyDetails.class.getSimpleName();
 
@@ -69,6 +81,17 @@ public class PharmacyDetails {
         image = bottomSheetView.findViewById(R.id.pharmacy_image);
         medicineList = bottomSheetView.findViewById(R.id.fragment_map_avaliable_medicines);
         favouriteButton = bottomSheetView.findViewById(R.id.favouriteButton);
+
+        userRatingBar = bottomSheetView.findViewById(R.id.user_rating_bar);
+        averageRatingTextView = bottomSheetView.findViewById(R.id.average_rating);
+        fiveStarProgressBar = bottomSheetView.findViewById(R.id.fiveStarProgressBar);
+        fourStarProgressBar = bottomSheetView.findViewById(R.id.fourStarProgressBar);
+        threeStarProgressBar = bottomSheetView.findViewById(R.id.threeStarProgressBar);
+        twoStarProgressBar = bottomSheetView.findViewById(R.id.twoStarProgressBar);
+        oneStarProgressBar = bottomSheetView.findViewById(R.id.oneStarProgressBar);
+
+        userRatingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> submitReview(rating));
+
 
         fragmentContext = fragment.getContext();
 
@@ -212,6 +235,7 @@ public class PharmacyDetails {
                         currentPharmacy = pharmacy;
                         updateDetails();
                         updateUserActions();
+                        updateRatingBars();
                     }
                 }
             }
@@ -263,5 +287,86 @@ public class PharmacyDetails {
                 Toast.makeText(fragmentContext, "Pharmacy removed from favorites", Toast.LENGTH_SHORT).show();
             });
         }
+    }
+
+    private void submitReview(float rating) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(fragmentContext, "You need to be logged in to submit a review", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String userId = currentUser.getUid();
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference reviewsRef = database.getReference("reviews").child(currentPharmacy.getId()).child(userId);
+
+        reviewsRef.setValue(rating)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(fragmentContext, "Review submitted", Toast.LENGTH_SHORT).show();
+                    updateRatingBars();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(fragmentContext, "Failed to submit review", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void updateRatingBars() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference reviewsRef = database.getReference("reviews").child(currentPharmacy.getId());
+
+        reviewsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Map<Float, Integer> ratingsCount = new HashMap<>();
+                int totalReviews = 0;
+
+                if(dataSnapshot.exists()){
+                    //counts how many of each score there are
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        float rating = snapshot.getValue(Float.class);
+                        ratingsCount.put(rating, ratingsCount.getOrDefault(rating, 0) + 1);
+                        totalReviews++;
+                    }
+                }
+                updateProgressBars(ratingsCount, totalReviews);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG, "Failed to fetch new reviews data");
+            }
+        });
+    }
+
+    private void updateProgressBars(Map<Float, Integer> ratingsCount, int totalReviews) {
+        int fiveStarCount = ratingsCount.getOrDefault(5.0f, 0);
+        int fourStarCount = ratingsCount.getOrDefault(4.0f, 0);
+        int threeStarCount = ratingsCount.getOrDefault(3.0f, 0);
+        int twoStarCount = ratingsCount.getOrDefault(2.0f, 0);
+        int oneStarCount = ratingsCount.getOrDefault(1.0f, 0);
+
+        int fiveStarProgress = (int) ((fiveStarCount / (float) totalReviews) * 100);
+        int fourStarProgress = (int) ((fourStarCount / (float) totalReviews) * 100);
+        int threeStarProgress = (int) ((threeStarCount / (float) totalReviews) * 100);
+        int twoStarProgress = (int) ((twoStarCount / (float) totalReviews) * 100);
+        int oneStarProgress = (int) ((oneStarCount / (float) totalReviews) * 100);
+
+        fiveStarProgressBar.setProgress(fiveStarProgress);
+        fourStarProgressBar.setProgress(fourStarProgress);
+        threeStarProgressBar.setProgress(threeStarProgress);
+        twoStarProgressBar.setProgress(twoStarProgress);
+        oneStarProgressBar.setProgress(oneStarProgress);
+
+        float averageRating = calculateAverageRating(ratingsCount, totalReviews);
+        averageRatingTextView.setText(String.format("%.1f", averageRating));
+        userRatingBar.setRating(averageRating);
+    }
+
+    private float calculateAverageRating(Map<Float, Integer> ratingsCount, int totalReviews) {
+        float totalRating = 0;
+        for (Map.Entry<Float, Integer> entry : ratingsCount.entrySet()) {
+            totalRating += entry.getKey() * entry.getValue();
+        }
+        return totalRating / totalReviews;
     }
 }

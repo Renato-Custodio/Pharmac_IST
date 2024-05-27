@@ -6,8 +6,6 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <!-- Rating Summary -->
-    <!-- User Rating Bar -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/rating_summary"
         android:layout_width="match_parent"
@@ -24,6 +22,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+            <!-- Rating Summary -->
             <TextView
                 android:id="@+id/average_rating"
                 android:layout_width="match_parent"
@@ -32,6 +31,7 @@
                 android:textAlignment="center"
                 android:textSize="40dp" />
 
+            <!-- User Rating Bar -->
             <RatingBar
                 android:id="@+id/rating_bar"
                 style="@style/Widget.AppCompat.RatingBar.Small"
@@ -54,20 +54,20 @@
             app:layout_constraintStart_toEndOf="@+id/linearLayout"
             app:layout_constraintTop_toTopOf="parent">
 
+            <!-- Progress bars for each star rating -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
                 <TextView
-                    android:id="@+id/textView3"
+                    android:id="@+id/textView1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1"
+                    android:text="5"
                     android:textSize="12sp"
                     android:textStyle="bold" />
-
                 <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/fiveStarProgressBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -76,9 +76,46 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/fourStarProgressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="8dp" />
+            </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/threeStarProgressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="8dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
                 <TextView
                     android:id="@+id/textView4"
                     android:layout_width="wrap_content"
@@ -86,8 +123,8 @@
                     android:text="2"
                     android:textSize="12sp"
                     android:textStyle="bold" />
-
                 <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/twoStarProgressBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -96,58 +133,17 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
                 <TextView
                     android:id="@+id/textView5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3"
+                    android:text="1"
                     android:textSize="12sp"
                     android:textStyle="bold" />
-
                 <com.google.android.material.progressindicator.LinearProgressIndicator
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="8dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/textView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="4"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <com.google.android.material.progressindicator.LinearProgressIndicator
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="8dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/textView7"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="5"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/oneStarProgressBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
@@ -155,11 +151,9 @@
             </LinearLayout>
 
         </LinearLayout>
-
-        <!-- Bar Graph for Rating Distribution -->
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- User Rating Input -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
                         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                             String returnedData = result.getData().getStringExtra("resultKey");
                             sharedLocationViewModel.setPharmacyId(returnedData);
+                            binding.bottomNavigation.getMenu().getItem(0).setChecked(true);
+                            replaceFragment(mapFragment);
                         }
                     }
                 }

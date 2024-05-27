@@ -183,6 +183,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         focusButton.setOnClickListener(v -> {
             focus = MapFocus.CURRENT_POSITION;
+            markersSystem.resetNearestDistance();
             onLocationChanged(lastKnownLocation);
             focusButton.setVisibility(View.INVISIBLE);
         });
@@ -366,14 +367,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 if (locationResult.getLastLocation() != null) {
                     Location location = locationResult.getLastLocation();
                     sharedLocationViewModel.setLocation(location);
-
-
-                    if (focus == MapFocus.CURRENT_POSITION) {
-                        markersSystem.findNearestPharmacy(
-                                ChunkUtils.getChunkId(location.getLatitude(), location.getLongitude()),
-                                location);
-                    }
-
                     onLocationChanged(location);
                 }
             }
@@ -381,6 +374,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void onLocationChanged(@NonNull Location location) {
+        if (focus == MapFocus.CURRENT_POSITION) {
+            markersSystem.findNearestPharmacy(
+                    ChunkUtils.getChunkId(location.getLatitude(), location.getLongitude()),
+                    location);
+        }
+
         lastKnownLocation = focus != MapFocus.CURRENT_POSITION ? lastKnownLocation : location;
         if (focus != MapFocus.DISABLED) {
             mapInstance.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));

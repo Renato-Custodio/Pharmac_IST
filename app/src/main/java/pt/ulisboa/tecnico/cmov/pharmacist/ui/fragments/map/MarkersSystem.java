@@ -97,9 +97,7 @@ public class MarkersSystem {
         return favoritePharmacies.containsKey(Objects.requireNonNull(marker.getTag()).toString());
     }
 
-    private void updateMarkers() {
-        if (favoritePharmacies.isEmpty()) return;
-
+    private void updateMarker(Marker marker) {
         Optional<String> currentSelectedId;
 
         if (currentSelectedMarker != null) {
@@ -108,24 +106,27 @@ public class MarkersSystem {
             currentSelectedId = Optional.empty();
         }
 
-        markers.values().forEach(marker -> {
-            String pharmacyId = marker.getTag().toString();
+        String pharmacyId = marker.getTag().toString();
 
-            if (favoritePharmacies.containsKey(pharmacyId)) {
-                // Is favorite
-                if (currentSelectedId.isPresent()) {
-                    PharmacyMarker.setProps(marker, pharmacyId.equals(currentSelectedId.get()), true);
-                } else {
-                    PharmacyMarker.setProps(marker, false, true);
-                }
+        if (favoritePharmacies.containsKey(pharmacyId)) {
+            // Is favorite
+            if (currentSelectedId.isPresent()) {
+                PharmacyMarker.setProps(marker, pharmacyId.equals(currentSelectedId.get()), true);
             } else {
-                if (currentSelectedId.isPresent()) {
-                    PharmacyMarker.setProps(marker, pharmacyId.equals(currentSelectedId.get()), false);
-                } else {
-                    PharmacyMarker.setProps(marker, false, false);
-                }
+                PharmacyMarker.setProps(marker, false, true);
             }
-        });
+        } else {
+            if (currentSelectedId.isPresent()) {
+                PharmacyMarker.setProps(marker, pharmacyId.equals(currentSelectedId.get()), false);
+            } else {
+                PharmacyMarker.setProps(marker, false, false);
+            }
+        }
+    }
+
+    private void updateMarkers() {
+        if (favoritePharmacies.isEmpty()) return;
+        markers.values().forEach(this::updateMarker);
     }
 
     public void dismissSelection() {
@@ -138,7 +139,9 @@ public class MarkersSystem {
 
         if (active) {
             if (currentSelectedMarker != null) {
-                dismissSelection();
+                if (!currentSelectedMarker.equals(marker)) {
+                    dismissSelection();
+                }
             }
             currentSelectedMarker = marker;
         }
@@ -160,6 +163,7 @@ public class MarkersSystem {
                 Marker marker = mapInstance.addMarker(PharmacyMarker.createNew(context, new LatLng(pharmacyChunkData.getLocation().lat, pharmacyChunkData.getLocation().lng)));
                 markers.put(pharmacyChunkData.getPharmacyId(), marker);
                 marker.setTag(pharmacyChunkData.pharmacyId);
+                updateMarker(marker);
                 ObjectAnimator.ofFloat(marker, "alpha", 0f, 1f).setDuration(500).start();
             });
 
@@ -175,6 +179,7 @@ public class MarkersSystem {
                 Marker marker = mapInstance.addMarker(PharmacyMarker.createNew(context, new LatLng(pharmacyChunkData.getLocation().lat, pharmacyChunkData.getLocation().lng)));
                 markers.put(pharmacyChunkData.getPharmacyId(), marker);
                 marker.setTag(pharmacyChunkData.pharmacyId);
+                updateMarker(marker);
                 ObjectAnimator.ofFloat(marker, "alpha", 0f, 1f).setDuration(500).start();
             });
 
@@ -213,6 +218,10 @@ public class MarkersSystem {
         }
     }
 
+    public void resetNearestDistance() {
+        currentClosestPharmacyId = null;
+    }
+
     public void findNearestPharmacy(String chunkId, android.location.Location currentLocation) {
         Log.d(TAG, "Checking distance...");
 
@@ -245,7 +254,7 @@ public class MarkersSystem {
                 Float distance = Location.getDistance(currentLocation, new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location(current.latitude, current.longitude));
                 if (Math.round(distance) > 100) {
                     onDismiss.run();
-                    currentClosestPharmacyId = null;
+                    resetNearestDistance();
                 }
             }
         }

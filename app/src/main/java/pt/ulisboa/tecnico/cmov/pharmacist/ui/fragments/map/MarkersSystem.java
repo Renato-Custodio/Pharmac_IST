@@ -5,6 +5,8 @@ import android.content.Context;
 import android.util.Log;
 import android.util.LruCache;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -17,12 +19,16 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MapChunk;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyChunkData;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.Location;
 
@@ -35,11 +41,11 @@ public class MarkersSystem {
     private final GoogleMap mapInstance;
     private final Context context;
     private static final String TAG = MarkersSystem.class.getSimpleName();
-
     private String currentClosestPharmacyId;
-
     private final Consumer<Marker> closestPharmacyCallBack;
     private Runnable onDismiss;
+    private Map<String, Boolean> favoritePharmacies;
+    private Marker currentSelectedMarker;
 
     public MarkersSystem(GoogleMap mapInstance, Context context, Consumer<Marker> closestPharmacyCallBack, Runnable onDismiss) {
         this.closestPharmacyCallBack = closestPharmacyCallBack;
@@ -68,6 +74,76 @@ public class MarkersSystem {
                 Log.e(TAG, "Database error: " + databaseError.toException());
             }
         };
+
+        AuthUtils.registerUserDataListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+
+                if (user == null) return;
+
+                favoritePharmacies = user.getFavoritePharmaciesIds();
+                updateMarkers();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private boolean isFavorite(Marker marker) {
+        return favoritePharmacies.containsKey(Objects.requireNonNull(marker.getTag()).toString());
+    }
+
+    private void updateMarkers() {
+        if (favoritePharmacies.isEmpty()) return;
+
+        Optional<String> currentSelectedId;
+
+        if (currentSelectedMarker != null) {
+            currentSelectedId = Optional.of(Objects.requireNonNull(currentSelectedMarker.getTag()).toString());
+        } else {
+            currentSelectedId = Optional.empty();
+        }
+
+        markers.values().forEach(marker -> {
+            String pharmacyId = marker.getTag().toString();
+
+            if (favoritePharmacies.containsKey(pharmacyId)) {
+                // Is favorite
+                if (currentSelectedId.isPresent()) {
+                    PharmacyMarker.setProps(marker, pharmacyId.equals(currentSelectedId.get()), true);
+                } else {
+                    PharmacyMarker.setProps(marker, false, true);
+                }
+            } else {
+                if (currentSelectedId.isPresent()) {
+                    PharmacyMarker.setProps(marker, pharmacyId.equals(currentSelectedId.get()), false);
+                } else {
+                    PharmacyMarker.setProps(marker, false, false);
+                }
+            }
+        });
+    }
+
+    public void dismissSelection() {
+        PharmacyMarker.setProps(currentSelectedMarker, false, isFavorite(currentSelectedMarker));
+        currentSelectedMarker = null;
+    }
+
+    public void setActive(Marker marker, boolean active) {
+        if (marker == null) return;
+
+        if (active) {
+            if (currentSelectedMarker != null) {
+                dismissSelection();
+            }
+            currentSelectedMarker = marker;
+        }
+
+        PharmacyMarker.setProps(marker, active, isFavorite(marker));
     }
 
     private void updateChunk(MapChunk chunk) {

@@ -90,8 +90,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     // Persistence
     private static final String KEY_LOCATION = "map_location";
-
-    private Marker currentSelectedMarker;
     private SharedLocationViewModel sharedLocationViewModel;
     private MarkersSystem markersSystem;
 
@@ -419,10 +417,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private void dismissDetails() {
-        if (currentSelectedMarker == null) return;
-
-        PharmacyMarker.setActive(currentSelectedMarker, false);
-        currentSelectedMarker = null;
+        markersSystem.dismissSelection();
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         bottomSheetState = BottomSheetBehavior.STATE_HIDDEN;
     }
@@ -441,15 +436,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             unfocused();
         }
 
-        if (currentSelectedMarker != null) {
-            PharmacyMarker.setActive(currentSelectedMarker, false);
-        }
+        markersSystem.setActive(marker, true);
 
         pharmacyDetails.update((String) marker.getTag());
-
-        currentSelectedMarker = marker;
-
-        PharmacyMarker.setActive(marker, true);
 
         bottomSheetBehavior.setHalfExpandedRatio((float) bottomSheetHalfExpandedRatio);
         bottomSheetBehavior.setSkipCollapsed(true);

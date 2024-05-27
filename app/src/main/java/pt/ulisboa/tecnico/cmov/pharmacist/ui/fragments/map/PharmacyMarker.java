@@ -25,23 +25,34 @@ public class PharmacyMarker {
 
     private static Bitmap defaultIconBitmap;
     private static Bitmap activeIconBitmap;
+    private static Bitmap favIconBitmap;
+
+    private static Bitmap favActiveIconBitmap;
 
     public static MarkerOptions createNew(Context context, LatLng position) {
         if (defaultIconBitmap == null) {
             Bitmap defaultBitmap = getBitmap(context, R.drawable.local_pharmacy_map);
             Bitmap activeBitmap = getBitmap(context, R.drawable.local_pharmacy_map_active);
+            Bitmap favBitmap = getBitmap(context, R.drawable.local_pharmacy_map_fav);
+            Bitmap favActiveBitmap = getBitmap(context, R.drawable.local_pharmacy_map_fav_active);
 
             defaultIconBitmap = addShadow(defaultBitmap, defaultBitmap.getHeight() + 20, defaultBitmap.getWidth() + 20, Color.GRAY, 5, 5, 5);
             activeIconBitmap = addShadow(activeBitmap, activeBitmap.getHeight() + 20, activeBitmap.getWidth() + 20, Color.GRAY, 5, 5, 5);
+            favIconBitmap = addShadow(favBitmap, activeBitmap.getHeight() + 20, activeBitmap.getWidth() + 20, Color.GRAY, 5, 5, 5);
+            favActiveIconBitmap = addShadow(favActiveBitmap, activeBitmap.getHeight() + 20, activeBitmap.getWidth() + 20, Color.GRAY, 5, 5, 5);
         }
 
         return new MarkerOptions().position(position).icon(BitmapDescriptorFactory.fromBitmap(defaultIconBitmap));
     }
 
-    public static void setActive(Marker marker, boolean active) {
+    public static void setProps(Marker marker, boolean isActive, boolean isFavorite) {
         if (marker == null) return;
 
-        marker.setIcon(BitmapDescriptorFactory.fromBitmap(active ? activeIconBitmap : defaultIconBitmap));
+        if (isFavorite) {
+            marker.setIcon(BitmapDescriptorFactory.fromBitmap(isActive ? favActiveIconBitmap : favIconBitmap));
+        } else {
+            marker.setIcon(BitmapDescriptorFactory.fromBitmap(isActive ? activeIconBitmap : defaultIconBitmap));
+        }
     }
 
     private static Bitmap addShadow(final Bitmap bm, final int dstHeight, final int dstWidth, int color, int size, float dx, float dy) {

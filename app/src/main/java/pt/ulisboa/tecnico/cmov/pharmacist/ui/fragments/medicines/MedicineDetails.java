@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
@@ -11,8 +13,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -23,8 +27,10 @@ import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyDistance;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.ClosestPharmaciesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
 import com.google.android.material.transition.MaterialSharedAxis;
@@ -37,6 +43,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MedicineDetails extends Fragment {
 
@@ -54,6 +61,12 @@ public class MedicineDetails extends Fragment {
     private List<PharmacyDistance> recivedPharmacies = new ArrayList<PharmacyDistance>();
     private String origin;
     private MedicineDetailsBack callback;
+
+    private Button notification;
+
+    public Map<String, Boolean> medicineNotificationIds;
+
+
     public interface MedicineDetailsBack {
         void onBackButtonPressed(String origin);
     }
@@ -133,6 +146,52 @@ public class MedicineDetails extends Fragment {
         });
     }
 
+    private void updateUserActions() {
+        if (mMedicine == null) return;
+
+        //favouriteButton.setIcon(ContextCompat.getDrawable(getContext(), (medicineNotificationIds.containsKey(mMedicine.getId())) ? R.drawable.favorite_fill : R.drawable.favorite_outline));
+        if(medicineNotificationIds.containsKey(mMedicine.getId())){
+            notification.setText("Stop Notificarions");
+        }else{
+            notification.setText("Notify me when avaliable!");
+        }
+
+    }
+
+    private void updateMedicine() {
+        if (mMedicine == null) return;
+
+        if (!medicineNotificationIds.containsKey(mMedicine.getId())) {
+            // Add to notifications
+            AuthUtils.getUserRef().child("medicineNotificationIds").child(mMedicine.getId())
+                    .setValue(true)
+                    .addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            Log.e(TAG, "Failed to add medicine to notifications:", task.getException());
+                            Toast.makeText(getContext(), "Failed to add medicine to notifications", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        Log.d(TAG, "Added medicine to notifications: " + mMedicine.getId());
+                        Toast.makeText(getContext(), "Medicine added to medicines", Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            // Remove from notifications
+            AuthUtils.getUserRef().child("medicineNotificationIds").child(mMedicine.getId())
+                    .removeValue()
+                    .addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            Log.e(TAG, "Failed to remove medicine from notifications:", task.getException());
+                            Toast.makeText(getContext(), "Failed to remove medicine from notifications", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        Log.d(TAG, "Removed medicine to notifications: " + mMedicine.getId());
+                        Toast.makeText(getContext(), "Medicine removed from notifications", Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -144,6 +203,7 @@ public class MedicineDetails extends Fragment {
         nearestPharmacies = rootView.findViewById(R.id.nearest_pharmacies);
         imageView = rootView.findViewById(R.id.medicine_details_image);
         qrCode = rootView.findViewById(R.id.medicine_details_qrcode);
+        notification = rootView.findViewById(R.id.notif_btn);
 
         Button backButton = rootView.findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -153,6 +213,23 @@ public class MedicineDetails extends Fragment {
                 notifyBackButtonPressed();
             }
         });
+
+        AuthUtils.registerUserDataListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+
+                if (user == null) return;
+
+                medicineNotificationIds = user.getMedicineNotificationIds();
+                updateUserActions();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+
+        notification.setOnClickListener(v -> updateMedicine());
 
         // Set text based on the Medicine object
         if (mMedicine != null) {
@@ -176,7 +253,6 @@ public class MedicineDetails extends Fragment {
             mLayoutManager = new LinearLayoutManager(getActivity());
             nearestPharmacies.setLayoutManager(mLayoutManager);
             nearestPharmacies.setAdapter(nearestPharmaciesAdapter);
-
             closestPharmacies(mMedicine.id);
         }
 

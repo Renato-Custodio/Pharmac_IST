@@ -447,7 +447,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         markersSystem.setActive(marker, true);
 
         pharmacyDetails.update((String) marker.getTag());
-
         bottomSheetBehavior.setHalfExpandedRatio((float) bottomSheetHalfExpandedRatio);
         bottomSheetBehavior.setSkipCollapsed(true);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);

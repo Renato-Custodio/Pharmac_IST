@@ -14,6 +14,7 @@ public class User {
     public String photoUrl;
     public List<String> ownedPharmaciesIds;
     public Map<String, Boolean> favoritePharmaciesIds;
+    public Map<String, Boolean> medicineNotificationIds;
     public boolean isPharmacyOwner = false;
 
     public User() {
@@ -32,6 +33,17 @@ public class User {
         if (favoritePharmaciesIds == null) return new HashMap<>();
 
         return favoritePharmaciesIds;
+    }
+
+    public void setMedicineNotificationIds(Map<String, Boolean> medicineNotificationIds) {
+        this.medicineNotificationIds = medicineNotificationIds;
+    }
+
+    public Map<String, Boolean> getMedicineNotificationIds() {
+
+        if (medicineNotificationIds == null) return new HashMap<>();
+
+        return medicineNotificationIds;
     }
 
     public void setUsername(String username) {

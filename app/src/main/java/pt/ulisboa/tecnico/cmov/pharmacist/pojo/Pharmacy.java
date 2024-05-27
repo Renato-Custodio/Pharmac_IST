@@ -2,7 +2,10 @@ package pt.ulisboa.tecnico.cmov.pharmacist.pojo;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
+
 @IgnoreExtraProperties
 public class Pharmacy implements Indexed {
 
@@ -11,8 +14,17 @@ public class Pharmacy implements Indexed {
     private Location location;
     //key = medicineId // value = quantity
     private Map<String, Object> stock;
+    private Map<String, Long> ratings;
 
-    public Pharmacy(){}
+    public Pharmacy(){
+        Map<String, Long> initialRatings = new HashMap<>();
+        initialRatings.put("1", 0L);
+        initialRatings.put("2", 0L);
+        initialRatings.put("3", 0L);
+        initialRatings.put("4", 0L);
+        initialRatings.put("5", 0L);
+        this.ratings = initialRatings;
+    }
 
     public String getId() {
         return id;
@@ -53,5 +65,16 @@ public class Pharmacy implements Indexed {
 
     public int getMedicineStock(String medicineId){
         return Integer.parseInt((String) this.stock.get(medicineId)) ;
+    }
+
+    // Function to generate random ratings for a pharmacy
+    public void generateRandomRatings() {
+        Random random = new Random();
+        // Generate random values for each rating category
+        this.ratings.put("1", (long) random.nextInt(100));
+        this.ratings.put("2", (long) random.nextInt(100));
+        this.ratings.put("3", (long) random.nextInt(100));
+        this.ratings.put("4", (long) random.nextInt(100));
+        this.ratings.put("5", (long) random.nextInt(100));
     }
 }

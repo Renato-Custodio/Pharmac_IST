@@ -143,12 +143,13 @@ public class SeedPharmacies {
 
         for (Pharmacy pharmacyExample : pharmacies) {
             DatabaseReference newPharmacyRef = pharmaciesRef.push();
-            //create new pharmacy
 
+            //create new pharmacy
             Pharmacy pharmacy = new Pharmacy();
             pharmacy.setId(newPharmacyRef.getKey());
             pharmacy.setLocation(pharmacyExample.getLocation());
             pharmacy.setName(pharmacyExample.getName());
+            pharmacy.generateRandomRatings();
             Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.__wa3uibb2uizmvpt6reyk8g);
             newPharmacyRef.setValue(pharmacy)
                     .addOnSuccessListener(aVoid -> {

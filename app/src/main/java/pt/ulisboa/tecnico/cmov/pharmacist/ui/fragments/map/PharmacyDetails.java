@@ -92,8 +92,7 @@ public class PharmacyDetails {
 
         userRatingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> submitReview(rating));
         //Initialize user ratings
-        averageRatingTextView.setText("0");
-        userRatingBar.setRating(0);
+        resetUserRatings();
 
 
         fragmentContext = fragment.getContext();
@@ -293,69 +292,116 @@ public class PharmacyDetails {
     }
 
     private void submitReview(float rating) {
-        if(rating == 0){
+        if (rating == 0) {
             return;
         }
+
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
             Toast.makeText(fragmentContext, "You need to be logged in to submit a review", Toast.LENGTH_SHORT).show();
             return;
         }
         String userId = currentUser.getUid();
-
+        String pharmacyId = currentPharmacy.getId();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference reviewsRef = database.getReference("reviews").child(currentPharmacy.getId()).child(userId);
-
-        reviewsRef.setValue(rating)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(fragmentContext, "Review submitted", Toast.LENGTH_SHORT).show();
-                    updateRatingBars();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(fragmentContext, "Failed to submit review", Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private void updateRatingBars() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference reviewsRef = database.getReference("reviews").child(currentPharmacy.getId());
-
-        reviewsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference pharmacyRef = database.getReference("pharmacies").child(pharmacyId).child("rating");
+        DatabaseReference userReviewRef = database.getReference("users").child(userId).child("ratings").child(pharmacyId);
+        userReviewRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Map<Float, Integer> ratingsCount = new HashMap<>();
-                int totalReviews = 0;
+            public void onDataChange(@NonNull DataSnapshot userReviewSnapshot) {
+                Float previousRating = userReviewSnapshot.getValue(Float.class);
+                pharmacyRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Map<String, Long> ratings = (Map<String, Long>) dataSnapshot.getValue();
+                        if (ratings == null) {
+                            ratings = new HashMap<>();
+                        }
+                        // Adjust old rating if it exists and is different from current one
+                        if (previousRating != null) {
+                            if(previousRating == rating){
+                                return;
+                            }
+                            String previousRatingKey = String.valueOf(previousRating.intValue());
+                            ratings.put(previousRatingKey, ratings.getOrDefault(previousRatingKey, 0L) - 1);
+                        }
 
-                if(dataSnapshot.exists()){
-                    //counts how many of each score there are
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        float rating = snapshot.getValue(Float.class);
-                        ratingsCount.put(rating, ratingsCount.getOrDefault(rating, 0) + 1);
-                        totalReviews++;
+                        // Update new rating
+                        String ratingKey = String.valueOf((int) rating);
+                        ratings.put(ratingKey, ratings.getOrDefault(ratingKey, 0L) + 1);
+
+                        Map<String, Long> finalRatings = ratings;
+                        pharmacyRef.setValue(ratings)
+                                .addOnSuccessListener(aVoid -> {
+                                    // Also update user's review history
+                                    userReviewRef.setValue(rating)
+                                            .addOnSuccessListener(aVoid1 -> {
+                                                Toast.makeText(fragmentContext, "Review submitted", Toast.LENGTH_SHORT).show();
+                                                updateProgressBars(finalRatings);
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Toast.makeText(fragmentContext, "Failed to submit review", Toast.LENGTH_SHORT).show();
+                                            });
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(fragmentContext, "Failed to submit review", Toast.LENGTH_SHORT).show();
+                                });
                     }
-                }
-                updateProgressBars(ratingsCount, totalReviews);
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.d(TAG, "Failed to fetch current ratings data");
+                    }
+                });
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG, "Failed to fetch new reviews data");
+                Log.d(TAG, "Failed to fetch user review data");
             }
         });
     }
 
-    private void updateProgressBars(Map<Float, Integer> ratingsCount, int totalReviews) {
-        int fiveStarCount = ratingsCount.getOrDefault(5.0f, 0);
-        int fourStarCount = ratingsCount.getOrDefault(4.0f, 0);
-        int threeStarCount = ratingsCount.getOrDefault(3.0f, 0);
-        int twoStarCount = ratingsCount.getOrDefault(2.0f, 0);
-        int oneStarCount = ratingsCount.getOrDefault(1.0f, 0);
+    private void updateRatingBars() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference pharmacyRef = database.getReference("pharmacies").child(currentPharmacy.getId()).child("rating");
 
-        int fiveStarProgress = (int) ((fiveStarCount / (float) totalReviews) * 100);
-        int fourStarProgress = (int) ((fourStarCount / (float) totalReviews) * 100);
-        int threeStarProgress = (int) ((threeStarCount / (float) totalReviews) * 100);
-        int twoStarProgress = (int) ((twoStarCount / (float) totalReviews) * 100);
-        int oneStarProgress = (int) ((oneStarCount / (float) totalReviews) * 100);
+        pharmacyRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Map<String, Long> ratingsCount = (Map<String, Long>) dataSnapshot.getValue();
+                if (ratingsCount == null) {
+                    ratingsCount = new HashMap<>();
+                }
+                updateProgressBars(ratingsCount);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG, "Failed to fetch ratings data");
+            }
+        });
+    }
+
+    private void updateProgressBars(Map<String, Long> ratingsCount) {
+        int totalReviews = 0;
+        for (Long count : ratingsCount.values()) {
+            totalReviews += count;
+        }
+        if(totalReviews == 0){
+            resetUserRatings();
+            return;
+        }
+
+        int fiveStarCount = ratingsCount.getOrDefault("5", 0L).intValue();
+        int fourStarCount = ratingsCount.getOrDefault("4", 0L).intValue();
+        int threeStarCount = ratingsCount.getOrDefault("3", 0L).intValue();
+        int twoStarCount = ratingsCount.getOrDefault("2", 0L).intValue();
+        int oneStarCount = ratingsCount.getOrDefault("1", 0L).intValue();
+
+        int fiveStarProgress =(int) ((fiveStarCount / (float) totalReviews) * 100);
+        int fourStarProgress =(int) ((fourStarCount / (float) totalReviews) * 100);
+        int threeStarProgress =(int) ((threeStarCount / (float) totalReviews) * 100);
+        int twoStarProgress =(int) ((twoStarCount / (float) totalReviews) * 100);
+        int oneStarProgress =(int) ((oneStarCount / (float) totalReviews) * 100);
 
         fiveStarProgressBar.setProgress(fiveStarProgress);
         fourStarProgressBar.setProgress(fourStarProgress);
@@ -368,11 +414,28 @@ public class PharmacyDetails {
         userRatingBar.setRating(averageRating);
     }
 
-    private float calculateAverageRating(Map<Float, Integer> ratingsCount, int totalReviews) {
-        float totalRating = 0;
-        for (Map.Entry<Float, Integer> entry : ratingsCount.entrySet()) {
-            totalRating += entry.getKey() * entry.getValue();
+    private float calculateAverageRating(Map<String, Long> ratingsCount, int totalReviews) {
+        if (totalReviews == 0) {
+            return 0;
         }
-        return totalRating / totalReviews;
+
+        int sum = 0;
+        for (Map.Entry<String, Long> entry : ratingsCount.entrySet()) {
+            int rating = Integer.parseInt(entry.getKey());
+            sum += rating * entry.getValue().intValue();
+        }
+
+        return (float) sum / totalReviews;
+    }
+
+    private void resetUserRatings(){
+        fiveStarProgressBar.setProgress(0);
+        fourStarProgressBar.setProgress(0);
+        threeStarProgressBar.setProgress(0);
+        twoStarProgressBar.setProgress(0);
+        oneStarProgressBar.setProgress(0);
+
+        averageRatingTextView.setText("0");
+        userRatingBar.setRating(0);
     }
 }

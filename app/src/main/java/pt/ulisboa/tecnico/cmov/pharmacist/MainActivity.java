@@ -31,10 +31,6 @@ import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.MapFragment;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicineDetails;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicinesFragment;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.seed.SeedMapChunks;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.seed.SeedMedicines;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.seed.SeedPharmacies;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.seed.SeedReviews;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 
 public class MainActivity extends AppCompatActivity implements MedicinesRecyclerAdapter.OnItemClickListener, MedicineDetails.MedicineDetailsBack, MedicinesInPharmacyRecyclerAdapter.OnItemClickListener{

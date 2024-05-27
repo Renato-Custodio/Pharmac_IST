@@ -210,7 +210,6 @@ public class QRCodeActivity extends AppCompatActivity {
                 if(stock == null){
                     createStock(medicineId, String.valueOf(amount));
                 }else{
-                    System.out.println(stock);
                     updateStock(medicineId, amount);
                 }
 
@@ -237,8 +236,7 @@ public class QRCodeActivity extends AppCompatActivity {
                     addStockLayout.setVisibility(View.VISIBLE);
                     addStockText.setVisibility(View.VISIBLE);
                 } else {
-                    System.out.println("No barcode found");
-                    //create medicine
+                    Toast.makeText(context, "No barcode found", Toast.LENGTH_SHORT).show();
                 }
                 stopScanner();
                 scanButton.setVisibility(View.VISIBLE);

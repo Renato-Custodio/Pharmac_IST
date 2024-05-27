@@ -16,7 +16,6 @@ import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
-import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyDistance;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.Location;
 
@@ -25,31 +24,43 @@ public class FavoritePharmaciesRecyclerAdapter extends RecyclerView.Adapter<Favo
 
     private Context context;
 
+    public interface OnItemClickListener {
+        void onItemClicked(String pharmacyId);
+    }
+    private final FavoritePharmaciesRecyclerAdapter.OnItemClickListener itemClickListener;
+
     /**
      * Initialize the dataset of the Adapter
      *
-     * @param dataSet String[] containing the data to populate views to be used
-     * by RecyclerView
+     * @param dataSet           String[] containing the data to populate views to be used
+     *                          by RecyclerView
+     * @param itemClickListener
      */
-    public FavoritePharmaciesRecyclerAdapter(List<Pharmacy> dataSet, Context context) {
+    public FavoritePharmaciesRecyclerAdapter(List<Pharmacy> dataSet, Context context, OnItemClickListener itemClickListener) {
         localDataSet = dataSet;
         this.context = context;
+        this.itemClickListener = itemClickListener;
     }
 
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder)
      */
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final TextView title;
         private final TextView address;
         private final ImageView image;
 
-        public ViewHolder(View view) {
+        private final OnItemClickListener itemClickListener;
+
+
+        public ViewHolder(View view, OnItemClickListener itemClickListener) {
             super(view);
             title = view.findViewById(R.id.fav_pharmacy_title);
             address = view.findViewById(R.id.fav_pharmacy_description);
             image = view.findViewById(R.id.fav_pharmacy_picture);
+            this.itemClickListener = itemClickListener;
+            view.setOnClickListener(this);
         }
 
         public TextView getTitleView() {
@@ -63,6 +74,14 @@ public class FavoritePharmaciesRecyclerAdapter extends RecyclerView.Adapter<Favo
         public ImageView getImageView() {
             return image;
         }
+
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                itemClickListener.onItemClicked(localDataSet.get(position).getId());
+            }
+        }
     }
 
     // Create new views (invoked by the layout manager)
@@ -72,7 +91,7 @@ public class FavoritePharmaciesRecyclerAdapter extends RecyclerView.Adapter<Favo
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.favorite_pharmacy_list_item, viewGroup, false);
 
-        return new ViewHolder(view);
+        return new ViewHolder(view, itemClickListener);
     }
 
     // Replace the contents of a view (invoked by the layout manager)

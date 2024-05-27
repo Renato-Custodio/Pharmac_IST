@@ -285,4 +285,8 @@ public class MarkersSystem {
             chunkRef.addValueEventListener(chunkListener);
         }
     }
+
+    public Marker getMarkerFromPharmacyId(String pharmacyId){
+       return this.markers.get(pharmacyId);
+    }
 }

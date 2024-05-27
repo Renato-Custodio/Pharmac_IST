@@ -7,8 +7,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -16,11 +22,15 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
+
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
-public class Account extends AppCompatActivity {
+public class Account extends AppCompatActivity implements Serializable {
+
 
     private void fetchUserData() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -59,9 +69,25 @@ public class Account extends AppCompatActivity {
             }));
         });
 
+        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                            String returnedData = result.getData().getStringExtra("resultKey");
+                            Intent resultIntent = new Intent();
+                            resultIntent.putExtra("resultKey", returnedData);
+                            setResult(RESULT_OK, resultIntent);
+                            finish();
+                        }
+                    }
+                }
+        );
+
         findViewById(R.id.account_login_button).setOnClickListener(v -> startActivity(new Intent(Account.this, AccountLogin.class)));
 
-        findViewById(R.id.account_menu_favorites).setOnClickListener(v -> startActivity(new Intent(Account.this, FavoritesActivity.class)));
+        findViewById(R.id.account_menu_favorites).setOnClickListener(v -> activityResultLauncher.launch(new Intent(Account.this, FavoritesActivity.class)));
 
         AuthUtils.registerUserDataListener(new ValueEventListener() {
             @Override

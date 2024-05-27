@@ -6,6 +6,10 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -15,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.database.FirebaseDatabase;
@@ -22,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import pt.ulisboa.tecnico.cmov.pharmacist.databinding.ActivityMainBinding;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.MapFragment;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicineDetails;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicinesFragment;
@@ -39,14 +45,13 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
     Fragment current;
     Fragment details = new Fragment();
 
-    int medicinesOrDetails = 0;
+    SharedLocationViewModel sharedLocationViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
         EdgeToEdge.enable(this);
+        sharedLocationViewModel = new ViewModelProvider(this).get(SharedLocationViewModel.class);
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -67,6 +72,19 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
 
         AuthUtils.signAsAnonymous(this);
 
+        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                            String returnedData = result.getData().getStringExtra("resultKey");
+                            sharedLocationViewModel.setPharmacyId(returnedData);
+                        }
+                    }
+                }
+        );
+
         binding.topAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -77,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
                     if (AuthUtils.isLoggedIn()) {
                         // If the user is logged in, navigate to AccountInfo activity
                         Intent accIntent = new Intent(MainActivity.this, Account.class);
-                        startActivity(accIntent);
+                        activityResultLauncher.launch(accIntent);
                         Log.d("MainActivity", "User is logged in");
                     } else {
                         Log.d("MainActivity", "User is not logged in");

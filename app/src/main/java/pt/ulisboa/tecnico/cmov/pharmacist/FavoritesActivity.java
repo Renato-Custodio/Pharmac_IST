@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.pharmacist;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,10 +26,12 @@ import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.FavoritePharmaciesRecyclerAdapter;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AdapterUtils;
 
 
-public class FavoritesActivity extends AppCompatActivity {
+public class FavoritesActivity extends AppCompatActivity implements FavoritePharmaciesRecyclerAdapter.OnItemClickListener {
 
     private RecyclerView.LayoutManager mLayoutManager;
     private FavoritePharmaciesRecyclerAdapter favoritePharmaciesListAdapter;
@@ -51,14 +55,13 @@ public class FavoritesActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
-
         findViewById(R.id.favorites_back_button).setOnClickListener(e -> finish());
 
         favoritePharmaciesList = findViewById(R.id.favorites_recycler_view);
 
         // Initialize pharmacies list
         mLayoutManager = new LinearLayoutManager(this);
-        favoritePharmaciesListAdapter = new FavoritePharmaciesRecyclerAdapter(pharmacies, this);
+        favoritePharmaciesListAdapter = new FavoritePharmaciesRecyclerAdapter(pharmacies, this, this);
         favoritePharmaciesList.setLayoutManager(mLayoutManager);
         favoritePharmaciesList.setAdapter(favoritePharmaciesListAdapter);
 
@@ -116,4 +119,11 @@ public class FavoritesActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onItemClicked(String pharmacyId) {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("resultKey", pharmacyId);
+        setResult(RESULT_OK, resultIntent);
+        finish();
+    }
 }

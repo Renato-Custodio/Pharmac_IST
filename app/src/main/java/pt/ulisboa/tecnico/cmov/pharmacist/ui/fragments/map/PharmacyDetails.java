@@ -91,6 +91,9 @@ public class PharmacyDetails {
         oneStarProgressBar = bottomSheetView.findViewById(R.id.oneStarProgressBar);
 
         userRatingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> submitReview(rating));
+        //Initialize user ratings
+        averageRatingTextView.setText("0");
+        userRatingBar.setRating(0);
 
 
         fragmentContext = fragment.getContext();
@@ -290,6 +293,9 @@ public class PharmacyDetails {
     }
 
     private void submitReview(float rating) {
+        if(rating == 0){
+            return;
+        }
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
             Toast.makeText(fragmentContext, "You need to be logged in to submit a review", Toast.LENGTH_SHORT).show();

@@ -76,8 +76,13 @@ public class Account extends AppCompatActivity implements Serializable {
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                             String returnedData = result.getData().getStringExtra("resultKey");
+                            String data = result.getData().getStringExtra("medicineKey");
                             Intent resultIntent = new Intent();
-                            resultIntent.putExtra("resultKey", returnedData);
+                            if(returnedData != null){
+                                resultIntent.putExtra("resultKey", returnedData);
+                            } else if (data != null) {
+                                resultIntent.putExtra("medicineKey", data);
+                            }
                             setResult(RESULT_OK, resultIntent);
                             finish();
                         }
@@ -88,6 +93,8 @@ public class Account extends AppCompatActivity implements Serializable {
         findViewById(R.id.account_login_button).setOnClickListener(v -> startActivity(new Intent(Account.this, AccountLogin.class)));
 
         findViewById(R.id.account_menu_favorites).setOnClickListener(v -> activityResultLauncher.launch(new Intent(Account.this, FavoritesActivity.class)));
+
+        findViewById(R.id.notifications_card).setOnClickListener(v -> activityResultLauncher.launch(new Intent(Account.this, NotificationsActivity.class)));
 
         AuthUtils.registerUserDataListener(new ValueEventListener() {
             @Override

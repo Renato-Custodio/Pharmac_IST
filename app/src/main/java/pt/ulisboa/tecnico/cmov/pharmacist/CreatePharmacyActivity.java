@@ -42,6 +42,9 @@ import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
 public class CreatePharmacyActivity extends AppCompatActivity {
     private LatLng latlng;
+
+    private LatLng selectedLatLng;
+
     private EditText nameEditText;
     private TextView addressEditText;
     private Bitmap pharmacyPhoto = null;
@@ -55,7 +58,8 @@ public class CreatePharmacyActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            latlng = (LatLng) extras.get("selected_coordinates");
+            selectedLatLng = (LatLng) extras.get("selected_coordinates");
+            latlng = selectedLatLng;
             //The key argument here must match that used in the other activity
         }
 
@@ -104,17 +108,22 @@ public class CreatePharmacyActivity extends AppCompatActivity {
     private void selectOnMap() {
         Location location = new Location(""); // Set an empty string as provider
 
-        location.setLatitude(latlng.latitude);
-        location.setLongitude(latlng.longitude);
+        location.setLatitude(selectedLatLng.latitude);
+        location.setLongitude(selectedLatLng.longitude);
         String address = getAddressFromLocation(location);
         addressEditText.setText(address);
+
+        latlng = selectedLatLng;
+
         Toast.makeText(this, "Using location selected in the map", Toast.LENGTH_SHORT).show();
     }
 
     private void useCurrentLocation() {
         SharedLocationViewModel sharedLocationViewModel = new ViewModelProvider(this).get(SharedLocationViewModel.class);
         Location location = sharedLocationViewModel.getLocation().getValue();
+
         if (location != null) {
+            latlng = new LatLng(location.getLatitude(), location.getLongitude());
             String address = getAddressFromLocation(location);
             addressEditText.setText(address);
             Toast.makeText(this, "Current location used", Toast.LENGTH_SHORT).show();

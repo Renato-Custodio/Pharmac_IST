@@ -384,7 +384,7 @@ public class PharmacyDetails {
         String userId = currentUser.getUid();
         String pharmacyId = currentPharmacy.getId();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference pharmacyRef = database.getReference("pharmacies").child(pharmacyId).child("rating");
+        DatabaseReference pharmacyRef = database.getReference("pharmacies").child(pharmacyId).child("ratings");
         DatabaseReference userReviewRef = database.getReference("users").child(userId).child("ratings").child(pharmacyId);
         userReviewRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

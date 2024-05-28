@@ -25,15 +25,13 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.database.FirebaseDatabase;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.databinding.ActivityMainBinding;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.MapFragment;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicineDetails;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicinesFragment;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 
-public class MainActivity extends AppCompatActivity implements MedicinesRecyclerAdapter.OnItemClickListener, MedicineDetails.MedicineDetailsBack, MedicinesInPharmacyRecyclerAdapter.OnItemClickListener{
+public class MainActivity extends AppCompatActivity implements MedicineDetails.MedicineDetailsBack {
 
     ActivityMainBinding binding;
     MapFragment mapFragment;
@@ -53,68 +51,55 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        mapFragment = MapFragment.newInstance(this);
-        medicinesFragment = MedicinesFragment.newInstance(this);
+        mapFragment = MapFragment.newInstance(this::openMedicineDetails);
+        medicinesFragment = MedicinesFragment.newInstance(this::openMedicineDetails);
 
         addFragment(mapFragment);
         addFragment(medicinesFragment);
 
         replaceFragment(mapFragment);
 
-        //SeedMedicines.seedMedicine(this);
-        //SeedPharmacies.seedPharmacy(this);
-        //SeedMapChunks.seedChuncks();
-        //SeedReviews.seedReviews(this);
 
         AuthUtils.signAsAnonymous(this);
 
         ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                            String returnedData = result.getData().getStringExtra("resultKey");
-                            sharedLocationViewModel.setPharmacyId(returnedData);
-                            binding.bottomNavigation.getMenu().getItem(0).setChecked(true);
-                            replaceFragment(mapFragment);
-                        }
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        String returnedData = result.getData().getStringExtra("resultKey");
+                        sharedLocationViewModel.setPharmacyId(returnedData);
+                        binding.bottomNavigation.getMenu().getItem(0).setChecked(true);
+                        replaceFragment(mapFragment);
                     }
                 }
         );
 
-        binding.topAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
+        binding.topAppBar.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
 
-                if (id == R.id.account) {
-                    // Handle click on the "Account" menu item
-                    if (AuthUtils.isLoggedIn()) {
-                        // If the user is logged in, navigate to AccountInfo activity
-                        Intent accIntent = new Intent(MainActivity.this, Account.class);
-                        activityResultLauncher.launch(accIntent);
-                        Log.d("MainActivity", "User is logged in");
-                    } else {
-                        Log.d("MainActivity", "User is not logged in");
-                    }
+            if (id == R.id.account) {
+                // Handle click on the "Account" menu item
+                if (AuthUtils.isLoggedIn()) {
+                    // If the user is logged in, navigate to AccountInfo activity
+                    Intent accIntent = new Intent(MainActivity.this, Account.class);
+                    activityResultLauncher.launch(accIntent);
+                    Log.d("MainActivity", "User is logged in");
+                } else {
+                    Log.d("MainActivity", "User is not logged in");
                 }
-                return true;
             }
+            return true;
         });
 
-        binding.bottomNavigation.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                int menuItemId =  menuItem.getItemId();
+        binding.bottomNavigation.setOnItemSelectedListener(menuItem -> {
+            int menuItemId =  menuItem.getItemId();
 
-                if (menuItemId == R.id.pharmacies_map) {
-                    replaceFragment(mapFragment);
-                } else if (menuItemId == R.id.medicines) {
-                    replaceFragment(medicinesFragment);
-                }
-                return true;
+            if (menuItemId == R.id.pharmacies_map) {
+                replaceFragment(mapFragment);
+            } else if (menuItemId == R.id.medicines) {
+                replaceFragment(medicinesFragment);
             }
+            return true;
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -147,8 +132,8 @@ public class MainActivity extends AppCompatActivity implements MedicinesRecycler
         transaction.commit();
     }
 
-    @Override
-    public void onItemClicked(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine medicine, String origin) {
+
+    public void openMedicineDetails(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine medicine, String origin) {
         MedicineDetails newFragment = MedicineDetails.newInstance(medicine, this, origin);
         details = newFragment;
         binding.bottomNavigation.getMenu().getItem(1).setChecked(true);

@@ -1,7 +1,5 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines;
 
-import static com.android.volley.VolleyLog.TAG;
-
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 
@@ -17,7 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
 import com.google.android.material.search.SearchBar;
@@ -34,16 +31,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesRecyclerAdapter;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.RecyclerAdapterProvider;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.SearchRecyclerAdapter;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.view_holders.MedicineViewHolder;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.NavigateFunction;
 
 
 public class MedicinesFragment extends Fragment {
     private static final int PAGE_SIZE = 4;
     RecyclerView recommendedMedicines;
-    MedicinesRecyclerAdapter medicinesRecyclerAdapter;
+    RecyclerAdapterProvider<List<Medicine>, MedicineViewHolder> medicinesRecyclerAdapter;
     SearchRecyclerAdapter searchRecyclerAdapter;
-
     RecyclerView.LayoutManager mLayoutManager;
 
     // Search view controllers
@@ -54,15 +53,15 @@ public class MedicinesFragment extends Fragment {
     RecyclerView.LayoutManager mLayoutManager2;
 
     // Search results
-    private List<pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine> searchResults = new ArrayList<>();
-    private MedicinesRecyclerAdapter.OnItemClickListener listener;
+    private List<Medicine> searchResults = new ArrayList<>();
+    private NavigateFunction<Medicine> openMedicine;
 
     // Search back button
     private Button backButton;
 
-    public static MedicinesFragment newInstance(MedicinesRecyclerAdapter.OnItemClickListener listener) {
+    public static MedicinesFragment newInstance(NavigateFunction<Medicine> openMedicine) {
         MedicinesFragment fragment = new MedicinesFragment();
-        fragment.listener = listener;
+        fragment.openMedicine = openMedicine;
         return fragment;
     }
 
@@ -131,16 +130,12 @@ public class MedicinesFragment extends Fragment {
             }
         });
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onClick(View v) {
-                searchView.setText("");
-                searchBar.setText("");
-                searchResults.clear();
-                searchRecyclerAdapter.notifyDataSetChanged();
-                backButton.setVisibility(View.GONE);
-            }
+        backButton.setOnClickListener(v -> {
+            searchView.setText("");
+            searchBar.setText("");
+            searchResults.clear();
+            searchRecyclerAdapter.notifyDataSetChanged();
+            backButton.setVisibility(View.GONE);
         });
 
         searchView.getEditText().addTextChangedListener(new TextWatcher() {
@@ -180,8 +175,12 @@ public class MedicinesFragment extends Fragment {
         recommendedMedicines = view.findViewById(R.id.nearest_pharmacies);
         resultsMedicines = view.findViewById(R.id.medicine_search_results);
 
+        medicinesRecyclerAdapter = new RecyclerAdapterProvider<>(searchResults, getContext(), R.layout.medicine_list_item, (view1, context, dataset) -> {
+            MedicineViewHolder medicineViewHolder = new MedicineViewHolder(view1, context, dataset, (medicine) -> openMedicine.apply(medicine, "MedicinesRecyclerAdapter"), (pharmacyId) -> {});
+            medicineViewHolder.hideBuyButton();
+            return medicineViewHolder;
+        });
 
-        medicinesRecyclerAdapter = new MedicinesRecyclerAdapter(searchResults, this, listener,getContext());
         recommendedMedicines.setLayoutManager(mLayoutManager);
         recommendedMedicines.setAdapter(medicinesRecyclerAdapter);
 

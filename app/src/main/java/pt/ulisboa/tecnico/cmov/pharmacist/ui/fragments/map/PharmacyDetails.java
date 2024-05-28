@@ -17,8 +17,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,7 +26,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.MessageFormat;
@@ -42,12 +42,14 @@ import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.RecyclerAdapterProvider;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.view_holders.MedicineViewHolder;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AdapterUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.Location;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.NavigateFunction;
 
 
 public class PharmacyDetails {
@@ -56,12 +58,10 @@ public class PharmacyDetails {
     private final MaterialButton favouriteButton;
     private Pharmacy currentPharmacy;
     private final Context fragmentContext;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private final MedicinesInPharmacyRecyclerAdapter medicineListAdapter;
+    private final RecyclerAdapterProvider<List<Medicine>, MedicineViewHolder> medicineListAdapter;
     private List<Medicine> medicines = new ArrayList<>();
     private Query currentStockQuery;
     private ChildEventListener currentStockQueryEventListener;
-    private RecyclerView medicineList;
     private Map<String, Boolean> favoritePharmacies;
     private RatingBar userRatingBar;
     private TextView averageRatingTextView;
@@ -73,13 +73,13 @@ public class PharmacyDetails {
 
     private static final String TAG = PharmacyDetails.class.getSimpleName();
 
-    public PharmacyDetails(Fragment fragment, View bottomSheetView, SharedLocationViewModel sharedLocationViewModel, MedicinesInPharmacyRecyclerAdapter.OnItemClickListener listener) {
+    public PharmacyDetails(Fragment fragment, View bottomSheetView, SharedLocationViewModel sharedLocationViewModel, NavigateFunction<Medicine> openMedicine) {
 
         title = bottomSheetView.findViewById(R.id.details_pharmacy_title);
         location = bottomSheetView.findViewById(R.id.details_pharmacy_location);
         distance = bottomSheetView.findViewById(R.id.details_pharmacy_distance);
         image = bottomSheetView.findViewById(R.id.pharmacy_image);
-        medicineList = bottomSheetView.findViewById(R.id.fragment_map_avaliable_medicines);
+        RecyclerView medicineList = bottomSheetView.findViewById(R.id.fragment_map_avaliable_medicines);
         favouriteButton = bottomSheetView.findViewById(R.id.favouriteButton);
 
         userRatingBar = bottomSheetView.findViewById(R.id.user_rating_bar);
@@ -115,8 +115,10 @@ public class PharmacyDetails {
         });
 
         // Initialize medicines list
-        mLayoutManager = new LinearLayoutManager(fragment.getActivity());
-        medicineListAdapter = new MedicinesInPharmacyRecyclerAdapter(medicines, fragment, currentPharmacy, listener, fragmentContext);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(fragment.getActivity());
+
+        medicineListAdapter = new RecyclerAdapterProvider<>(medicines, fragmentContext, R.layout.medicine_list_item, (view, context, dataset) -> new MedicineViewHolder(view, context, dataset, medicine -> openMedicine.apply(medicine, "MedicinesInPharmacyRecyclerAdapter"), this::buyMedicine));
+
         medicineList.setLayoutManager(mLayoutManager);
         medicineList.setAdapter(medicineListAdapter);
 
@@ -251,6 +253,8 @@ public class PharmacyDetails {
 
 
     // User related actions
+
+    //  Favorites
     private void updateUserActions() {
         if (currentPharmacy == null) return;
 
@@ -290,6 +294,50 @@ public class PharmacyDetails {
             });
         }
     }
+
+    //  Buys
+
+    private void buyMedicine(Medicine medicine) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference db = database.getReference("pharmacies").child(currentPharmacy.getId()).child("stock").child(medicine.getId());
+        db.runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                String stockStr = mutableData.getValue(String.class);
+                if (stockStr == null) {
+                    return Transaction.success(mutableData); // No stock information
+                }
+
+                int stock = Integer.parseInt(stockStr);
+
+                if (stock - 1 < 0) {
+                    // Insufficient stock
+                    return Transaction.abort();
+                }
+
+                // Update stock
+                mutableData.setValue(String.valueOf(stock - 1));
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, boolean committed, @Nullable DataSnapshot dataSnapshot) {
+                if (databaseError != null) {
+                    Log.e("Map fragment getting medicines", "Database error: " + databaseError.getMessage());
+                    Toast.makeText(fragmentContext, "Database error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                } else if (!committed) {
+                    // Transaction was not committed, likely due to insufficient stock
+                    Toast.makeText(fragmentContext, "Not enough stock!", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Transaction committed and stock updated
+                    Toast.makeText(fragmentContext, "1 dose of " + medicine.getName() + " bought successfully!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    //  Ratings
 
     private void submitReview(float rating) {
         if (rating == 0) {

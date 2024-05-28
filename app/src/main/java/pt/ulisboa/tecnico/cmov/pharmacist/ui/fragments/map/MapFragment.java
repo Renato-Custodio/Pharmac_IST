@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
 import android.annotation.SuppressLint;
-import android.content.ClipData;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -57,10 +55,11 @@ import java.text.MessageFormat;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.MedicinesInPharmacyRecyclerAdapter;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.PlacesAutoCompleteAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.NavigateFunction;
 
 
 enum MapFocus {
@@ -111,16 +110,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private double bottomSheetHalfExpandedRatio = 0.34f;
 
-    private MedicinesInPharmacyRecyclerAdapter.OnItemClickListener listener;
+    private NavigateFunction<Medicine> openMedicine;
 
     private PharmacyDetails pharmacyDetails;
 
     // Fragment Lifecycle functions
 
 
-    public static MapFragment newInstance(MedicinesInPharmacyRecyclerAdapter.OnItemClickListener listener){
+    public static MapFragment newInstance(NavigateFunction<Medicine> openMedicine){
         MapFragment fragment = new MapFragment();
-        fragment.listener = listener;
+        fragment.openMedicine = openMedicine;
         return fragment;
     }
     @Override
@@ -289,7 +288,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         bottomSheetView = getView().findViewById(R.id.pharmacy_details);
         textViewSlideMessage = bottomSheetView.findViewById(R.id.slide_up_message);
 
-        pharmacyDetails = new PharmacyDetails(this, bottomSheetView, sharedLocationViewModel, listener);
+        pharmacyDetails = new PharmacyDetails(this, bottomSheetView, sharedLocationViewModel, openMedicine);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);

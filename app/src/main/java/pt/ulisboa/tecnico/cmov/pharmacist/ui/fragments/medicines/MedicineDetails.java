@@ -58,7 +58,7 @@ public class MedicineDetails extends Fragment {
 
     private RecyclerAdapterProvider<List<PharmacyDistance>, ClosestPharmacyViewHolder> nearestPharmaciesAdapter;
 
-    private List<PharmacyDistance> recivedPharmacies = new ArrayList<PharmacyDistance>();
+    private List<PharmacyDistance> recivedPharmacies = new ArrayList<>();
     private String origin;
     private MedicineDetailsBack callback;
 

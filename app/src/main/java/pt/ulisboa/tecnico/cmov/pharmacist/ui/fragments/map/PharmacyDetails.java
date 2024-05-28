@@ -311,9 +311,10 @@ public class PharmacyDetails {
 
                 int stock = Integer.parseInt(stockStr);
 
-                if (stock - 1 < 0) {
+                if (stock - 1 <= 0) {
                     // Insufficient stock
-                    return Transaction.abort();
+                    mutableData.setValue(null);
+                    return Transaction.success(mutableData);
                 }
 
                 // Update stock

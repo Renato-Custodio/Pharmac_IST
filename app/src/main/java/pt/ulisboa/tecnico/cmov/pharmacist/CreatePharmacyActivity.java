@@ -49,6 +49,7 @@ public class CreatePharmacyActivity extends AppCompatActivity {
     private TextView addressEditText;
     private Bitmap pharmacyPhoto = null;
 
+    private Location location;
     private static final String TAG = CreatePharmacyActivity.class.getSimpleName();
 
     @Override
@@ -59,6 +60,7 @@ public class CreatePharmacyActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             selectedLatLng = (LatLng) extras.get("selected_coordinates");
+            location = (Location) extras.get("current_coordinates");
             latlng = selectedLatLng;
             //The key argument here must match that used in the other activity
         }
@@ -119,8 +121,7 @@ public class CreatePharmacyActivity extends AppCompatActivity {
     }
 
     private void useCurrentLocation() {
-        SharedLocationViewModel sharedLocationViewModel = new ViewModelProvider(this).get(SharedLocationViewModel.class);
-        Location location = sharedLocationViewModel.getLocation().getValue();
+
 
         if (location != null) {
             latlng = new LatLng(location.getLatitude(), location.getLongitude());

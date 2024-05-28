@@ -351,6 +351,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         mapInstance.setOnMapLongClickListener(latLng -> {
             Intent createPharmacyIntent = new Intent(getActivity(), CreatePharmacyActivity.class);
+            createPharmacyIntent.putExtra("current_coordinates", sharedLocationViewModel.getLocation().getValue());
             createPharmacyIntent.putExtra("selected_coordinates", latLng);
             startActivity(createPharmacyIntent);
         });

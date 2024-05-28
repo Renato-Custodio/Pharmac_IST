@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -53,7 +54,10 @@ import com.google.android.material.search.SearchView;
 
 import java.text.MessageFormat;
 
+import pt.ulisboa.tecnico.cmov.pharmacist.AccountLogin;
+import pt.ulisboa.tecnico.cmov.pharmacist.AccountSignup;
 import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
+import pt.ulisboa.tecnico.cmov.pharmacist.CreatePharmacyActivity;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.PlacesAutoCompleteAdapter;
@@ -346,12 +350,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         mapInstance.setOnMapLongClickListener(latLng -> {
-            CreatePharmacy newFragment = CreatePharmacy.newInstance(latLng);
-
-            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragmentContainerView, newFragment);
-            transaction.addToBackStack(null); // Add to back stack to allow back navigation
-            transaction.commit();
+            Intent createPharmacyIntent = new Intent(getActivity(), CreatePharmacyActivity.class);
+            createPharmacyIntent.putExtra("selected_coordinates", latLng);
+            startActivity(createPharmacyIntent);
         });
 
         mapInstance.getUiSettings().setMyLocationButtonEnabled(false);

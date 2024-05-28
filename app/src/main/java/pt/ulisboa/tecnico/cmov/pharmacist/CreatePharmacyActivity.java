@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
+package pt.ulisboa.tecnico.cmov.pharmacist;
 
 import android.graphics.Bitmap;
 import android.location.Address;
@@ -7,9 +7,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -17,17 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.search.SearchBar;
-import com.google.android.material.transition.MaterialFadeThrough;
-import com.google.android.material.transition.MaterialSharedAxis;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,61 +29,46 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 
-import pt.ulisboa.tecnico.cmov.pharmacist.R;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MapChunk;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyChunkData;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageResultLaunchers;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
-import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MapChunk;
 
-
-public class CreatePharmacy extends Fragment {
+public class CreatePharmacyActivity extends AppCompatActivity {
     private LatLng latlng;
     private EditText nameEditText;
     private TextView addressEditText;
     private Bitmap pharmacyPhoto = null;
 
-    private static final String TAG = CreatePharmacy.class.getSimpleName();
-
-    public CreatePharmacy() {}
-
-    public static CreatePharmacy newInstance(LatLng latLng) {
-        CreatePharmacy fragment = new CreatePharmacy();
-        fragment.latlng = latLng;
-        return fragment;
-    }
+    private static final String TAG = CreatePharmacyActivity.class.getSimpleName();
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_create_pharmacy);
 
-        setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_add_pharmacy, container, false);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            latlng = (LatLng) extras.get("selected_coordinates");
+            //The key argument here must match that used in the other activity
+        }
 
         // Get UI Elements
-        nameEditText = view.findViewById(R.id.pharmacy_name_text);
-        addressEditText = ( (SearchBar) view.findViewById(R.id.pharmacy_address_search_bar)).getTextView();
-        Button selectOnMapButton = view.findViewById(R.id.selectOnMapButton);
-        Button useCurrentLocationButton = view.findViewById(R.id.useCurrentLocationButton);
-        Button addPictureButton = view.findViewById(R.id.pharmacy_upload_photo_button);
-        Button saveButton = view.findViewById(R.id.saveButton);
+        nameEditText = findViewById(R.id.pharmacy_name_text);
+        addressEditText = ( (SearchBar) findViewById(R.id.pharmacy_address_search_bar)).getTextView();
+        Button selectOnMapButton = findViewById(R.id.selectOnMapButton);
+        Button useCurrentLocationButton = findViewById(R.id.useCurrentLocationButton);
+        Button addPictureButton = findViewById(R.id.pharmacy_upload_photo_button);
+        Button saveButton = findViewById(R.id.saveButton);
 
         // Init back button
-        view.findViewById(R.id.create_pharmacy_back_button).setOnClickListener(e ->
-            requireActivity().getSupportFragmentManager().popBackStack()
-        );
+        findViewById(R.id.create_pharmacy_back_button).setOnClickListener(e -> finish());
 
         // Parse address of location
         if (latlng != null){
@@ -110,41 +86,45 @@ public class CreatePharmacy extends Fragment {
 
         // Image dialogs
         ImageResultLaunchers imageResultLaunchers = ImageUtils.registerResultLaunchers(this, bitmap -> {
-            ( (ImageView) view.findViewById(R.id.picture_pharmacy)).setImageBitmap(bitmap);
+            ( (ImageView) findViewById(R.id.picture_pharmacy)).setImageBitmap(bitmap);
             pharmacyPhoto = bitmap;
         });
 
         addPictureButton.setOnClickListener(v -> {
             try {
-                ImageUtils.openDialog(getActivity(), imageResultLaunchers);
+                ImageUtils.openDialog(this, imageResultLaunchers);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
         saveButton.setOnClickListener(v -> savePharmacy());
-
-        return view;
     }
 
     private void selectOnMap() {
-        Toast.makeText(getActivity(), "Select on Map clicked", Toast.LENGTH_SHORT).show();
+        Location location = new Location(""); // Set an empty string as provider
+
+        location.setLatitude(latlng.latitude);
+        location.setLongitude(latlng.longitude);
+        String address = getAddressFromLocation(location);
+        addressEditText.setText(address);
+        Toast.makeText(this, "Using location selected in the map", Toast.LENGTH_SHORT).show();
     }
 
     private void useCurrentLocation() {
-        SharedLocationViewModel sharedLocationViewModel = new ViewModelProvider(requireActivity()).get(SharedLocationViewModel.class);
+        SharedLocationViewModel sharedLocationViewModel = new ViewModelProvider(this).get(SharedLocationViewModel.class);
         Location location = sharedLocationViewModel.getLocation().getValue();
         if (location != null) {
             String address = getAddressFromLocation(location);
             addressEditText.setText(address);
-            Toast.makeText(getActivity(), "Current location used", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Current location used", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getActivity(), "Current location not available", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Current location not available", Toast.LENGTH_SHORT).show();
         }
     }
 
     private String getAddressFromLocation(Location location) {
-        Geocoder geocoder = new Geocoder(requireActivity(), Locale.getDefault());
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         try {
             List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             if (addresses != null && !addresses.isEmpty()) {
@@ -164,7 +144,7 @@ public class CreatePharmacy extends Fragment {
         DatabaseReference pharmacyRef = database.getReference("pharmacies");
 
         if (pharmacyPhoto == null) {
-            Toast.makeText(getActivity(), "Please select a picture", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please select a picture", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -191,16 +171,17 @@ public class CreatePharmacy extends Fragment {
         newPharmacyRef.setValue(pharmacy)
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "Pharmacy entry added successfully with key: " + newPharmacyRef.getKey());
-                    ImageUtils.uploadImage(getActivity(), pharmacyPhoto, "pharmacies", newPharmacyRef.getKey(), metadata -> {
+                    ImageUtils.uploadImage(this, pharmacyPhoto, "pharmacies", newPharmacyRef.getKey(), metadata -> {
                         updateMapChunk(newPharmacyRef.getKey(), latlng.latitude, latlng.longitude);
                     });
                 })
                 .addOnFailureListener(e -> {
                     // Failed to add
                     Log.e("Firebase", "Failed to add pharmacy entry", e);
-                    Toast.makeText(getActivity(), "ERROR: Pharmacy did not save: " + pharmacyName + ", " + address, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "ERROR: Pharmacy did not save: " + pharmacyName + ", " + address, Toast.LENGTH_SHORT).show();
                 });
     }
+
     private void updateMapChunk(String pharmacyId, double latitude, double longitude) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -232,8 +213,8 @@ public class CreatePharmacy extends Fragment {
                 chunksRef.child(chunkId).setValue(mapChunk)
                         .addOnSuccessListener(aVoid -> {
                             Log.d(TAG, MessageFormat.format("MapChunk {0} updated successfully", chunkId));
-                            Toast.makeText(getActivity(), "Pharmacy saved", Toast.LENGTH_SHORT).show();
-                            requireActivity().getSupportFragmentManager().popBackStack();
+                            Toast.makeText(getApplicationContext(), "Pharmacy saved", Toast.LENGTH_SHORT).show();
+                            finish();
                         })
                         .addOnFailureListener(e -> Log.e(TAG, "Failed to update MapChunk", e));
             }
@@ -244,4 +225,5 @@ public class CreatePharmacy extends Fragment {
             }
         });
     }
+
 }

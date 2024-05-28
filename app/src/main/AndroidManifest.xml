@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PharmacIST"
         tools:targetApi="31">
+        <activity
+            android:name=".CreatePharmacyActivity"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -50,19 +53,19 @@
         </activity>
         <activity
             android:name=".AccountLogin"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".AccountSignup"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".QRCodeActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".CreateMedicineActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".FavoritesActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
     </application>
 
 </manifest>

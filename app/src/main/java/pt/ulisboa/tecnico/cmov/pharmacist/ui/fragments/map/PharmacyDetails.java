@@ -61,7 +61,9 @@ public class PharmacyDetails {
     private final RecyclerAdapterProvider<List<Medicine>, MedicineViewHolder> medicineListAdapter;
     private List<Medicine> medicines = new ArrayList<>();
     private Query currentStockQuery;
+    private DatabaseReference currentRatingsRef;
     private ChildEventListener currentStockQueryEventListener;
+    private ValueEventListener currentRatingsRefEventListener;
     private Map<String, Boolean> favoritePharmacies;
     private RatingBar userRatingBar;
     private TextView averageRatingTextView;
@@ -185,8 +187,7 @@ public class PharmacyDetails {
             public void onCancelled(@NonNull DatabaseError error) {}
         };
 
-        DatabaseReference ratingsRef = FirebaseDatabase.getInstance().getReference().child("pharmacies").child(currentPharmacy.getId()).child("ratings");
-        ratingsRef.addValueEventListener(new ValueEventListener() {
+        currentRatingsRefEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
@@ -199,11 +200,11 @@ public class PharmacyDetails {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
 
     }
 
-        private void fetchStock(String startId) {
+    private void fetchStock(String startId) {
         if (currentStockQuery != null) {
             currentStockQuery.removeEventListener(currentStockQueryEventListener);
         }
@@ -223,6 +224,20 @@ public class PharmacyDetails {
         currentStockQuery.addChildEventListener(currentStockQueryEventListener);
     }
 
+    private void fetchRatings() {
+        if (currentRatingsRef != null) {
+            currentRatingsRef.removeEventListener(currentRatingsRefEventListener);
+        }
+
+        DatabaseReference ratingsRef = FirebaseDatabase.getInstance().getReference("pharmacies").child(currentPharmacy.getId()).child("ratings");
+
+        Log.d(TAG, MessageFormat.format("Fetching ratings for {0}", currentPharmacy.getId()));
+
+        currentRatingsRef = ratingsRef;
+
+        currentRatingsRef.addValueEventListener(currentRatingsRefEventListener);
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     private void updateDetails() {
         ImageUtils.loadImage(fragmentContext, String.format("/pharmacies/%s", currentPharmacy.getId()), image);
@@ -233,6 +248,7 @@ public class PharmacyDetails {
             medicineListAdapter.notifyDataSetChanged();
         }
         fetchStock(null);
+        fetchRatings();
     }
 
     public void update(String pharmacyId) {
@@ -255,7 +271,6 @@ public class PharmacyDetails {
                         currentPharmacy = pharmacy;
                         updateDetails();
                         updateUserActions();
-                        updateRatingBars();
                     }
                 }
             }
@@ -421,27 +436,6 @@ public class PharmacyDetails {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG, "Failed to fetch user review data");
-            }
-        });
-    }
-
-    private void updateRatingBars() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference pharmacyRef = database.getReference("pharmacies").child(currentPharmacy.getId()).child("rating");
-
-        pharmacyRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Map<String, Long> ratingsCount = (Map<String, Long>) dataSnapshot.getValue();
-                if (ratingsCount == null) {
-                    ratingsCount = new HashMap<>();
-                }
-                updateProgressBars(ratingsCount);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG, "Failed to fetch ratings data");
             }
         });
     }

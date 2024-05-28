@@ -31,11 +31,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MapChunk;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyChunkData;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageResultLaunchers;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
@@ -48,9 +50,10 @@ public class CreatePharmacyActivity extends AppCompatActivity {
     private EditText nameEditText;
     private TextView addressEditText;
     private Bitmap pharmacyPhoto = null;
-
     private Location location;
     private static final String TAG = CreatePharmacyActivity.class.getSimpleName();
+
+    public Map<String, Boolean> ownedPharmaciesIds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,12 +186,29 @@ public class CreatePharmacyActivity extends AppCompatActivity {
                     Log.d(TAG, "Pharmacy entry added successfully with key: " + newPharmacyRef.getKey());
                     ImageUtils.uploadImage(this, pharmacyPhoto, "pharmacies", newPharmacyRef.getKey(), metadata -> {
                         updateMapChunk(newPharmacyRef.getKey(), latlng.latitude, latlng.longitude);
+                        updateOwnedPharmacies(newPharmacyRef.getKey());
                     });
                 })
                 .addOnFailureListener(e -> {
                     // Failed to add
                     Log.e("Firebase", "Failed to add pharmacy entry", e);
                     Toast.makeText(this, "ERROR: Pharmacy did not save: " + pharmacyName + ", " + address, Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void updateOwnedPharmacies(String pharmacyId){
+        // Add to ownedPharmacies
+        AuthUtils.getUserRef().child("ownedPharmaciesIds").child(pharmacyId)
+                .setValue(true)
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.e(TAG, "Failed to add pharmacy to ownedPharmacies:", task.getException());
+                        Toast.makeText(this, "Failed to add pharmacy to ownedPharmacies", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    Log.d(TAG, "Added pharmacy to ownedPharmacies: " + pharmacyId);
+                    Toast.makeText(this, "Pharmacy added to ownedPharmacies", Toast.LENGTH_SHORT).show();
                 });
     }
 

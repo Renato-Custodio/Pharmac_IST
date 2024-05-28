@@ -61,7 +61,7 @@ public class AuthUtils {
                 // Create account data in the DB
                 FirebaseUser user = auth.getCurrentUser();
 
-                User newUserData = new User("anonymous", "", new ArrayList<>(), new HashMap<>(), false);
+                User newUserData = new User("anonymous", new HashMap<>(), new HashMap<>(), false);
 
                 db.child("users").child(user.getUid()).setValue(newUserData).addOnCompleteListener(dbTask -> {
                     if (dbTask.isSuccessful()) {

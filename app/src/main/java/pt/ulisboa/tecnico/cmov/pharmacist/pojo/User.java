@@ -11,18 +11,16 @@ import java.util.Map;
 @IgnoreExtraProperties
 public class User {
     public String username;
-    public String photoUrl;
-    public List<String> ownedPharmaciesIds;
     public Map<String, Boolean> favoritePharmaciesIds;
     public Map<String, Boolean> medicineNotificationIds;
+    public Map<String, Boolean> ownedPharmaciesIds;
     public boolean isPharmacyOwner = false;
 
     public User() {
     }
 
-    public User(String username, String photoUrl, List<String> ownedPharmaciesIds, Map<String, Boolean> favoritePharmaciesIds, boolean isPharmacyOwner) {
+    public User(String username, Map<String, Boolean> ownedPharmaciesIds, Map<String, Boolean> favoritePharmaciesIds, boolean isPharmacyOwner) {
         this.username = username;
-        this.photoUrl = photoUrl;
         this.ownedPharmaciesIds = ownedPharmaciesIds;
         this.favoritePharmaciesIds = favoritePharmaciesIds;
         this.isPharmacyOwner = isPharmacyOwner;
@@ -50,11 +48,8 @@ public class User {
         this.username = username;
     }
 
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
-    }
 
-    public void setOwnedPharmaciesIds(List<String> ownedPharmaciesIds) {
+    public void setOwnedPharmaciesIds(Map<String, Boolean> ownedPharmaciesIds) {
         this.ownedPharmaciesIds = ownedPharmaciesIds;
     }
 

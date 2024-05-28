@@ -185,9 +185,25 @@ public class PharmacyDetails {
             public void onCancelled(@NonNull DatabaseError error) {}
         };
 
+        DatabaseReference ratingsRef = FirebaseDatabase.getInstance().getReference().child("pharmacies").child(currentPharmacy.getId()).child("ratings");
+        ratingsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    Map<String, Long> ratings = (Map<String, Long>) snapshot.getValue();
+                    updateProgressBars(ratings);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
-    private void fetchStock(String startId) {
+        private void fetchStock(String startId) {
         if (currentStockQuery != null) {
             currentStockQuery.removeEventListener(currentStockQueryEventListener);
         }

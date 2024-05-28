@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
+import static pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils.isLoggedIn;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -51,6 +53,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.search.SearchBar;
 import com.google.android.material.search.SearchView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.MessageFormat;
 
@@ -60,8 +65,10 @@ import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.CreatePharmacyActivity;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.PlacesAutoCompleteAdapter;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.NavigateFunction;
 
@@ -117,6 +124,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private NavigateFunction<Medicine> openMedicine;
 
     private PharmacyDetails pharmacyDetails;
+
+    private boolean isPharmacyOwner;
 
     // Fragment Lifecycle functions
 
@@ -187,6 +196,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         zoomOut.setOnClickListener(v -> {
             unfocused();
             mapInstance.animateCamera(CameraUpdateFactory.zoomOut());
+        });
+
+        AuthUtils.registerUserDataListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+
+                if (user == null) return;
+                isPharmacyOwner = user.isPharmacyOwner;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
 
         // Initialize focus
@@ -350,6 +372,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         mapInstance.setOnMapLongClickListener(latLng -> {
+            if(!AuthUtils.isLoggedIn() || AuthUtils.getUser().isAnonymous()) return;
+            if(!isPharmacyOwner) return;
             Intent createPharmacyIntent = new Intent(getActivity(), CreatePharmacyActivity.class);
             createPharmacyIntent.putExtra("current_coordinates", sharedLocationViewModel.getLocation().getValue());
             createPharmacyIntent.putExtra("selected_coordinates", latLng);

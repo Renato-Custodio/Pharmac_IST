@@ -132,6 +132,10 @@ public class AuthUtils {
         return userRef;
     }
 
+    public static FirebaseUser getUser(){
+        return FirebaseAuth.getInstance().getCurrentUser();
+    }
+
     public static void convertToPermanentAccount(Context context, String username, boolean isPharmacyOwner, AuthCredential credentials, Runnable onSuccess, Runnable onFail) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         DatabaseReference db = FirebaseDatabase.getInstance().getReference().child("users");

@@ -96,6 +96,8 @@ public class Account extends AppCompatActivity implements Serializable {
 
         findViewById(R.id.notifications_card).setOnClickListener(v -> activityResultLauncher.launch(new Intent(Account.this, NotificationsActivity.class)));
 
+        findViewById(R.id.manage_pharmacies_card).setOnClickListener(v -> activityResultLauncher.launch(new Intent(Account.this, OwnedPharmaciesActivity.class)));
+
         AuthUtils.registerUserDataListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

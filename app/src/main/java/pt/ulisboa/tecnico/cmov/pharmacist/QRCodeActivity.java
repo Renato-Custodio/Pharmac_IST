@@ -254,7 +254,13 @@ public class QRCodeActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 stock = dataSnapshot.getValue(String.class);
-                String text = "Stock: " + stock;
+                String text;
+                if(stock == null){
+                    text = "Stock: 0";
+                }else{
+                    text = "Stock: " + stock;
+                }
+
                 currentStock.setText(text);
                 currentStock.setVisibility(View.VISIBLE);
             }

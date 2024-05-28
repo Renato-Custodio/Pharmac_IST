@@ -28,7 +28,8 @@ import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyDistance;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.ClosestPharmaciesRecyclerAdapter;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.RecyclerAdapterProvider;
+import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.view_holders.ClosestPharmacyViewHolder;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
@@ -38,7 +39,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class MedicineDetails extends Fragment {
 
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private ClosestPharmaciesRecyclerAdapter nearestPharmaciesAdapter;
+    private RecyclerAdapterProvider<List<PharmacyDistance>, ClosestPharmacyViewHolder> nearestPharmaciesAdapter;
 
     private List<PharmacyDistance> recivedPharmacies = new ArrayList<PharmacyDistance>();
     private String origin;
@@ -192,6 +192,7 @@ public class MedicineDetails extends Fragment {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -233,19 +234,18 @@ public class MedicineDetails extends Fragment {
 
         // Set text based on the Medicine object
         if (mMedicine != null) {
-            sharedLocationViewModel.getLocation().observe(getViewLifecycleOwner(), new Observer<Location>() {
-                @Override
-                public void onChanged(Location location) {
-                    for (PharmacyDistance pharmacyDistance: recivedPharmacies) {
-                        pharmacyDistance.distance =
-                                pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(
-                                        location, pharmacyDistance.pharmacy.getLocation());
-                    }
-                    recivedPharmacies.sort(new PharmacyDistanceComparator());
-                    nearestPharmaciesAdapter.notifyDataSetChanged();
+            sharedLocationViewModel.getLocation().observe(getViewLifecycleOwner(), location -> {
+                for (PharmacyDistance pharmacyDistance: recivedPharmacies) {
+                    pharmacyDistance.distance =
+                            pt.ulisboa.tecnico.cmov.pharmacist.utils.Location.getDistance(
+                                    location, pharmacyDistance.pharmacy.getLocation());
                 }
+                recivedPharmacies.sort(new PharmacyDistanceComparator());
+                nearestPharmaciesAdapter.notifyDataSetChanged();
             });
-            nearestPharmaciesAdapter = new ClosestPharmaciesRecyclerAdapter(recivedPharmacies, getContext());
+
+            nearestPharmaciesAdapter = new RecyclerAdapterProvider<>(recivedPharmacies, getContext(), R.layout.closest_pharmacy_list_item, ClosestPharmacyViewHolder::new);
+
             nameTextView.setText(mMedicine.name);
             purposeTextView.setText(mMedicine.purpose);
             ImageUtils.loadImage(getContext(),"/medicines/" + mMedicine.id,imageView);

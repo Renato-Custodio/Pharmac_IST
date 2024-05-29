@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -65,6 +66,7 @@ public class PharmacyDetails {
     private ChildEventListener currentStockQueryEventListener;
     private ValueEventListener currentRatingsRefEventListener;
     private Map<String, Boolean> favoritePharmacies;
+    private Map<String, Boolean> ownedPharmacies;
     private RatingBar userRatingBar;
     private TextView averageRatingTextView;
     private LinearProgressIndicator fiveStarProgressBar;
@@ -72,6 +74,8 @@ public class PharmacyDetails {
     private LinearProgressIndicator threeStarProgressBar;
     private LinearProgressIndicator twoStarProgressBar;
     private LinearProgressIndicator oneStarProgressBar;
+
+    private Button pulsButton;
 
     private static final String TAG = PharmacyDetails.class.getSimpleName();
 
@@ -83,7 +87,7 @@ public class PharmacyDetails {
         image = bottomSheetView.findViewById(R.id.pharmacy_image);
         RecyclerView medicineList = bottomSheetView.findViewById(R.id.fragment_map_avaliable_medicines);
         favouriteButton = bottomSheetView.findViewById(R.id.favouriteButton);
-
+        pulsButton = bottomSheetView.findViewById(R.id.details_add_stock_button);
         userRatingBar = bottomSheetView.findViewById(R.id.user_rating_bar);
         averageRatingTextView = bottomSheetView.findViewById(R.id.average_rating);
         fiveStarProgressBar = bottomSheetView.findViewById(R.id.fiveStarProgressBar);
@@ -129,10 +133,12 @@ public class PharmacyDetails {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-
+                ownedPharmacies = null;
+                favoritePharmacies = null;
                 if (user == null) return;
 
                 favoritePharmacies = user.getFavoritePharmaciesIds();
+                ownedPharmacies = user.getOwnedPharmaciesIds();
                 updateUserActions();
             }
 
@@ -247,8 +253,17 @@ public class PharmacyDetails {
             medicines.clear();
             medicineListAdapter.notifyDataSetChanged();
         }
+        isOwner();
         fetchStock(null);
         fetchRatings();
+    }
+
+    private void isOwner(){
+        if(ownedPharmacies != null && ownedPharmacies.get(currentPharmacy.getId()) != null){
+            pulsButton.setVisibility(View.VISIBLE);
+        }else {
+            pulsButton.setVisibility(View.GONE);
+        }
     }
 
     public void update(String pharmacyId) {

@@ -88,7 +88,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private FusedLocationProviderClient fusedLocationClient;
     private LocationRequest locationRequest;
-
     private Location lastKnownLocation;
 
     // UI
@@ -96,8 +95,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private FloatingActionButton focusButton;
     private FloatingActionButton zoomIn;
     private FloatingActionButton zoomOut;
-
-    private Button addMedicineButton;
     private BottomSheetBehavior bottomSheetBehavior;
 
     // Persistence
@@ -424,8 +421,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Location location = new Location("coordinates");
         location.setLatitude(coordinates.latitude);
         location.setLongitude(coordinates.longitude);
-        synchronizeMiniMap(coordinates);
-        synchronizeMarkers(coordinates);
         this.onLocationChanged(location);
     }
 
@@ -469,6 +464,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             unfocused();
         }
 
+        synchronizeMiniMap(marker.getPosition());
+        synchronizeMarkers(marker.getPosition());
         markersSystem.setActive(marker, true);
 
         pharmacyDetails.update((String) marker.getTag());

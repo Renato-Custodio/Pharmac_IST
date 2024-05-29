@@ -53,6 +53,10 @@ public class User {
         this.ownedPharmaciesIds = ownedPharmaciesIds;
     }
 
+    public Map<String, Boolean> getOwnedPharmaciesIds() {
+        return ownedPharmaciesIds;
+    }
+
     public void setFavoritePharmaciesIds(Map<String, Boolean> favoritePharmaciesIds) {
         this.favoritePharmaciesIds = favoritePharmaciesIds;
     }

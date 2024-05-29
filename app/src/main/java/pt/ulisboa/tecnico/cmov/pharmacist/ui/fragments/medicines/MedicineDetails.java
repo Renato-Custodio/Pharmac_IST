@@ -148,8 +148,8 @@ public class MedicineDetails extends Fragment {
 
     private void updateUserActions() {
         if (mMedicine == null) return;
+        if(!AuthUtils.isLoggedIn() || AuthUtils.getUser().isAnonymous()) return;
 
-        //favouriteButton.setIcon(ContextCompat.getDrawable(getContext(), (medicineNotificationIds.containsKey(mMedicine.getId())) ? R.drawable.favorite_fill : R.drawable.favorite_outline));
         if(medicineNotificationIds.containsKey(mMedicine.getId())){
             notification.setText("Stop Notificarions");
         }else{
@@ -159,7 +159,11 @@ public class MedicineDetails extends Fragment {
     }
 
     private void updateMedicine() {
-        if (mMedicine == null) return;
+        if(!AuthUtils.isLoggedIn() || AuthUtils.getUser().isAnonymous()) {
+            Toast.makeText(getContext(), "You have to be logged in to get notifications", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(mMedicine == null) return;
 
         if (!medicineNotificationIds.containsKey(mMedicine.getId())) {
             // Add to notifications
@@ -219,9 +223,9 @@ public class MedicineDetails extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
+                medicineNotificationIds = null;
 
                 if (user == null) return;
-
                 medicineNotificationIds = user.getMedicineNotificationIds();
                 updateUserActions();
             }

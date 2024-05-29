@@ -105,6 +105,7 @@ public class Account extends AppCompatActivity implements Serializable {
 
                 if (user == null) return;
 
+                showNotifications();
                 findViewById(R.id.manage_pharmacies_card).setVisibility(user.isPharmacyOwner ? View.VISIBLE : View.GONE);
             }
 
@@ -113,6 +114,14 @@ public class Account extends AppCompatActivity implements Serializable {
 
             }
         });
+    }
+
+    private void showNotifications(){
+        if(!AuthUtils.isLoggedIn() || AuthUtils.getUser().isAnonymous()){
+            findViewById(R.id.notifications_card).setVisibility(View.GONE);
+        }else{
+            findViewById(R.id.notifications_card).setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

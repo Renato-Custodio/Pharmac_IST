@@ -155,7 +155,6 @@ public class MedicineDetails extends Fragment {
         }else{
             notification.setText("Notify me when avaliable!");
         }
-
     }
 
     private void updateMedicine() {

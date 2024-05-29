@@ -48,6 +48,8 @@ public class CreateMedicineActivity extends AppCompatActivity {
     private Bitmap medicinePhoto = null;
     ImageResultLaunchers imageResultLaunchers;
 
+    private boolean isSaving = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +109,8 @@ public class CreateMedicineActivity extends AppCompatActivity {
         saveMedicine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(isSaving) return;
+                isSaving = true;
                 //validate params
                 if(!mAwesomeValidation.validate()) {
                     return;

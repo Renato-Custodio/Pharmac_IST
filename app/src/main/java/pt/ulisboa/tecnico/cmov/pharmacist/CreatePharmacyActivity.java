@@ -57,6 +57,8 @@ public class CreatePharmacyActivity extends AppCompatActivity {
 
     ImageResultLaunchers imageResultLaunchers;
 
+    private boolean isSaving = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,7 +111,11 @@ public class CreatePharmacyActivity extends AppCompatActivity {
             }
         });
 
-        saveButton.setOnClickListener(v -> savePharmacy());
+        saveButton.setOnClickListener(v -> {
+            if(isSaving) return;
+            isSaving = true;
+            savePharmacy();
+        });
     }
 
     @Override

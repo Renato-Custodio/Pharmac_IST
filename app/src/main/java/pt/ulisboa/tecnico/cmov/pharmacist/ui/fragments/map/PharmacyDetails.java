@@ -68,6 +68,7 @@ public class PharmacyDetails {
     private Map<String, Boolean> favoritePharmacies;
     private Map<String, Boolean> ownedPharmacies;
     private RatingBar userRatingBar;
+    private RatingBar averageRatingBar;
     private TextView averageRatingTextView;
     private LinearProgressIndicator fiveStarProgressBar;
     private LinearProgressIndicator fourStarProgressBar;
@@ -89,6 +90,7 @@ public class PharmacyDetails {
         favouriteButton = bottomSheetView.findViewById(R.id.favouriteButton);
         pulsButton = bottomSheetView.findViewById(R.id.details_add_stock_button);
         userRatingBar = bottomSheetView.findViewById(R.id.user_rating_bar);
+        averageRatingBar = bottomSheetView.findViewById(R.id.rating_bar);
         averageRatingTextView = bottomSheetView.findViewById(R.id.average_rating);
         fiveStarProgressBar = bottomSheetView.findViewById(R.id.fiveStarProgressBar);
         fourStarProgressBar = bottomSheetView.findViewById(R.id.fourStarProgressBar);
@@ -96,10 +98,14 @@ public class PharmacyDetails {
         twoStarProgressBar = bottomSheetView.findViewById(R.id.twoStarProgressBar);
         oneStarProgressBar = bottomSheetView.findViewById(R.id.oneStarProgressBar);
 
-        userRatingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> submitReview(rating));
         //Initialize user ratings
         resetUserRatings();
 
+        userRatingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+            if (fromUser) {
+                submitReview(rating);
+            }
+        });
 
         fragmentContext = fragment.getContext();
 
@@ -198,7 +204,8 @@ public class PharmacyDetails {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     Map<String, Long> ratings = (Map<String, Long>) snapshot.getValue();
-                    updateProgressBars(ratings);
+                    Map<String, Long> parsedRatings = transformRatingsMap(ratings);
+                    updateProgressBars(parsedRatings);
                 }
             }
 
@@ -234,9 +241,27 @@ public class PharmacyDetails {
         if (currentRatingsRef != null) {
             currentRatingsRef.removeEventListener(currentRatingsRefEventListener);
         }
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ratingsRef = database.getReference("pharmacies").child(currentPharmacy.getId()).child("ratings");
 
-        DatabaseReference ratingsRef = FirebaseDatabase.getInstance().getReference("pharmacies").child(currentPharmacy.getId()).child("ratings");
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null && AuthUtils.isLoggedIn()) {
+            String userId = user.getUid();
+            DatabaseReference userReviewRef = database.getReference("users").child(userId).child("ratings").child(currentPharmacy.getId());
+            userReviewRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot userReviewSnapshot) {
+                    Float previousRating = userReviewSnapshot.getValue(Float.class);
+                    if (previousRating != null) userRatingBar.setRating(previousRating);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.d(TAG, "Failed to fetch user review data");
+                }
+            });
+        }
         Log.d(TAG, MessageFormat.format("Fetching ratings for {0}", currentPharmacy.getId()));
 
         currentRatingsRef = ratingsRef;
@@ -390,10 +415,9 @@ public class PharmacyDetails {
         if (rating == 0) {
             return;
         }
-
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser == null) {
-            Toast.makeText(fragmentContext, "You need to be logged in to submit a review", Toast.LENGTH_SHORT).show();
+        if (currentUser == null || !AuthUtils.isLoggedIn() || AuthUtils.getUser().isAnonymous()) {
+            Toast.makeText(fragmentContext, "Log in to submit a review", Toast.LENGTH_SHORT).show();
             return;
         }
         String userId = currentUser.getUid();
@@ -404,7 +428,7 @@ public class PharmacyDetails {
         userReviewRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot userReviewSnapshot) {
-                Float previousRating = userReviewSnapshot.getValue(Float.class);
+                Float previousUserRating = userReviewSnapshot.getValue(Float.class);
                 pharmacyRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -413,26 +437,30 @@ public class PharmacyDetails {
                             ratings = new HashMap<>();
                         }
                         // Adjust old rating if it exists and is different from current one
-                        if (previousRating != null) {
-                            if(previousRating == rating){
+                        if (previousUserRating != null) {
+                            if(previousUserRating == rating){
                                 return;
                             }
-                            String previousRatingKey = String.valueOf(previousRating.intValue());
-                            ratings.put(previousRatingKey, ratings.getOrDefault(previousRatingKey, 0L) - 1);
+                            String previousRatingKey = String.valueOf(previousUserRating.intValue());
+                            long previousRatingCount = ratings.getOrDefault("rating_" + previousRatingKey, 0L) - 1;
+                            if (previousRatingCount > 0) {
+                                ratings.put("rating_" + previousRatingKey, previousRatingCount);
+                            } else {
+                                ratings.remove("rating_" + previousRatingKey);
+                            }
                         }
 
                         // Update new rating
                         String ratingKey = String.valueOf((int) rating);
-                        ratings.put(ratingKey, ratings.getOrDefault(ratingKey, 0L) + 1);
-
-                        Map<String, Long> finalRatings = ratings;
+                        ratings.put("rating_" + ratingKey, ratings.getOrDefault("rating_" + ratingKey, 0L) + 1);
+                        Map<String, Long> parsedRatings = transformRatingsMap(ratings);
                         pharmacyRef.setValue(ratings)
                                 .addOnSuccessListener(aVoid -> {
                                     // Also update user's review history
                                     userReviewRef.setValue(rating)
                                             .addOnSuccessListener(aVoid1 -> {
                                                 Toast.makeText(fragmentContext, "Review submitted", Toast.LENGTH_SHORT).show();
-                                                updateProgressBars(finalRatings);
+                                                updateProgressBars(parsedRatings);
                                             })
                                             .addOnFailureListener(e -> {
                                                 Toast.makeText(fragmentContext, "Failed to submit review", Toast.LENGTH_SHORT).show();
@@ -485,7 +513,7 @@ public class PharmacyDetails {
 
         float averageRating = calculateAverageRating(ratingsCount, totalReviews);
         averageRatingTextView.setText(String.format("%.1f", averageRating));
-        userRatingBar.setRating(averageRating);
+        averageRatingBar.setRating(averageRating);
     }
 
     private float calculateAverageRating(Map<String, Long> ratingsCount, int totalReviews) {
@@ -510,6 +538,27 @@ public class PharmacyDetails {
         oneStarProgressBar.setProgress(0);
 
         averageRatingTextView.setText("0");
+        averageRatingBar.setRating(0);
         userRatingBar.setRating(0);
+    }
+    public static Map<String, Long> transformRatingsMap(Map<String, Long> originalMap) {
+        if (originalMap.isEmpty()) {
+            return originalMap;  // Return original map if it is empty
+        }
+
+        Map<String, Long> transformedMap = new HashMap<>();
+
+        for (Map.Entry<String, Long> entry : originalMap.entrySet()) {
+            String originalKey = entry.getKey();
+            Long value = entry.getValue();
+
+            // Extract the numeric part of the key
+            String newKey = originalKey.replaceAll("[^0-9]", "");
+
+            // Put the new key-value pair into the transformed map
+            transformedMap.put(newKey, value);
+        }
+
+        return transformedMap;
     }
 }

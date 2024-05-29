@@ -18,11 +18,11 @@ public class Pharmacy implements Indexed {
 
     public Pharmacy(){
         Map<String, Long> initialRatings = new HashMap<>();
-        initialRatings.put("1", 0L);
-        initialRatings.put("2", 0L);
-        initialRatings.put("3", 0L);
-        initialRatings.put("4", 0L);
-        initialRatings.put("5", 0L);
+        initialRatings.put("rating_1", 0L);
+        initialRatings.put("rating_2", 0L);
+        initialRatings.put("rating_3", 0L);
+        initialRatings.put("rating_4", 0L);
+        initialRatings.put("rating_5", 0L);
         this.ratings = initialRatings;
     }
 
@@ -71,10 +71,10 @@ public class Pharmacy implements Indexed {
     public void generateRandomRatings() {
         Random random = new Random();
         // Generate random values for each rating category
-        this.ratings.put("1", (long) random.nextInt(100));
-        this.ratings.put("2", (long) random.nextInt(100));
-        this.ratings.put("3", (long) random.nextInt(100));
-        this.ratings.put("4", (long) random.nextInt(100));
-        this.ratings.put("5", (long) random.nextInt(100));
+        this.ratings.put("rating_1", (long) random.nextInt(100));
+        this.ratings.put("rating_2", (long) random.nextInt(100));
+        this.ratings.put("rating_3", (long) random.nextInt(100));
+        this.ratings.put("rating_4", (long) random.nextInt(100));
+        this.ratings.put("rating_5", (long) random.nextInt(100));
     }
 }

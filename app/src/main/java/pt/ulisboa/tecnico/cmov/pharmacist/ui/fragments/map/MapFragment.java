@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -35,6 +36,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -404,6 +406,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 }
             }
         }, null);
+    }
+
+    public void openGoogleMaps(double sourceLat, double sourceLng, double destLat, double destLng) {
+        // Construct the URI for the Google Maps intent, including both origin and destination
+        Uri gmmIntentUri = Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + sourceLat + "," + sourceLng + "&destination=" + destLat + "," + destLng + "&travelmode=driving");
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+
+        if (mapIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivity(mapIntent);
+        } else {
+            // Handle case where no application can handle the Intent
+            Toast.makeText(getContext(), "Google Maps app is not installed", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void onLocationChanged(@NonNull Location location) {

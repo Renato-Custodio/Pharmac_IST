@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -78,6 +79,8 @@ public class PharmacyDetails {
 
     private Button pulsButton;
 
+    private Button routeButton;
+
     private static final String TAG = PharmacyDetails.class.getSimpleName();
 
     public PharmacyDetails(Fragment fragment, View bottomSheetView, SharedLocationViewModel sharedLocationViewModel, NavigateFunction<Medicine> openMedicine) {
@@ -86,6 +89,7 @@ public class PharmacyDetails {
         location = bottomSheetView.findViewById(R.id.details_pharmacy_location);
         distance = bottomSheetView.findViewById(R.id.details_pharmacy_distance);
         image = bottomSheetView.findViewById(R.id.pharmacy_image);
+
         RecyclerView medicineList = bottomSheetView.findViewById(R.id.fragment_map_avaliable_medicines);
         favouriteButton = bottomSheetView.findViewById(R.id.favouriteButton);
         pulsButton = bottomSheetView.findViewById(R.id.details_add_stock_button);
@@ -97,7 +101,7 @@ public class PharmacyDetails {
         threeStarProgressBar = bottomSheetView.findViewById(R.id.threeStarProgressBar);
         twoStarProgressBar = bottomSheetView.findViewById(R.id.twoStarProgressBar);
         oneStarProgressBar = bottomSheetView.findViewById(R.id.oneStarProgressBar);
-
+        routeButton = bottomSheetView.findViewById(R.id.routeButton);
         //Initialize user ratings
         resetUserRatings();
 
@@ -117,6 +121,12 @@ public class PharmacyDetails {
 
             intent.putExtra("pharmacyId", currentPharmacy.getId());
             fragment.startActivity(intent);
+        });
+
+        routeButton.setOnClickListener(v -> {
+            android.location.Location location = sharedLocationViewModel.getLocation().getValue();
+            pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location loc = this.currentPharmacy.getLocation();
+            openGoogleMaps(fragment,location.getLatitude(), location.getLongitude(), loc.lat,loc.lng);
         });
 
         // Register distance observer
@@ -215,6 +225,20 @@ public class PharmacyDetails {
             }
         };
 
+    }
+
+    public void openGoogleMaps(Fragment fragment ,double sourceLat, double sourceLng, double destLat, double destLng) {
+        // Construct the URI for the Google Maps intent, including both origin and destination
+        Uri gmmIntentUri = Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + sourceLat + "," + sourceLng + "&destination=" + destLat + "," + destLng + "&travelmode=driving");
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+
+        if (mapIntent.resolveActivity(fragment.getActivity().getPackageManager()) != null) {
+            fragment.startActivity(mapIntent);
+        } else {
+            // Handle case where no application can handle the Intent
+            Toast.makeText(fragmentContext, "Google Maps app is not installed", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void fetchStock(String startId) {

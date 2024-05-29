@@ -125,7 +125,6 @@ public class MarkersSystem {
     }
 
     private void updateMarkers() {
-        if (favoritePharmacies.isEmpty()) return;
         markers.values().forEach(this::updateMarker);
     }
 

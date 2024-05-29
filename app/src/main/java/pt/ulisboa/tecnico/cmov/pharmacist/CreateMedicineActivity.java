@@ -110,19 +110,19 @@ public class CreateMedicineActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(isSaving) return;
-                isSaving = true;
                 //validate params
-                if(!mAwesomeValidation.validate()) {
-                    return;
-                }
                 String name = Objects.requireNonNull(nameText.getText()).toString();
                 String purpose = Objects.requireNonNull(purposeText.getText()).toString();
+                if(!checks(mAwesomeValidation)){
+                    return;
+                }
                 int amount = 0;
                 try {
                     amount = Integer.parseInt(Objects.requireNonNull(quantityText.getText()).toString());
                 }catch (Exception e){
                     return;
                 }
+                isSaving = true;
                 Objects.requireNonNull(nameText.getText()).clear();
                 Objects.requireNonNull(purposeText.getText()).clear();
                 quantityText.getText().clear();
@@ -135,14 +135,18 @@ public class CreateMedicineActivity extends AppCompatActivity {
         });
     }
 
+    private boolean checks(AwesomeValidation mAwesomeValidation){
+        if (medicinePhoto == null) {
+            Toast.makeText(getApplicationContext(), "Please select a picture", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return mAwesomeValidation.validate();
+    }
+
     private void saveMedicine(String name, String purpose, int amount){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference medicinesRef = database.getReference("medicines");
-
-        if (medicinePhoto == null) {
-            Toast.makeText(this, "Please select a picture", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         DatabaseReference newMedicineRef = medicinesRef.push();
         //create new medicine

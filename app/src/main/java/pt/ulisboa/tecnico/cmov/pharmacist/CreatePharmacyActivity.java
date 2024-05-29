@@ -113,8 +113,13 @@ public class CreatePharmacyActivity extends AppCompatActivity {
 
         saveButton.setOnClickListener(v -> {
             if(isSaving) return;
+            String pharmacyName = nameEditText.getText().toString().trim();
+            String address = addressEditText.getText().toString().trim();
+            if (!checks(pharmacyName, address)){
+                return;
+            }
             isSaving = true;
-            savePharmacy();
+            savePharmacy(pharmacyName, address);
         });
     }
 
@@ -164,26 +169,28 @@ public class CreatePharmacyActivity extends AppCompatActivity {
         return "Unknown Address";
     }
 
-    private void savePharmacy() {
-        String pharmacyName = nameEditText.getText().toString().trim();
-        String address = addressEditText.getText().toString().trim();
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference pharmacyRef = database.getReference("pharmacies");
-
+    private boolean checks(String pharmacyName, String address){
         if (pharmacyPhoto == null) {
             Toast.makeText(this, "Please select a picture", Toast.LENGTH_SHORT).show();
-            return;
+            return false;
         }
 
         if (TextUtils.isEmpty(address)) {
             addressEditText.setError("Pharmacy location is required");
-            return;
+            return false;
         }
 
         if (TextUtils.isEmpty(pharmacyName)) {
             nameEditText.setError("Pharmacy name is required");
-            return;
+            return false;
         }
+        return true;
+    }
+
+    private void savePharmacy(String pharmacyName, String address) {
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference pharmacyRef = database.getReference("pharmacies");
 
         // Add the new entry with a unique key
         DatabaseReference newPharmacyRef = pharmacyRef.push();

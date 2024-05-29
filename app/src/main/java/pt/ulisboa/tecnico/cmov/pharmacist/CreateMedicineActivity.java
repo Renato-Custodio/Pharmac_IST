@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
@@ -45,6 +46,8 @@ public class CreateMedicineActivity extends AppCompatActivity {
     private ImageView imageView;
 
     private Bitmap medicinePhoto = null;
+    ImageResultLaunchers imageResultLaunchers;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +71,7 @@ public class CreateMedicineActivity extends AppCompatActivity {
     }
 
     private void addPhoto(){
-        ImageResultLaunchers imageResultLaunchers = ImageUtils.registerResultLaunchers(this, bitmap -> {
+        imageResultLaunchers = ImageUtils.registerResultLaunchers(this, bitmap -> {
             imageView.setImageBitmap(bitmap);
             medicinePhoto = bitmap;
         });
@@ -80,6 +83,12 @@ public class CreateMedicineActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        ImageUtils.onRequestPermissionsResult(requestCode, permissions, grantResults, this, imageResultLaunchers);
     }
 
     private void initTextValidation(){

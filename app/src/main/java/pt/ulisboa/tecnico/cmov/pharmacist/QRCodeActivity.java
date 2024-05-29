@@ -3,10 +3,13 @@ package pt.ulisboa.tecnico.cmov.pharmacist;
 import static com.basgeekball.awesomevalidation.ValidationStyle.TEXT_INPUT_LAYOUT;
 import static com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +25,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.google.android.material.textfield.TextInputEditText;
@@ -49,6 +54,7 @@ import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyDistance;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.PharmacyDistanceComparator;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
 public class QRCodeActivity extends AppCompatActivity {
     private DecoratedBarcodeView barcodeView;
@@ -79,6 +85,8 @@ public class QRCodeActivity extends AppCompatActivity {
     private Button createMedicineButton;
 
     private String stock;
+
+    private static final int REQUEST_CAMERA_PERMISSION = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,9 +137,8 @@ public class QRCodeActivity extends AppCompatActivity {
                 addStockText.setVisibility(View.GONE);
                 medicineName.setVisibility(View.GONE);
                 medicineDescription.setVisibility(View.GONE);
-                scanButton.setVisibility(View.GONE);
                 currentStock.setVisibility(View.GONE);
-                startScanner();
+                getCameraPermisson();
             }
         });
         initTextValidation();
@@ -219,6 +226,36 @@ public class QRCodeActivity extends AppCompatActivity {
 
     private void stopScanner() {
         barcodeView.pause();
+    }
+
+    private void getCameraPermisson(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Check if the camera permission is already available.
+            if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                // If permission is not granted, request for permission.
+                ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                return; // Exit the method and wait for the user to grant permission.
+            }else {
+                scanButton.setVisibility(View.GONE);
+                startScanner();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            // If the request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission was granted, proceed with opening the dialog.
+                scanButton.setVisibility(View.GONE);
+                startScanner();
+            } else {
+                // Permission was denied, show a message to the user.
+                Toast.makeText(context, "Camera permission is required to scan Qrcodes", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void startScanner() {

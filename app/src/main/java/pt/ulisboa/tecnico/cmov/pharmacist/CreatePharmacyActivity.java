@@ -55,6 +55,8 @@ public class CreatePharmacyActivity extends AppCompatActivity {
 
     public Map<String, Boolean> ownedPharmaciesIds;
 
+    ImageResultLaunchers imageResultLaunchers;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +96,7 @@ public class CreatePharmacyActivity extends AppCompatActivity {
         useCurrentLocationButton.setOnClickListener(v -> useCurrentLocation());
 
         // Image dialogs
-        ImageResultLaunchers imageResultLaunchers = ImageUtils.registerResultLaunchers(this, bitmap -> {
+        imageResultLaunchers = ImageUtils.registerResultLaunchers(this, bitmap -> {
             ( (ImageView) findViewById(R.id.picture_pharmacy)).setImageBitmap(bitmap);
             pharmacyPhoto = bitmap;
         });
@@ -108,6 +110,12 @@ public class CreatePharmacyActivity extends AppCompatActivity {
         });
 
         saveButton.setOnClickListener(v -> savePharmacy());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        ImageUtils.onRequestPermissionsResult(requestCode, permissions, grantResults, this, imageResultLaunchers);
     }
 
     private void selectOnMap() {

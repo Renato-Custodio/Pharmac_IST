@@ -3,9 +3,11 @@ package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 import static pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils.isLoggedIn;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.Manifest;
@@ -16,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -270,7 +273,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             // Save the mini map instance for later use
             miniMapInstance = googleMap;
         });
-
 
         mAutoCompleteAdapter = new PlacesAutoCompleteAdapter(getContext());
         addressResultsView.setLayoutManager(new LinearLayoutManager(getContext()));

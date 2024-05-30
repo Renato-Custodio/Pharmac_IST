@@ -57,7 +57,7 @@ public class SeedMapChunks {
                                     @NonNull
                                     @Override
                                     public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
-                                        mapChunk.addPharmacy(new PharmacyChunkData(pharmacy.getId(), pharmacy.getLocation()));
+                                        mapChunk.addPharmacy(new PharmacyChunkData(pharmacy.getId(), pharmacy.getLocation(), pharmacy.isSuspended()));
                                         mutableData.child(chunkId).setValue(mapChunk);
                                         return Transaction.success(mutableData);
                                     }
@@ -68,7 +68,7 @@ public class SeedMapChunks {
                                 return Transaction.abort();
                             }
 
-                            chunk.addPharmacy(new PharmacyChunkData(pharmacy.getId(), pharmacy.getLocation()));
+                            chunk.addPharmacy(new PharmacyChunkData(pharmacy.getId(), pharmacy.getLocation(), pharmacy.isSuspended()));
                             mutableData.setValue(chunk);
                             return Transaction.success(mutableData);
                         }

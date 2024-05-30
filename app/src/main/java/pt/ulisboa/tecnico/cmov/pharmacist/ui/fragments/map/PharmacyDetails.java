@@ -58,6 +58,7 @@ public class PharmacyDetails {
     private final TextView title, location, distance;
     private final ImageView image;
     private final MaterialButton favouriteButton;
+    private final MaterialButton flagButton;
     private Pharmacy currentPharmacy;
     private final Context fragmentContext;
     private final RecyclerAdapterProvider<List<Medicine>, MedicineViewHolder> medicineListAdapter;
@@ -68,6 +69,7 @@ public class PharmacyDetails {
     private ValueEventListener currentRatingsRefEventListener;
     private Map<String, Boolean> favoritePharmacies;
     private Map<String, Boolean> ownedPharmacies;
+    private Map<String, Boolean> flaggedPharmacies;
     private RatingBar userRatingBar;
     private RatingBar averageRatingBar;
     private TextView averageRatingTextView;
@@ -92,6 +94,7 @@ public class PharmacyDetails {
 
         RecyclerView medicineList = bottomSheetView.findViewById(R.id.fragment_map_avaliable_medicines);
         favouriteButton = bottomSheetView.findViewById(R.id.favouriteButton);
+        flagButton = bottomSheetView.findViewById(R.id.flagButton);
         pulsButton = bottomSheetView.findViewById(R.id.details_add_stock_button);
         userRatingBar = bottomSheetView.findViewById(R.id.user_rating_bar);
         averageRatingBar = bottomSheetView.findViewById(R.id.rating_bar);
@@ -151,10 +154,12 @@ public class PharmacyDetails {
                 User user = snapshot.getValue(User.class);
                 ownedPharmacies = null;
                 favoritePharmacies = null;
+                flaggedPharmacies = null;
                 if (user == null) return;
 
                 favoritePharmacies = user.getFavoritePharmaciesIds();
                 ownedPharmacies = user.getOwnedPharmaciesIds();
+                flaggedPharmacies = user.getFlaggedPharmaciesIds();
                 updateUserActions();
             }
 
@@ -165,6 +170,7 @@ public class PharmacyDetails {
         });
 
         favouriteButton.setOnClickListener(v -> updateFavorite());
+        flagButton.setOnClickListener(v -> updateFlag());
 
         currentStockQueryEventListener = new ChildEventListener() {
             @Override
@@ -327,6 +333,7 @@ public class PharmacyDetails {
                     pharmacy.setName(snapshot.child("name").getValue(String.class));
                     pharmacy.setLocation(snapshot.child("location").getValue(pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location.class));
                     pharmacy.setStock(new HashMap<>());
+                    pharmacy.setOwner(snapshot.child("owner").getValue(String.class));
 
 
                     Log.d(TAG, MessageFormat.format("Fetched details for pharmacy {0}", pharmacy.getId()));
@@ -352,7 +359,6 @@ public class PharmacyDetails {
     //  Favorites
     private void updateUserActions() {
         if (currentPharmacy == null) return;
-
         favouriteButton.setIcon(ContextCompat.getDrawable(fragmentContext, (favoritePharmacies.containsKey(currentPharmacy.getId())) ? R.drawable.favorite_fill : R.drawable.favorite_outline));
     }
 
@@ -431,6 +437,129 @@ public class PharmacyDetails {
                 }
             }
         });
+    }
+
+    // Flags
+
+    private void updateFlag() {
+        String pharmacyId = currentPharmacy.getId();
+
+        //Check if the pharmacy is already flagged
+        if (flaggedPharmacies == null || !flaggedPharmacies.containsKey(pharmacyId)) {
+            // Add to flagged pharmacies
+            AuthUtils.getUserRef().child("flaggedPharmaciesIds").child(pharmacyId)
+                    .setValue(true)
+                    .addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            Log.e(TAG, "Failed to flag pharmacy:", task.getException());
+                            Toast.makeText(fragmentContext, "Failed to flag pharmacy", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        //Increase the flags count for the pharmacy
+                        increasePharmacyFlags(pharmacyId);
+                    });
+        }
+        else{
+            Toast.makeText(fragmentContext, "This pharmacy has already been flagged", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void increasePharmacyFlags(String pharmacyId) {
+        DatabaseReference pharmacyRef = FirebaseDatabase.getInstance().getReference("pharmacies").child(pharmacyId);
+        pharmacyRef.child("flags").runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Long currentFlags = mutableData.getValue(Long.class);
+                if (currentFlags == null) {
+                    mutableData.setValue(1);
+                } else {
+                    mutableData.setValue(currentFlags + 1);
+                }
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+                if (databaseError != null) {
+                    Log.e(TAG, "Failed to update flags count:", databaseError.toException());
+                    return;
+                }
+
+                Log.d(TAG, "Pharmacy flagged: " + pharmacyId);
+                Toast.makeText(fragmentContext, "Pharmacy flagged", Toast.LENGTH_SHORT).show();
+
+                Long newFlagsCount = dataSnapshot.getValue(Long.class);
+                if (newFlagsCount != null && newFlagsCount > 10) {
+                    //Suspend the pharmacy
+                    suspendPharmacy(pharmacyId);
+                }
+            }
+        });
+    }
+
+    private void suspendPharmacy(String pharmacyId) {
+        DatabaseReference pharmacyRef = FirebaseDatabase.getInstance().getReference("pharmacies").child(pharmacyId);
+        pharmacyRef.child("isSuspended").setValue(true)
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.e(TAG, "Failed to suspend pharmacy:", task.getException());
+                        return;
+                    }
+
+                    Log.d(TAG, "Pharmacy suspended: " + pharmacyId);
+
+                    //Increase the suspendedPharmacies count for the owner
+                    if(currentPharmacy.getOwner() != null){
+                        increaseOwnerSuspendedPharmacies();
+                    }
+                });
+    }
+
+    private void increaseOwnerSuspendedPharmacies() {
+        DatabaseReference ownerRef = FirebaseDatabase.getInstance().getReference("users").child(currentPharmacy.getOwner());
+
+        ownerRef.child("suspendedPharmacies").runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Long currentSuspendedPharmacies = mutableData.getValue(Long.class);
+                if (currentSuspendedPharmacies == null) {
+                    mutableData.setValue(1);
+                } else {
+                    mutableData.setValue(currentSuspendedPharmacies + 1);
+                }
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+                if (databaseError != null) {
+                    Log.e(TAG, "Failed to update suspended pharmacies count:", databaseError.toException());
+                    return;
+                }
+
+                Long newSuspendedCount = dataSnapshot.getValue(Long.class);
+                if (newSuspendedCount != null && newSuspendedCount > 5) {
+                    //Suspend the owner of the pharmacy
+                    banUser(currentPharmacy.getOwner());
+                }
+            }
+        });
+    }
+
+    public void banUser(String userId){
+        FirebaseDatabase.getInstance().getReference("users").child(userId).child("isBanned")
+                .setValue(true)
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.e(TAG, "Failed to ban user:", task.getException());
+                        Toast.makeText(fragmentContext, "Failed to bna user", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    Log.d(TAG, "User banned: " + userId);
+                    Toast.makeText(fragmentContext, "User banned", Toast.LENGTH_SHORT).show();
+                });
+        //TODO: Suspend all pharmacies owned by this user
     }
 
     //  Ratings

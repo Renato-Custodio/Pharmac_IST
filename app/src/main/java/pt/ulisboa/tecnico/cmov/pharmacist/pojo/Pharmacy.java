@@ -15,6 +15,8 @@ public class Pharmacy implements Indexed {
     //key = medicineId // value = quantity
     private Map<String, Object> stock;
     private Map<String, Long> ratings;
+    private String owner;
+    private Boolean isSuspended;
 
     public Pharmacy(){
         Map<String, Long> initialRatings = new HashMap<>();
@@ -24,6 +26,7 @@ public class Pharmacy implements Indexed {
         initialRatings.put("rating_4", 0L);
         initialRatings.put("rating_5", 0L);
         this.ratings = initialRatings;
+        this.isSuspended = false;
     }
 
     public String getId() {
@@ -66,6 +69,12 @@ public class Pharmacy implements Indexed {
     public int getMedicineStock(String medicineId){
         return Integer.parseInt((String) this.stock.get(medicineId)) ;
     }
+
+    public String getOwner(){ return this.owner; }
+
+    public void setOwner(String owner) { this.owner = owner; }
+
+    public boolean isSuspended(){ return  this.isSuspended; }
 
     // Function to generate random ratings for a pharmacy
     public void generateRandomRatings() {

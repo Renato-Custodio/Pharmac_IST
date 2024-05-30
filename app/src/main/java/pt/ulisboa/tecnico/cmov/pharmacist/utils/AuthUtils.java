@@ -26,7 +26,6 @@ import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 
 public class AuthUtils {
     private static final String TAG = AuthUtils.class.getSimpleName();
-
     private static final List<ValueEventListener> userChangesListeners = new ArrayList<>();
     private static DatabaseReference userRef = null;
 
@@ -61,7 +60,7 @@ public class AuthUtils {
                 // Create account data in the DB
                 FirebaseUser user = auth.getCurrentUser();
 
-                User newUserData = new User("anonymous", new HashMap<>(), new HashMap<>(), false);
+                User newUserData = new User("anonymous", new HashMap<>(), new HashMap<>(),new HashMap<>(), false, false);
 
                 db.child("users").child(user.getUid()).setValue(newUserData).addOnCompleteListener(dbTask -> {
                     if (dbTask.isSuccessful()) {

@@ -45,6 +45,7 @@ public class MarkersSystem {
     private final Consumer<Marker> closestPharmacyCallBack;
     private Runnable onDismiss;
     private Map<String, Boolean> favoritePharmacies;
+    private Map<String, Boolean> flaggedPharmacies;
     private Marker currentSelectedMarker;
 
     public MarkersSystem(GoogleMap mapInstance, Context context, Consumer<Marker> closestPharmacyCallBack, Runnable onDismiss) {
@@ -83,7 +84,10 @@ public class MarkersSystem {
                 if (user == null) return;
 
                 favoritePharmacies = user.getFavoritePharmaciesIds();
+                flaggedPharmacies = user.getFlaggedPharmaciesIds();
+
                 updateMarkers();
+                updateChunksWithFlaggedPharmacies();
             }
 
             @Override
@@ -94,7 +98,17 @@ public class MarkersSystem {
     }
 
     private boolean isFavorite(Marker marker) {
-        return favoritePharmacies.containsKey(Objects.requireNonNull(marker.getTag()).toString());
+        if(marker != null){
+            return favoritePharmacies.containsKey(Objects.requireNonNull(marker.getTag()).toString());
+        }
+        return false;
+    }
+
+    private boolean isFlagged(String pharmacyId) {
+        if(flaggedPharmacies != null){
+            return flaggedPharmacies.containsKey(pharmacyId);
+        }
+        return false;
     }
 
     private void updateMarker(Marker marker) {
@@ -158,28 +172,42 @@ public class MarkersSystem {
                 return;
             // New chunk, load all the markers
             chunk.pharmacies.forEach(pharmacyChunkData -> {
-                Log.d(TAG, MessageFormat.format("   > Adding: {0}", pharmacyChunkData.pharmacyId));
-                Marker marker = mapInstance.addMarker(PharmacyMarker.createNew(context, new LatLng(pharmacyChunkData.getLocation().lat, pharmacyChunkData.getLocation().lng)));
-                markers.put(pharmacyChunkData.getPharmacyId(), marker);
-                marker.setTag(pharmacyChunkData.pharmacyId);
-                updateMarker(marker);
-                ObjectAnimator.ofFloat(marker, "alpha", 0f, 1f).setDuration(500).start();
+                if(!isFlagged(pharmacyChunkData.getPharmacyId()) && !pharmacyChunkData.isSuspended){
+                    Log.d(TAG, MessageFormat.format("   > Adding: {0}", pharmacyChunkData.pharmacyId));
+                    Marker marker = mapInstance.addMarker(PharmacyMarker.createNew(context, new LatLng(pharmacyChunkData.getLocation().lat, pharmacyChunkData.getLocation().lng)));
+                    markers.put(pharmacyChunkData.getPharmacyId(), marker);
+                    marker.setTag(pharmacyChunkData.pharmacyId);
+                    updateMarker(marker);
+                    ObjectAnimator.ofFloat(marker, "alpha", 0f, 1f).setDuration(500).start();
+                }
             });
 
         } else {
             Log.d(TAG, MessageFormat.format("{0} is an existing chunk", chunk.getChunkId()));
 
-            Set<String> incomingPharmaciesIds = chunk.getPharmacies().stream().map(pharmacyChunkData -> pharmacyChunkData.pharmacyId).collect(Collectors.toSet());
-            Set<PharmacyChunkData> pharmaciesToRemove = oldChunk.getPharmacies().stream().filter(pharmacyChunkData -> !incomingPharmaciesIds.contains(pharmacyChunkData.pharmacyId)).collect(Collectors.toSet());
-            Set<PharmacyChunkData> pharmaciesToAdd = chunk.getPharmacies().stream().filter(pharmacyChunkData -> !markers.containsKey(pharmacyChunkData.pharmacyId)).collect(Collectors.toSet());
+            Set<String> incomingPharmaciesIds = chunk.getPharmacies().stream()
+                    .map(pharmacyChunkData ->
+                            pharmacyChunkData.pharmacyId).collect(Collectors.toSet());
+            Set<PharmacyChunkData> pharmaciesToRemove = oldChunk.getPharmacies().stream()
+                    .filter(pharmacyChunkData ->
+                            !incomingPharmaciesIds.contains(pharmacyChunkData.pharmacyId) ||
+                                    isFlagged(pharmacyChunkData.pharmacyId) ||
+                                    pharmacyChunkData.isSuspended)
+                    .collect(Collectors.toSet());
+            Set<PharmacyChunkData> pharmaciesToAdd = chunk.getPharmacies().stream()
+                    .filter(pharmacyChunkData ->
+                            !markers.containsKey(pharmacyChunkData.pharmacyId))
+                    .collect(Collectors.toSet());
 
             pharmaciesToAdd.forEach(pharmacyChunkData -> {
-                Log.d(TAG, MessageFormat.format("   > Adding: {0}", pharmacyChunkData.pharmacyId));
-                Marker marker = mapInstance.addMarker(PharmacyMarker.createNew(context, new LatLng(pharmacyChunkData.getLocation().lat, pharmacyChunkData.getLocation().lng)));
-                markers.put(pharmacyChunkData.getPharmacyId(), marker);
-                marker.setTag(pharmacyChunkData.pharmacyId);
-                updateMarker(marker);
-                ObjectAnimator.ofFloat(marker, "alpha", 0f, 1f).setDuration(500).start();
+                if(!isFlagged(pharmacyChunkData.getPharmacyId()) && !pharmacyChunkData.isSuspended){
+                    Log.d(TAG, MessageFormat.format("   > Adding: {0}", pharmacyChunkData.pharmacyId));
+                    Marker marker = mapInstance.addMarker(PharmacyMarker.createNew(context, new LatLng(pharmacyChunkData.getLocation().lat, pharmacyChunkData.getLocation().lng)));
+                    markers.put(pharmacyChunkData.getPharmacyId(), marker);
+                    marker.setTag(pharmacyChunkData.pharmacyId);
+                    updateMarker(marker);
+                    ObjectAnimator.ofFloat(marker, "alpha", 0f, 1f).setDuration(500).start();
+                }
             });
 
             pharmaciesToRemove.forEach(pharmacyChunkData -> {
@@ -234,7 +262,7 @@ public class MarkersSystem {
         if (chunksCache.get(chunkId).pharmacies != null && !chunksCache.get(chunkId).pharmacies.isEmpty()) {
             for (PharmacyChunkData pharmacyChunkData : chunksCache.get(chunkId).pharmacies) {
                 Float distance = Location.getDistance(currentLocation, pharmacyChunkData.location);
-                if (distance < minDistance) {
+                if (distance < minDistance && !isFlagged(pharmacyChunkData.getPharmacyId()) && !pharmacyChunkData.isSuspended) {
                     minDistance = distance;
                     closestPharmacy = pharmacyChunkData;
                 }
@@ -287,5 +315,38 @@ public class MarkersSystem {
 
     public Marker getMarkerFromPharmacyId(String pharmacyId){
        return this.markers.get(pharmacyId);
+    }
+
+    private void updateChunksWithFlaggedPharmacies() {
+        if (flaggedPharmacies == null) {
+            return;
+        }
+
+        for (MapChunk chunk : chunksCache.values()) {
+            if(chunk.getPharmacies() != null){
+                boolean containsFlaggedPharmacy = chunk.getPharmacies().stream()
+                        .anyMatch(pharmacyChunkData -> isFlagged(pharmacyChunkData.getPharmacyId())
+                        || pharmacyChunkData.isSuspended);
+                if (containsFlaggedPharmacy) {
+                    checkAndDismissIfFlagged(chunk);
+                    updateChunk(chunk);
+
+                }
+            }
+        }
+    }
+
+    private void checkAndDismissIfFlagged(MapChunk chunk){
+        if(currentSelectedMarker != null){
+            if(currentSelectedMarker.getTag() != null){
+                boolean isMarkerFlagged = chunk.getPharmacies().stream()
+                        .anyMatch(pharmacyChunkData -> (isFlagged(pharmacyChunkData.getPharmacyId())
+                                || pharmacyChunkData.isSuspended)
+                                && currentSelectedMarker.getTag().toString().equals(pharmacyChunkData.getPharmacyId()));
+                if (isMarkerFlagged) {
+                    onDismiss.run();
+                }
+            }
+        }
     }
 }

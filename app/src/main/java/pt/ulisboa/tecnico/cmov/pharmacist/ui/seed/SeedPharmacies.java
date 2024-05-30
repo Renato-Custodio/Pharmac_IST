@@ -17,6 +17,7 @@ import java.util.List;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
 public class SeedPharmacies {
@@ -149,6 +150,7 @@ public class SeedPharmacies {
             pharmacy.setId(newPharmacyRef.getKey());
             pharmacy.setLocation(pharmacyExample.getLocation());
             pharmacy.setName(pharmacyExample.getName());
+            pharmacy.setOwner(AuthUtils.getUser().getUid());
             pharmacy.generateRandomRatings();
             Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.__wa3uibb2uizmvpt6reyk8g);
             newPharmacyRef.setValue(pharmacy)

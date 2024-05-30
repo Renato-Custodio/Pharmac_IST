@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.search.SearchBar;
@@ -36,7 +35,6 @@ import java.util.Map;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.MapChunk;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.PharmacyChunkData;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageResultLaunchers;
@@ -200,13 +198,14 @@ public class CreatePharmacyActivity extends AppCompatActivity {
         pharmacy.setId(newPharmacyRef.getKey());
         pharmacy.setName(pharmacyName);
         pharmacy.setLocation(new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location(latlng.latitude, latlng.longitude));
+        pharmacy.setOwner(AuthUtils.getUser().getUid());
 
         // Add the new entry to the database
         newPharmacyRef.setValue(pharmacy)
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "Pharmacy entry added successfully with key: " + newPharmacyRef.getKey());
                     ImageUtils.uploadImage(this, pharmacyPhoto, "pharmacies", newPharmacyRef.getKey(), metadata -> {
-                        updateMapChunk(newPharmacyRef.getKey(), latlng.latitude, latlng.longitude);
+                        updateMapChunk(newPharmacyRef.getKey(), latlng.latitude, latlng.longitude, false);
                         updateOwnedPharmacies(newPharmacyRef.getKey());
                     });
                 })
@@ -233,7 +232,7 @@ public class CreatePharmacyActivity extends AppCompatActivity {
                 });
     }
 
-    private void updateMapChunk(String pharmacyId, double latitude, double longitude) {
+    private void updateMapChunk(String pharmacyId, double latitude, double longitude, boolean isSuspended) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         DatabaseReference chunksRef = database.getReference("chunks");
@@ -244,7 +243,7 @@ public class CreatePharmacyActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 MapChunk mapChunk;
 
-                PharmacyChunkData pharmacyChunkData = new PharmacyChunkData(pharmacyId, new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location(latitude, longitude));
+                PharmacyChunkData pharmacyChunkData = new PharmacyChunkData(pharmacyId, new pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location(latitude, longitude), isSuspended);
 
                 if (snapshot.exists()) {
                     mapChunk = snapshot.getValue(MapChunk.class);

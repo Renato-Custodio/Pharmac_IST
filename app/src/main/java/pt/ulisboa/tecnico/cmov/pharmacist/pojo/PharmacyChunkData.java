@@ -5,11 +5,14 @@ public class PharmacyChunkData {
 
     public Location location;
 
+    public boolean isSuspended;
+
     public PharmacyChunkData() {}
 
-    public PharmacyChunkData(String pharmacyId, Location location) {
+    public PharmacyChunkData(String pharmacyId, Location location, boolean isSuspended) {
         this.pharmacyId = pharmacyId;
         this.location = location;
+        this.isSuspended = isSuspended;
     }
 
     public void setPharmacyId(String pharmacyId) {

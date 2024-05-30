@@ -14,16 +14,20 @@ public class User {
     public Map<String, Boolean> favoritePharmaciesIds;
     public Map<String, Boolean> medicineNotificationIds;
     public Map<String, Boolean> ownedPharmaciesIds;
+    public Map<String, Boolean> flaggedPharmaciesIds;
     public boolean isPharmacyOwner = false;
+    public boolean isBanned = false;
 
     public User() {
     }
 
-    public User(String username, Map<String, Boolean> ownedPharmaciesIds, Map<String, Boolean> favoritePharmaciesIds, boolean isPharmacyOwner) {
+    public User(String username, Map<String, Boolean> ownedPharmaciesIds, Map<String, Boolean> favoritePharmaciesIds, Map<String, Boolean> flaggedPharmaciesIds, boolean isPharmacyOwner, boolean isBanned) {
         this.username = username;
         this.ownedPharmaciesIds = ownedPharmaciesIds;
         this.favoritePharmaciesIds = favoritePharmaciesIds;
+        this.flaggedPharmaciesIds = flaggedPharmaciesIds;
         this.isPharmacyOwner = isPharmacyOwner;
+        this.isBanned = isBanned;
     }
 
     public Map<String, Boolean> getFavoritePharmaciesIds() {
@@ -63,5 +67,11 @@ public class User {
 
     public void setPharmacyOwner(boolean pharmacyOwner) {
         isPharmacyOwner = pharmacyOwner;
+    }
+
+    public Map<String, Boolean> getFlaggedPharmaciesIds() { return this.flaggedPharmaciesIds; }
+
+    public void setFlaggedPharmaciesIds(Map<String, Boolean> flaggedPharmaciesIds) {
+        this.flaggedPharmaciesIds = flaggedPharmaciesIds;
     }
 }

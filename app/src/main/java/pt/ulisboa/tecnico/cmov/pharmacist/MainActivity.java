@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.pharmacist;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -55,9 +56,9 @@ public class MainActivity extends AppCompatActivity implements MedicineDetails.M
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         EdgeToEdge.enable(this);
         sharedLocationViewModel = new ViewModelProvider(this).get(SharedLocationViewModel.class);
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -136,6 +137,13 @@ public class MainActivity extends AppCompatActivity implements MedicineDetails.M
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
+
+        Intent serviceIntent = new Intent(this, MyFirebaseMessagingService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
     }
 
     private void addFragment(Fragment fragment) {

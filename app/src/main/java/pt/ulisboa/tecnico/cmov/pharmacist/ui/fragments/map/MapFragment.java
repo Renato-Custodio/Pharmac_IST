@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
+import static android.content.Context.WINDOW_SERVICE;
 import static pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils.isLoggedIn;
 
 import android.annotation.SuppressLint;
@@ -29,11 +30,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -121,7 +125,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     int bottomSheetState;
 
-    private double bottomSheetHalfExpandedRatio = 0.34f;
+    private Float bottomSheetHalfExpandedRatio = 0.38f;
 
     private NavigateFunction<Medicine> openMedicine;
 
@@ -166,7 +170,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 @Override
                 public void onGlobalLayout() {
                     root.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    bottomSheetHalfExpandedRatio = ChunkUtils.precisionRound(794.58 / root.getHeight(), 100);
                 }
             });
 
@@ -466,7 +469,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         markersSystem.setActive(marker, true);
 
         pharmacyDetails.update((String) marker.getTag());
-        bottomSheetBehavior.setHalfExpandedRatio((float) bottomSheetHalfExpandedRatio);
+
+        bottomSheetBehavior.setHalfExpandedRatio((Float) bottomSheetHalfExpandedRatio);
         bottomSheetBehavior.setSkipCollapsed(true);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
         bottomSheetState = BottomSheetBehavior.STATE_HALF_EXPANDED;

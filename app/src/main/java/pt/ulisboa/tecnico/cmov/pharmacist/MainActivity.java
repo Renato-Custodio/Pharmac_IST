@@ -24,6 +24,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -56,14 +57,18 @@ public class MainActivity extends AppCompatActivity implements MedicineDetails.M
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        if(!MyFirebaseMessagingService.isServiceRunning(this)) {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            Intent serviceIntent = new Intent(this, MyFirebaseMessagingService.class);
+            startForegroundService(serviceIntent);
+        }
         EdgeToEdge.enable(this);
         sharedLocationViewModel = new ViewModelProvider(this).get(SharedLocationViewModel.class);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         mapFragment = MapFragment.newInstance(this::openMedicineDetails);
+
         medicinesFragment = MedicinesFragment.newInstance(this::openMedicineDetails);
 
         addFragment(mapFragment);
@@ -85,9 +90,12 @@ public class MainActivity extends AppCompatActivity implements MedicineDetails.M
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                             String returnedData = result.getData().getStringExtra("resultKey");
+                            String lat = result.getData().getStringExtra("lat");
+                            String lng = result.getData().getStringExtra("lng");
                             String data = result.getData().getStringExtra("medicineKey");
-                            if(returnedData != null) {
-                                sharedLocationViewModel.setPharmacyId(returnedData);
+                            if(returnedData != null && lat != null && lng != null) {
+                                mapFragment.goToPharmacy(
+                                        new LatLng(Double.valueOf(lat),Double.valueOf(lng)),returnedData);
                                 binding.bottomNavigation.getMenu().getItem(0).setChecked(true);
                                 replaceFragment(mapFragment);
                             } else if (data != null) {
@@ -137,13 +145,6 @@ public class MainActivity extends AppCompatActivity implements MedicineDetails.M
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
-
-        Intent serviceIntent = new Intent(this, MyFirebaseMessagingService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent);
-        } else {
-            startService(serviceIntent);
-        }
     }
 
     private void addFragment(Fragment fragment) {
@@ -205,5 +206,18 @@ public class MainActivity extends AppCompatActivity implements MedicineDetails.M
                 Log.e("Medicine Fragment getting medicines", "Database error: " + databaseError.getMessage());
             }
         });
+    }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        String pharmacyId = intent.getStringExtra("pharmacyId");
+        String latitude = intent.getStringExtra("latitude");
+        String longitude = intent.getStringExtra("longitude");
+
+        if (pharmacyId != null && latitude != null && longitude != null) {
+            mapFragment.goToPharmacy(
+                    new LatLng(Double.valueOf(latitude),Double.valueOf(longitude)), pharmacyId);
+        }
     }
 }

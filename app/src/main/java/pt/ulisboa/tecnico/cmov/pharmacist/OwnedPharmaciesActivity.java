@@ -116,9 +116,11 @@ public class OwnedPharmaciesActivity extends AppCompatActivity {
     }
 
 
-    public void onItemClicked(String pharmacyId) {
+    public void onItemClicked(Pharmacy pharmacy) {
         Intent resultIntent = new Intent();
-        resultIntent.putExtra("resultKey", pharmacyId);
+        resultIntent.putExtra("resultKey", pharmacy.getId());
+        resultIntent.putExtra("lat", String.valueOf(pharmacy.getLocation().lat));
+        resultIntent.putExtra("lng", String.valueOf(pharmacy.getLocation().lng));
         setResult(RESULT_OK, resultIntent);
         finish();
     }

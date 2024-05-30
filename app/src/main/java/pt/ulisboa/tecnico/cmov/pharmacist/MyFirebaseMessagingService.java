@@ -1,10 +1,14 @@
 package pt.ulisboa.tecnico.cmov.pharmacist;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -23,9 +27,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
@@ -60,6 +66,17 @@ public class MyFirebaseMessagingService extends Service {
         setupPharmaciesListener();
     }
 
+    public static boolean isServiceRunning(Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (MyFirebaseMessagingService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     private void setupPharmaciesListener() {
         DatabaseReference pharmaciesRef = FirebaseDatabase.getInstance().getReference("pharmacies");
 
@@ -68,7 +85,7 @@ public class MyFirebaseMessagingService extends Service {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Pharmacy pharmacy = snapshot.getValue(Pharmacy.class);
-                    setupStockListener(pharmacy.getId(), pharmacy.getName());
+                    setupStockListener(pharmacy.getId(), pharmacy.getName(), pharmacy.getLocation());
                 }
             }
 
@@ -85,7 +102,7 @@ public class MyFirebaseMessagingService extends Service {
                 favoritePharmaciesIds.get(pharmacyId) != null && medicineNotificationIds.get(medicineId) != null;
     }
 
-    private void setupStockListener(String pharmacyID, String pharmacyName) {
+    private void setupStockListener(String pharmacyID, String pharmacyName, Location location) {
         DatabaseReference stockRef = FirebaseDatabase.getInstance().getReference("pharmacies").child(pharmacyID).child("stock");
         //Ignore existing values
         AtomicBoolean initialSnapshotReceived = new AtomicBoolean(false);
@@ -102,7 +119,7 @@ public class MyFirebaseMessagingService extends Service {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             String medicineName = dataSnapshot.getValue(String.class);
                             sendNotification("Medicine " + medicineName + " is Available!",
-                                    "Pharmacy " + pharmacyName + " added " + quantity + "units of " + medicineName);
+                                    "Pharmacy " + pharmacyName + " added " + quantity + "units of " + medicineName, pharmacyID, location);
                         }
 
                         @Override
@@ -144,9 +161,13 @@ public class MyFirebaseMessagingService extends Service {
         });
     }
 
-    private void sendNotification(String title, String message) {
+    private void sendNotification(String title, String message, String pharmacyId, Location location) {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra("pharmacyId", pharmacyId);
+        intent.putExtra("latitude", String.valueOf(location.lat));
+        intent.putExtra("longitude", String.valueOf(location.lng));
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         // Create a notification builder
@@ -169,6 +190,7 @@ public class MyFirebaseMessagingService extends Service {
         notificationManager.notify(0, notification);
     }
 
+
     private Notification createServiceNotification() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.favorite_fill)
@@ -181,16 +203,13 @@ public class MyFirebaseMessagingService extends Service {
     }
 
     private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Firebase Listener Channel";
-            String description = "Channel for Firebase Listener Service";
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
+        CharSequence name = "Firebase Listener Channel";
+        String description = "Channel for Firebase Listener Service";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+        channel.setDescription(description);
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
     }
 
     @Nullable

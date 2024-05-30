@@ -23,6 +23,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Location;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Pharmacy;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.RecyclerAdapterProvider;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.view_holders.FavoritePharmacyViewHolder;
@@ -118,9 +119,11 @@ public class FavoritesActivity extends AppCompatActivity {
     }
 
 
-    public void onItemClicked(String pharmacyId) {
+    public void onItemClicked(Pharmacy pharmacy) {
         Intent resultIntent = new Intent();
-        resultIntent.putExtra("resultKey", pharmacyId);
+        resultIntent.putExtra("resultKey", pharmacy.getId());
+        resultIntent.putExtra("lat", String.valueOf(pharmacy.getLocation().lat));
+        resultIntent.putExtra("lng", String.valueOf(pharmacy.getLocation().lng));
         setResult(RESULT_OK, resultIntent);
         finish();
     }

@@ -48,6 +48,8 @@ public class MarkersSystem {
     private Map<String, Boolean> flaggedPharmacies;
     private Marker currentSelectedMarker;
 
+    MapFragment.OnChunkUpdateListener listener = null;
+
     public MarkersSystem(GoogleMap mapInstance, Context context, Consumer<Marker> closestPharmacyCallBack, Runnable onDismiss) {
         this.closestPharmacyCallBack = closestPharmacyCallBack;
         this.onDismiss = onDismiss;
@@ -216,8 +218,10 @@ public class MarkersSystem {
                 markers.remove(pharmacyChunkData.pharmacyId);
             });
         }
-
         chunksCache.put(chunk.getChunkId(), chunk);
+        if (listener != null) {
+            listener.onChunkUpdated();
+        }
     }
 
     private void checkCacheState() {
@@ -288,7 +292,8 @@ public class MarkersSystem {
 
     }
 
-    public void update(LatLng coord) {
+    public void update(LatLng coord, MapFragment.OnChunkUpdateListener listener) {
+        this.listener = listener;
         String chunkId = ChunkUtils.getChunkId(coord);
         LatLng roundedCoord = new LatLng(ChunkUtils.precisionRound(coord.latitude, 100), ChunkUtils.precisionRound(coord.longitude, 100));
 

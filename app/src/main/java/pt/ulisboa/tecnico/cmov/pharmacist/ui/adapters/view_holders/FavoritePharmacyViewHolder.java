@@ -28,7 +28,7 @@ public class FavoritePharmacyViewHolder extends RecyclerView.ViewHolder implemen
     private final Context context;
     private final List<Pharmacy> localDataSet;
 
-    public FavoritePharmacyViewHolder(View view, Context context, List<Pharmacy> localDataSet, Consumer<String> itemClickListener) {
+    public FavoritePharmacyViewHolder(View view, Context context, List<Pharmacy> localDataSet, Consumer<Pharmacy> itemClickListener) {
         super(view);
         title = view.findViewById(R.id.fav_pharmacy_title);
         address = view.findViewById(R.id.fav_pharmacy_description);
@@ -39,7 +39,7 @@ public class FavoritePharmacyViewHolder extends RecyclerView.ViewHolder implemen
         view.setOnClickListener(v -> {
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-                itemClickListener.accept(localDataSet.get(position).getId());
+                itemClickListener.accept(localDataSet.get(position));
             }
         });
     }

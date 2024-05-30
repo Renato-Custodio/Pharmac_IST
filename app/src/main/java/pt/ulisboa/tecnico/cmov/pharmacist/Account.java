@@ -76,10 +76,14 @@ public class Account extends AppCompatActivity implements Serializable {
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                             String returnedData = result.getData().getStringExtra("resultKey");
+                            String lat = result.getData().getStringExtra("lat");
+                            String lng = result.getData().getStringExtra("lng");
                             String data = result.getData().getStringExtra("medicineKey");
                             Intent resultIntent = new Intent();
-                            if(returnedData != null){
+                            if(returnedData != null && lat != null && lng != null){
                                 resultIntent.putExtra("resultKey", returnedData);
+                                resultIntent.putExtra("lat", lat);
+                                resultIntent.putExtra("lng", lng);
                             } else if (data != null) {
                                 resultIntent.putExtra("medicineKey", data);
                             }

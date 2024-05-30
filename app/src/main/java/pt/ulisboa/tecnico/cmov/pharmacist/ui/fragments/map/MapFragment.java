@@ -159,13 +159,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_map, container, false);
 
-        sharedLocationViewModel.getPharmacyId().observe(getViewLifecycleOwner(), pharmacyId -> {
-            Marker marker = this.markersSystem.getMarkerFromPharmacyId(pharmacyId);
-            if(marker==null)
-                return;
-            internalMarkerClick(marker, false);
-        });
-
         root.getViewTreeObserver().addOnGlobalLayoutListener(
             new ViewTreeObserver.OnGlobalLayoutListener() {
 
@@ -408,20 +401,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }, null);
     }
 
-    public void openGoogleMaps(double sourceLat, double sourceLng, double destLat, double destLng) {
-        // Construct the URI for the Google Maps intent, including both origin and destination
-        Uri gmmIntentUri = Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + sourceLat + "," + sourceLng + "&destination=" + destLat + "," + destLng + "&travelmode=driving");
-        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-        mapIntent.setPackage("com.google.android.apps.maps");
-
-        if (mapIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            startActivity(mapIntent);
-        } else {
-            // Handle case where no application can handle the Intent
-            Toast.makeText(getContext(), "Google Maps app is not installed", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private void onLocationChanged(@NonNull Location location) {
         if (focus == MapFocus.CURRENT_POSITION) {
             markersSystem.findNearestPharmacy(
@@ -459,7 +438,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onCameraIdle() {
         LatLng coordinates = mapInstance.getCameraPosition().target;
-        markersSystem.update(coordinates);
+        markersSystem.update(coordinates, null);
     }
 
     private void dismissDetails() {
@@ -493,10 +472,32 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         bottomSheetState = BottomSheetBehavior.STATE_HALF_EXPANDED;
     }
 
-
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
         internalMarkerClick(marker, false);
         return true;
+    }
+
+    public void goToPharmacy(LatLng coordinates, String pharmacyId) {
+
+        if(markersSystem.getMarkerFromPharmacyId(pharmacyId) != null){
+            internalMarkerClick(
+                    markersSystem.getMarkerFromPharmacyId(pharmacyId), false);
+            return;
+        }
+        this.markersSystem.update(coordinates, new OnChunkUpdateListener() {
+            @Override
+            public void onChunkUpdated() {
+                Marker marker = markersSystem.getMarkerFromPharmacyId(pharmacyId);
+                if(marker==null) {
+                    return;
+                }
+                internalMarkerClick(marker, false);
+            }
+        });
+    }
+
+    public interface OnChunkUpdateListener {
+        void onChunkUpdated();
     }
 }

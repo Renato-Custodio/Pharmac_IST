@@ -402,6 +402,7 @@ public class PharmacyDetails {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference db = database.getReference("pharmacies").child(currentPharmacy.getId()).child("stock").child(medicine.getId());
         db.runTransaction(new Transaction.Handler() {
+            @SuppressLint("NotifyDataSetChanged")
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData mutableData) {

@@ -229,14 +229,16 @@ public class MarkersSystem {
         Set<String> cachedChunkRefs = this.chunksRefsCache.snapshot().values().stream().map(DatabaseReference::getKey).collect(Collectors.toSet());
 
         Log.d(TAG, "Checking cache state...");
+        Iterator<Map.Entry<String, MapChunk>> i = chunksCache.entrySet().iterator();
+        while((i.hasNext())){
+            Map.Entry<String, MapChunk> chunkId =  i.next();
 
-        for (String chunkId : chunksCache.keySet()) {
-            if (!cachedChunkRefs.contains(chunkId)) {
+            if (!cachedChunkRefs.contains(chunkId.getKey())) {
                 Log.d(TAG, MessageFormat.format("Chunk {0} was unloaded, removing markers...", chunkId));
 
                 // Chunk was unloaded, remove ref and pharmacies markers
-                if (chunksCache.containsKey(chunkId) && chunksCache.get(chunkId).pharmacies != null) {
-                    Iterator<PharmacyChunkData> it = chunksCache.get(chunkId).pharmacies.iterator();
+                if (chunksCache.containsKey(chunkId.getKey()) && chunksCache.get(chunkId.getKey()).pharmacies != null) {
+                    Iterator<PharmacyChunkData> it = chunksCache.get(chunkId.getKey()).pharmacies.iterator();
                     while (it.hasNext()) {
                         PharmacyChunkData pharmacyChunkData = it.next();
                         if (markers.containsKey(pharmacyChunkData.pharmacyId)) {
@@ -246,7 +248,7 @@ public class MarkersSystem {
                     }
                 }
 
-                FirebaseDatabase.getInstance().getReference("chunks").child(chunkId).removeEventListener(chunkListener);
+                FirebaseDatabase.getInstance().getReference("chunks").child(chunkId.getKey()).removeEventListener(chunkListener);
                 chunksCache.remove(chunkId);
             }
         }

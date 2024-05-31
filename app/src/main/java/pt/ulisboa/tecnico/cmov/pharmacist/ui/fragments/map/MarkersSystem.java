@@ -18,6 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -234,13 +235,15 @@ public class MarkersSystem {
                 Log.d(TAG, MessageFormat.format("Chunk {0} was unloaded, removing markers...", chunkId));
 
                 // Chunk was unloaded, remove ref and pharmacies markers
-                if (chunksCache.containsKey(chunkId)) {
-                    chunksCache.get(chunkId).pharmacies.forEach(pharmacyChunkData -> {
+                if (chunksCache.containsKey(chunkId) && chunksCache.get(chunkId).pharmacies != null) {
+                    Iterator<PharmacyChunkData> it = chunksCache.get(chunkId).pharmacies.iterator();
+                    while (it.hasNext()) {
+                        PharmacyChunkData pharmacyChunkData = it.next();
                         if (markers.containsKey(pharmacyChunkData.pharmacyId)) {
                             markers.get(pharmacyChunkData.pharmacyId).remove();
                             markers.remove(pharmacyChunkData.pharmacyId);
                         }
-                    });
+                    }
                 }
 
                 FirebaseDatabase.getInstance().getReference("chunks").child(chunkId).removeEventListener(chunkListener);

@@ -330,6 +330,7 @@ public class MarkersSystem {
        return this.markers.get(pharmacyId);
     }
 
+    //Updates chunks with flagged or suspended pharmacies
     private void updateChunksWithFlaggedPharmacies() {
         if (flaggedPharmacies == null) {
             Log.d(TAG, "There are no flagged pharmacies");
@@ -351,6 +352,7 @@ public class MarkersSystem {
         }
     }
 
+    //Dismiss details of the pharmacy if it has been flagged
     private void checkAndDismissIfFlagged(MapChunk chunk){
         if(currentSelectedMarker != null){
             if(currentSelectedMarker.getTag() != null){

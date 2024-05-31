@@ -1,9 +1,5 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.utils;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
 import com.google.android.gms.maps.model.LatLng;
 
 import java.text.MessageFormat;

@@ -1,15 +1,9 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map;
 
-import static android.content.Context.WINDOW_SERVICE;
-import static pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils.isLoggedIn;
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import android.Manifest;
@@ -20,27 +14,20 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -68,8 +55,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.MessageFormat;
 
-import pt.ulisboa.tecnico.cmov.pharmacist.AccountLogin;
-import pt.ulisboa.tecnico.cmov.pharmacist.AccountSignup;
 import pt.ulisboa.tecnico.cmov.pharmacist.BuildConfig;
 import pt.ulisboa.tecnico.cmov.pharmacist.CreatePharmacyActivity;
 import pt.ulisboa.tecnico.cmov.pharmacist.R;

@@ -77,11 +77,6 @@ public class MainActivity extends AppCompatActivity implements MedicineDetails.M
 
         replaceFragment(mapFragment);
 
-        //SeedMedicines.seedMedicine(this);
-        //SeedPharmacies.seedPharmacy(this);
-        //SeedMapChunks.seedChuncks();
-        //SeedReviews.seedReviews(this);
-
         AuthUtils.signAsAnonymous(this);
 
         AuthUtils.registerUserDataListener(new ValueEventListener() {

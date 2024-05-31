@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.pharmacist.utils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import pt.ulisboa.tecnico.cmov.pharmacist.MainActivity;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 
 public class AuthUtils {
@@ -236,14 +238,21 @@ public class AuthUtils {
             return;
         }
 
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        logout(() -> {
+            activity.runOnUiThread(() -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                 builder.setTitle("Banned User")
-                        .setMessage("Your account has been banned.")
+                        .setMessage("A significant number of pharmacies you own have been suspended resulting in this account's indefinite ban.")
+                        .setPositiveButton("OK", (dialog, which) -> {
+                            dialog.dismiss();
+                            Intent intent = new Intent(activity, MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            activity.startActivity(intent);
+                            activity.finish();
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
-            }
+            });
         });
     }
 }

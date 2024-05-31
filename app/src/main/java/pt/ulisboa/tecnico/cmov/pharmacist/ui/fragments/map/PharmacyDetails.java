@@ -49,6 +49,7 @@ import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.view_holders.MedicineViewH
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AdapterUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.ChunkUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.Location;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.NavigateFunction;
@@ -156,7 +157,6 @@ public class PharmacyDetails {
                 favoritePharmacies = null;
                 flaggedPharmacies = null;
                 if (user == null) return;
-
                 favoritePharmacies = user.getFavoritePharmaciesIds();
                 ownedPharmacies = user.getOwnedPharmaciesIds();
                 flaggedPharmacies = user.getFlaggedPharmaciesIds();
@@ -358,12 +358,12 @@ public class PharmacyDetails {
 
     //  Favorites
     private void updateUserActions() {
-        if (currentPharmacy == null) return;
+        if (currentPharmacy == null || favoritePharmacies == null) return;
         favouriteButton.setIcon(ContextCompat.getDrawable(fragmentContext, (favoritePharmacies.containsKey(currentPharmacy.getId())) ? R.drawable.favorite_fill : R.drawable.favorite_outline));
     }
 
     private void updateFavorite() {
-        if (currentPharmacy == null) return;
+        if (currentPharmacy == null || favoritePharmacies == null) return;
 
         if (!favoritePharmacies.containsKey(currentPharmacy.getId())) {
             // Add to favorites
@@ -443,6 +443,7 @@ public class PharmacyDetails {
     // Flags
 
     private void updateFlag() {
+        if (currentPharmacy == null) return;
         String pharmacyId = currentPharmacy.getId();
 
         //Check if the pharmacy is already flagged
@@ -490,29 +491,60 @@ public class PharmacyDetails {
                 Toast.makeText(fragmentContext, "Pharmacy flagged", Toast.LENGTH_SHORT).show();
 
                 Long newFlagsCount = dataSnapshot.getValue(Long.class);
-                if (newFlagsCount != null && newFlagsCount > 10) {
+                if (newFlagsCount != null && newFlagsCount >= 10) {
                     //Suspend the pharmacy
                     suspendPharmacy(pharmacyId);
+                    if(currentPharmacy.getOwner() != null){
+                        //Increase the suspendedPharmacies count for the owner
+                        Log.d(TAG, "Increasing suspendedPharmacies of: " + currentPharmacy.getOwner());
+                        increaseOwnerSuspendedPharmacies();
+                    }
                 }
             }
         });
     }
 
     private void suspendPharmacy(String pharmacyId) {
-        DatabaseReference pharmacyRef = FirebaseDatabase.getInstance().getReference("pharmacies").child(pharmacyId);
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference pharmacyRef = db.getReference("pharmacies").child(pharmacyId);
         pharmacyRef.child("isSuspended").setValue(true)
                 .addOnCompleteListener(task -> {
                     if (!task.isSuccessful()) {
                         Log.e(TAG, "Failed to suspend pharmacy:", task.getException());
                         return;
                     }
+                    String chunkId = ChunkUtils.getChunkId(currentPharmacy.getLocation().lat, currentPharmacy.getLocation().lng);
+                    DatabaseReference chunksRef = db.getReference("chunks").child(chunkId).child("pharmacies");
+                    // Query the pharmacies to find the one with the matching pharmacyId
+                    chunksRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            boolean pharmacyFound = false;
+                            for (DataSnapshot pharmacySnapshot : dataSnapshot.getChildren()) {
+                                if (pharmacySnapshot.child("pharmacyId").getValue(String.class).equals(pharmacyId)) {
+                                    // Update the isSuspended attribute to true for the specified pharmacy
+                                    pharmacySnapshot.getRef().child("isSuspended").setValue(true)
+                                            .addOnSuccessListener(aVoid -> {
+                                                Log.d(TAG, "Pharmacy suspended: " + pharmacyId);
+                                            })
+                                            .addOnFailureListener(aVoid -> {
+                                                Log.d(TAG, "Failed to suspend pharmacy: " + pharmacyId);
+                                            });
+                                    pharmacyFound = true;
+                                    break;
+                                }
+                            }
+                            if (!pharmacyFound) {
+                                Log.e(TAG, "Pharmacy with ID " + pharmacyId + " not found.");
+                            }
+                        }
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Log.e(TAG, "Error querying pharmacies", databaseError.toException());
+                        }
+                    });
                     Log.d(TAG, "Pharmacy suspended: " + pharmacyId);
-
-                    //Increase the suspendedPharmacies count for the owner
-                    if(currentPharmacy.getOwner() != null){
-                        increaseOwnerSuspendedPharmacies();
-                    }
                 });
     }
 
@@ -538,9 +570,12 @@ public class PharmacyDetails {
                     return;
                 }
 
+                Log.d(TAG, "Increased suspended Pharmacies");
+
                 Long newSuspendedCount = dataSnapshot.getValue(Long.class);
-                if (newSuspendedCount != null && newSuspendedCount > 5) {
+                if (newSuspendedCount != null && newSuspendedCount >= 5) {
                     //Suspend the owner of the pharmacy
+                    Log.d(TAG, "Banning the user: " + currentPharmacy.getOwner());
                     banUser(currentPharmacy.getOwner());
                 }
             }
@@ -548,7 +583,9 @@ public class PharmacyDetails {
     }
 
     public void banUser(String userId){
-        FirebaseDatabase.getInstance().getReference("users").child(userId).child("isBanned")
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+        userRef.child("isBanned")
                 .setValue(true)
                 .addOnCompleteListener(task -> {
                     if (!task.isSuccessful()) {
@@ -560,7 +597,24 @@ public class PharmacyDetails {
                     Log.d(TAG, "User banned: " + userId);
                     Toast.makeText(fragmentContext, "User banned", Toast.LENGTH_SHORT).show();
                 });
-        //TODO: Suspend all pharmacies owned by this user
+        userRef.child("ownedPharmaciesIds").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot pharmacySnapshot : snapshot.getChildren()) {
+                    String pharmacyId = pharmacySnapshot.getKey();
+                    if (pharmacyId != null) {
+                        suspendPharmacy(pharmacyId);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Failed to retrieve owned pharmacies:", error.toException());
+                Toast.makeText(fragmentContext, "Failed to retrieve owned pharmacies", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     //  Ratings

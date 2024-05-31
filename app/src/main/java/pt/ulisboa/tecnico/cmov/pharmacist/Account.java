@@ -2,9 +2,7 @@ package pt.ulisboa.tecnico.cmov.pharmacist;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
@@ -13,7 +11,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,7 +22,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.Serializable;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
-import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.ImageUtils;
 
@@ -108,6 +104,11 @@ public class Account extends AppCompatActivity implements Serializable {
                 User user = snapshot.getValue(User.class);
 
                 if (user == null) return;
+
+                if(user.isBanned){
+                    AuthUtils.bannedUserAlert(Account.this);
+                    fetchUserData();
+                }
 
                 showNotifications();
                 findViewById(R.id.manage_pharmacies_card).setVisibility(user.isPharmacyOwner ? View.VISIBLE : View.GONE);

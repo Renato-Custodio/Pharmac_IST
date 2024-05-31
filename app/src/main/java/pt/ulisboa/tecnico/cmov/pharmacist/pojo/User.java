@@ -69,7 +69,12 @@ public class User {
         isPharmacyOwner = pharmacyOwner;
     }
 
-    public Map<String, Boolean> getFlaggedPharmaciesIds() { return this.flaggedPharmaciesIds; }
+    public Map<String, Boolean> getFlaggedPharmaciesIds() {
+        if( this.flaggedPharmaciesIds == null) return new HashMap<>();
+
+        return this.flaggedPharmaciesIds;
+
+    }
 
     public void setFlaggedPharmaciesIds(Map<String, Boolean> flaggedPharmaciesIds) {
         this.flaggedPharmaciesIds = flaggedPharmaciesIds;

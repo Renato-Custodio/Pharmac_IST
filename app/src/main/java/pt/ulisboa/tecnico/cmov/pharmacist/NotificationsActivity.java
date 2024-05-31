@@ -24,9 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.RecyclerAdapterProvider;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.adapters.view_holders.NotificationsViewHolder;
 import pt.ulisboa.tecnico.cmov.pharmacist.utils.AdapterUtils;
+import pt.ulisboa.tecnico.cmov.pharmacist.utils.AuthUtils;
 
 public class NotificationsActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
@@ -61,6 +63,25 @@ public class NotificationsActivity extends AppCompatActivity {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if (currentUser == null) return;
+
+        AuthUtils.registerUserDataListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+
+                if (user == null) return;
+
+                if(user.isBanned){
+                    AuthUtils.bannedUserAlert(NotificationsActivity.this);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid()).child("medicineNotificationIds").addChildEventListener(new ChildEventListener() {
             @Override

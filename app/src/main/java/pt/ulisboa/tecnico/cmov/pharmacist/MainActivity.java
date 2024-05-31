@@ -37,6 +37,7 @@ import java.util.List;
 
 import pt.ulisboa.tecnico.cmov.pharmacist.databinding.ActivityMainBinding;
 import pt.ulisboa.tecnico.cmov.pharmacist.pojo.Medicine;
+import pt.ulisboa.tecnico.cmov.pharmacist.pojo.User;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.SharedLocationViewModel;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.map.MapFragment;
 import pt.ulisboa.tecnico.cmov.pharmacist.ui.fragments.medicines.MedicineDetails;
@@ -82,6 +83,24 @@ public class MainActivity extends AppCompatActivity implements MedicineDetails.M
         //SeedReviews.seedReviews(this);
 
         AuthUtils.signAsAnonymous(this);
+
+        AuthUtils.registerUserDataListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+
+                if (user == null) return;
+
+                if(user.isBanned){
+                    AuthUtils.bannedUserAlert(MainActivity.this);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),

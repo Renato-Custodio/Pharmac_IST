@@ -100,7 +100,7 @@ public class MarkersSystem {
     }
 
     private boolean isFavorite(Marker marker) {
-        if(marker != null){
+        if(marker != null && favoritePharmacies != null){
             return favoritePharmacies.containsKey(Objects.requireNonNull(marker.getTag()).toString());
         }
         return false;
@@ -124,7 +124,7 @@ public class MarkersSystem {
 
         String pharmacyId = marker.getTag().toString();
 
-        if (favoritePharmacies.containsKey(pharmacyId)) {
+        if (favoritePharmacies != null && favoritePharmacies.containsKey(pharmacyId)) {
             // Is favorite
             if (currentSelectedId.isPresent()) {
                 PharmacyMarker.setProps(marker, pharmacyId.equals(currentSelectedId.get()), true);
@@ -214,7 +214,10 @@ public class MarkersSystem {
 
             pharmaciesToRemove.forEach(pharmacyChunkData -> {
                 Log.d(TAG, MessageFormat.format("   > Removing: {0}", pharmacyChunkData.pharmacyId));
-                markers.get(pharmacyChunkData.pharmacyId).remove();
+                Marker marker = markers.get(pharmacyChunkData.pharmacyId);
+                if(marker != null){
+                    marker.remove();
+                }
                 markers.remove(pharmacyChunkData.pharmacyId);
             });
         }
@@ -324,6 +327,7 @@ public class MarkersSystem {
 
     private void updateChunksWithFlaggedPharmacies() {
         if (flaggedPharmacies == null) {
+            Log.d(TAG, "There are no flagged pharmacies");
             return;
         }
 
@@ -333,6 +337,7 @@ public class MarkersSystem {
                         .anyMatch(pharmacyChunkData -> isFlagged(pharmacyChunkData.getPharmacyId())
                         || pharmacyChunkData.isSuspended);
                 if (containsFlaggedPharmacy) {
+                    Log.d(TAG, "There are flagged or suspended pharmacies");
                     checkAndDismissIfFlagged(chunk);
                     updateChunk(chunk);
 

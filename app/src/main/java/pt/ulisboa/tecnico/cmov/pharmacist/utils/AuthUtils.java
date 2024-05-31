@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.utils;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -94,33 +96,64 @@ public class AuthUtils {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser anonymousUser = auth.getCurrentUser();
 
-        if (anonymousUser == null) return;
-
         /**
          * The problem: Everytime a user logs out a new anonymous account is created
          * Why it's a problem: The database starts to fill with anonymous accounts really fast.
          * The solution: Everytime the user logs in, delete the anonymous account.
          */
 
+        if (anonymousUser == null) return;
+
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FirebaseUser user = auth.getCurrentUser();
 
-                Log.d(TAG, "signWithCredentials:success");
-
                 if (user == null) return;
 
-                deleteUser(anonymousUser);
+                // Check if the user is banned
+                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            Boolean isBanned = dataSnapshot.child("isBanned").getValue(Boolean.class);
+                            if (isBanned != null && isBanned) {
+                                // User is banned
+                                Log.w(TAG, "signWithCredentials:failure - User is banned");
+                                Toast.makeText(context, "Failed to login: User is banned", Toast.LENGTH_SHORT).show();
+                                auth.signOut();
+                                onFail.run();
+                            } else {
+                                // User is not banned, proceed with login
+                                deleteUser(anonymousUser);
 
-                Toast.makeText(context, MessageFormat.format("Logged in as {0}", user.getDisplayName()), Toast.LENGTH_SHORT).show();
-                updateUserRef(user);
-                onSuccess.run();
+                                Log.d(TAG, "signWithCredentials:success");
+                                Toast.makeText(context, MessageFormat.format("Logged in as {0}", user.getDisplayName()), Toast.LENGTH_SHORT).show();
+                                updateUserRef(user);
+                                onSuccess.run();
+                            }
+                        } else {
+                            Log.w(TAG, "signWithCredentials:failure - User data not found");
+                            Toast.makeText(context, "Failed to login: User data not found", Toast.LENGTH_SHORT).show();
+                            auth.signOut();
+                            onFail.run();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.w(TAG, "signWithCredentials:failure", databaseError.toException());
+                        Toast.makeText(context, "Failed to login: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                        auth.signOut();
+                        onFail.run();
+                    }
+                });
             } else {
                 if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                     Toast.makeText(context,"Failed to login: Invalid credentials", Toast.LENGTH_SHORT).show();
                 } else {
                     Log.w(TAG, "signWithCredentials:failure", task.getException());
-                    Toast.makeText(context, MessageFormat.format("Failed to login: {0}", task.getException().getMessage()), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Failed to login: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
                 onFail.run();
             }
@@ -196,5 +229,21 @@ public class AuthUtils {
         if (userRef != null) {
             userRef.removeEventListener(valueEventListener);
         }
+    }
+
+    public static void bannedUserAlert(Activity activity) {
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            return;
+        }
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setTitle("Banned User")
+                        .setMessage("Your account has been banned.")
+                        .show();
+            }
+        });
     }
 }

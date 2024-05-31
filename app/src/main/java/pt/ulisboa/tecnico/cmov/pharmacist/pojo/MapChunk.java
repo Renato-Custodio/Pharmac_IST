@@ -1,16 +1,7 @@
 package pt.ulisboa.tecnico.cmov.pharmacist.pojo;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
-import com.google.gson.annotations.SerializedName;
-
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class MapChunk {
     public Location location;
